@@ -1,0 +1,21 @@
+$design-width: 1920;
+$design-height: 1080;
+
+@function adaptiveWidth($px) {
+  @return #{$px / $design-width * 100}vw;
+}
+
+@function adaptiveHeight($px) {
+  @return #{$px / $design-height * 100}vh;
+}
+
+.inputcss {
+  width: adaptiveWidth(148);
+  height: adaptiveHeight(24);
+  margin-right: adaptiveWidth(11);
+}
+.inputcss :deep(.el-input__wrapper) {
+  background-color: rgba(255, 255, 255, 0);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+}
