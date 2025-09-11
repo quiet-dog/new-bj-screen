@@ -24,7 +24,6 @@
             <div>
               {{ item?.eventName }}
             </div>
-            <!-- <div>{{ dayjs(item?.createTime).format("YYYY-MM-DD") }}</div> -->
             <div>
               {{ getHandlePerson(item) }}
             </div>
@@ -41,7 +40,6 @@
         <img src="/public/img/光标.png" alt="" />
 
         <span>区域统计</span>
-        <span @click="openShowQushi">查看趋势</span>
       </div>
       <div class="pickerCss">
         <img src="/public/img/zuo.svg" alt="" @click="timeLeftClick" style="margin-left: 5px" />
@@ -54,6 +52,9 @@
           dayjs(areaStatisticsFormData.endTime).format("MM月DD日")
         }}</span>
         <img src="/public/img/you.svg" alt="" @click="timeRightClick" style="margin-right: 5px" />
+      </div>
+      <div class="chakanqushi">
+        <span @click="openShowQushi">查看趋势</span>
       </div>
     </div>
     <div class="bigscreen_lc_bottom">
@@ -146,9 +147,11 @@
             <el-input v-model="eventInfoDetail.processingFlow" readonly />
           </el-form-item> -->
               <el-form-item label="应对措施">
-                <el-tag @click="downloadFile(item.path)" v-for="item in files">
+                <!-- <el-tag @click="downloadFile(item.path)" v-for="item in files">
                   {{ item.fileName }}
-                </el-tag>
+                </el-tag> -->
+                 <el-link type="primary" @click="downloadFile(item.path)" v-for="item in files">{{ item.fileName }}</el-link>
+               
               </el-form-item>
             </el-form>
           </el-scrollbar>
@@ -285,6 +288,9 @@ import img7 from "../../../public/img/黄色背景框.png";
 import img9 from "../../../public/img/叉号.png";
 import { getEventAtatistics } from "../../api/home";
 import { download } from "../../api/login";
+import { get3dOption, getHistoryData } from "./echart";
+import "echarts-gl"
+import { useIntervalFn } from "@vueuse/core";
 
 const getHandlePerson = (item) => {
   // console.log("item",item)
@@ -300,7 +306,7 @@ const getHandlePerson = (item) => {
 const qushiShow = ref(false)
 const lcQushiRef = ref()
 const lcQushiChart = ref()
-const qushiOptions =  {
+const qushiOptions = {
   title: {
     text: '趋势统计',
     // 颜色
@@ -347,22 +353,22 @@ const qushiOptions =  {
     type: 'value'
   },
   series: [
- 
-]
+
+  ]
 }
 function openShowQushi() {
   qushiShow.value = true
   getAreaStatisticsByDate({
-    beginTime:areaStatisticsFormData.value.startTime,
-    endTime:areaStatisticsFormData.value.endTime,
-  }).then(res=>{
+    beginTime: areaStatisticsFormData.value.startTime,
+    endTime: areaStatisticsFormData.value.endTime,
+  }).then(res => {
     qushiOptions.xAxis.data = res.data.data.xdata
-    qushiOptions.series =res.data.data.series
+    qushiOptions.series = res.data.data.series
     qushiOptions.legend.data = res.data.data.series.map(item => item.name)
     if (lcQushiRef.value) {
       lcQushiChart.value = echarts.init(lcQushiRef.value);
       lcQushiChart.value.setOption(qushiOptions);
-      console.log("lcQushiRef.value", qushiOptions.xAxis.data,qushiOptions.series)
+      console.log("lcQushiRef.value", qushiOptions.xAxis.data, qushiOptions.series)
     }
   })
 }
@@ -374,7 +380,7 @@ function closeQushiShow() {
 
 let bigscreenLBChart: any = null;
 const bigscreenLBRef = ref();
-const bigscreenLBoption = {
+let bigscreenLBoption = {
   grid: {
     left: "6%",
     right: "6%",
@@ -436,7 +442,7 @@ const bigscreenLBoption = {
 
 let bigscreenLCChart: any = null;
 const bigscreenLCRef = ref();
-const bigscreenLCoption = {
+let bigscreenLCoption = {
   grid: {
     left: "6%",
     right: "6%",
@@ -444,7 +450,6 @@ const bigscreenLCoption = {
     top: "24%",
     containLabel: true,
   },
-
   tooltip: {
     trigger: "item",
   },
@@ -589,6 +594,16 @@ const alarmEventslistFun = async () => {
   alarmEventslist.value = data.data.rows;
 };
 
+const alarmTimer = useIntervalFn(() => {
+  alarmTimer.pause();
+  alarmEventslistFun().then(res => {
+  }).catch(err => {
+
+  }).finally(() => {
+    alarmTimer.resume();
+  });
+}, 5000);
+
 //报警信息
 const alarmInformationFormData = ref({
   eventName: "",
@@ -604,6 +619,16 @@ const alarmInformationlistFun = async () => {
   alarmInformationlistValue.value = data.data.rows;
 };
 
+const alarmInfoTimer = useIntervalFn(() => {
+  alarmInfoTimer.pause();
+  alarmInformationlistFun().then(res => {
+  }).catch(err => {
+
+  }).finally(() => {
+    alarmInfoTimer.resume();
+  });
+}, 5000);
+
 const zxSelect = ref("环境报警类");
 const zxChangeSelect = () => {
   historyStatistics();
@@ -615,16 +640,28 @@ const areaStatisticsFormData = ref({
 });
 const areaStatisticsFun = async () => {
   const { data } = await areaStatistics(areaStatisticsFormData.value);
-  bigscreenLCoption.series[0].data = data.data.map((itme) => {
-    return {
-      value: itme.count,
-      name: itme.manufacturer,
-    };
-  });
+  // bigscreenLCoption.series[0].data = data.data.map((itme) => {
+  //   return {
+  //     value: itme.count,
+  //     name: itme.manufacturer,
+  //   };
+  // });
+  bigscreenLCoption = get3dOption(data.data)
   if (bigscreenLCChart) {
-    bigscreenLCChart.setOption(bigscreenLCoption);
+    bigscreenLCChart.setOption(bigscreenLCoption, true);
   }
 };
+
+const areaStatisticsTimer = useIntervalFn(() => {
+  areaStatisticsTimer.pause();
+  areaStatisticsFun().then(res => {
+  }).catch(err => {
+
+  }).finally(() => {
+    areaStatisticsTimer.resume();
+  });
+}, 10000);
+
 
 const timeLeftClick = () => {
 
@@ -654,12 +691,23 @@ const historyStatistics = async () => {
   const { data } = await getEventAtatistics({
     type: zxSelect.value
   });
-  bigscreenLBoption.series[0].data = data.data.data;
+  // bigscreenLBoption.series[0].data = data.data.data;
+  bigscreenLBoption = getHistoryData(data.data)
   if (bigscreenLBRef.value) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
     bigscreenLBChart.setOption(bigscreenLBoption);
   }
 };
+
+const historyTimer = useIntervalFn(() => {
+  historyTimer.pause();
+  historyStatistics().then(res => {
+  }).catch(err => {
+
+  }).finally(() => {
+    historyTimer.resume();
+  });
+}, 10000);
 
 window.onresize = function () {
   bigscreenLCChart.resize();
@@ -708,12 +756,12 @@ const closeEventInfoShow = () => {
 onMounted(() => {
   if (bigscreenLBRef.value) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
-    bigscreenLBChart.setOption(bigscreenLBoption,true);
+    bigscreenLBChart.setOption(bigscreenLBoption, true);
   }
 
   if (bigscreenLCRef.value) {
     bigscreenLCChart = echarts.init(bigscreenLCRef.value);
-    bigscreenLCChart.setOption(bigscreenLCoption,true);
+    bigscreenLCChart.setOption(bigscreenLCoption, true);
   }
   if (lcQushiRef.value) {
     // lcQushiChart.value = echarts.init(lcQushiRef.value);
@@ -931,6 +979,12 @@ $design-height: 1080;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  // 添加下划线
+  // border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
+  background-size: 100% 100%;
+  margin-bottom: adaptiveHeight(5);
 
   div {
     &:nth-child(1) {
@@ -1001,15 +1055,22 @@ $design-height: 1080;
       height: adaptiveHeight(24);
       border: 1px solid rgba(227, 233, 243, 0.2);
       border-radius: 5px;
-      margin-right: adaptiveWidth(11);
+      // margin-right: adaptiveWidth(11);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-left: adaptiveWidth(80);
 
       span {
         color: #ffffff;
         font-size: adaptiveFontSize(12);
       }
+    }
+
+    .chakanqushi{
+      color: white;
+      font-size: adaptiveFontSize(15);
+      margin-right: adaptiveWidth(10);
     }
   }
 

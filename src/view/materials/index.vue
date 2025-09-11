@@ -3,7 +3,11 @@
     <div class="bigscreen_lt_top">
       <div class="bigscreen_lt_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>报警信息</span>
+        <span :class="alarmTypes == 0 ? 'alarm_active' : ''" @click="changeAlarmTypes(0)">报警信息</span>
+        <span style="color: white;">/</span><span :class="alarmTypes == 1 ? 'alarm_active' : ''"
+          @click="changeAlarmTypes(1)">领用报警</span>
+        <span style="color: white;">/</span><span :class="alarmTypes == 2 ? 'alarm_active' : ''"
+          @click="changeAlarmTypes(2)">上报报警</span>
       </div>
     </div>
     <div class="bigscreen_lt_bottom">
@@ -13,9 +17,14 @@
           <div class="bigscreen_lt_bottom_nei" v-for="item in alarmInformationlist">
             <img :src="item.img" alt="" />
             <div class="bigscreen_lt_bottom_nei_r">
-              <span style="padding-left: 25px">{{ item.materials?.name }}</span>
+              <el-popover class="box-item" title="" effect="dark" :content="item.materials?.name" placement="top-start">
+                <template #reference>
+                  <span style="padding-left: 25px">{{ item.materials?.name }}</span>
+                </template>
+              </el-popover>
+              <!-- <span style="padding-left: 25px">{{ item.materials?.name }}</span> -->
               <span>{{
-                dayjs(item.materials?.createTime).format("YYYY-MM-DD")
+                dayjs(item.createTime).format("YYYY-MM-DD")
               }}</span>
               <span>{{ item.level }}</span>
             </div>
@@ -58,11 +67,12 @@
       </div>
       <el-select size="small" class="selectcss" v-model="materialsName" @change="dosagetypeStatisticsFun"
         style="width: 80px; position: absolute; right: 20px; z-index: 100">
-        <el-option label="营养物质类" value="营养物质类" />
+        <!-- <el-option label="营养物质类" value="营养物质类" />
         <el-option label="反应调节类" value="反应调节类" />
         <el-option label="监测分析类" value="监测分析类" />
         <el-option label="生产核心原料类" value="生产核心原料类" />
-        <el-option label="耗材类" value="耗材类" />
+        <el-option label="耗材类" value="耗材类" /> -->
+        <el-option v-for="item in materailsTypes" :key="item" :label="item" :value="item" />
       </el-select>
     </div>
     <div class="bigscreen_lb_bottom">
@@ -138,10 +148,18 @@
           }" hover class="scrool">
             <!-- @click="changeMaterials" -->
             <div @click="changeMaterials(item)" class="bigscreen_rb_bottom_nei_b" v-for="(item, index) in receivelist">
-              <span>
+              <el-popover class="box-item" title="" :content="item.materialsInfo.name" placement="top-start">
+                <template #reference>
+                  <span>
+                    <img src="/public/img/equipment/tableicon.png" alt="" v-if="item.status" />
+                    {{ item.materialsInfo.name }}
+                  </span>
+                </template>
+              </el-popover>
+              <!-- <span>
                 <img src="/public/img/equipment/tableicon.png" alt="" v-if="item.status" />
                 {{ item.materialsInfo.name }}
-              </span>
+              </span> -->
               <span>{{ dayjs(item.createTime).format("YYYY-MM-DD") }} </span>
               <span>{{ item.receiverInfo.name }}</span>
               <span>{{ item.receiveNum }}</span>
@@ -160,12 +178,12 @@
     <div class="rbDialog_bottom">
       <el-input class="inputcss" v-model="receiveFormData2.materialName" @change="receivelistFun2"
         style="width: 148px; height: 24px" placeholder="请输入物料名称" :prefix-icon="Search" />
-      <el-scrollbar  class="bigscreen_rc_bottom_nei">
+      <el-scrollbar class="bigscreen_rc_bottom_nei">
         <div class="bigscreen_rc_bottom_l">
           <img src="/public/img/圆形标记.png" alt="" />
         </div>
         <div class="bigscreen_rc_bottom_r">
-            <div v-for="(item, index) in receivelist2" :key="index" class="bigscreen_rc_bottom_rnei">
+          <div v-for="(item, index) in receivelist2" :key="index" class="bigscreen_rc_bottom_rnei">
             <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
               dayjs(item.createTime).format("YYYY-MM-DD")
             }}</span>
@@ -196,6 +214,7 @@ import {
   dosagetypeStatistics,
   materialFilesInfo,
   allByReceiveExplain,
+  materialFilesTypes,
 } from "../../api/materials/index";
 import { alarmEventsList, alarmMateEventsList } from "../../api/incident/index";
 import dayjs from "dayjs";
@@ -211,9 +230,24 @@ const alarmInformationData = ref({
   pageSize: 10,
   orderColumn: "createTime",
   orderDirection: "descending",
+  types: undefined
 });
+
+const alarmTypes = ref(0)
 const alarmInformationlist = ref<any[]>([]);
+const changeAlarmTypes = (value) => {
+  alarmTypes.value = value
+  alarmInformationlistFun()
+}
 const alarmInformationlistFun = async () => {
+  if (alarmTypes.value == 0) {
+    alarmInformationData.value.types = undefined
+  } else if (alarmTypes.value == 1) {
+    alarmInformationData.value.types = 0
+  } else {
+    alarmInformationData.value.types = 1
+  }
+
   const { data } = await alarmMateEventsList(alarmInformationData.value);
   let list = data.data.rows;
   let imgList = [
@@ -238,23 +272,23 @@ const alarmInformationlistFun = async () => {
       img: "/img/yiji_icon.png",
     },
   ];
-  list.forEach((item) => {
-    let level = "未知";
-    item.materials?.values?.forEach(v =>{
-      const isExit =  (v.scondition === "小于等于" && item.stock <= v.value) ||
-      (v.scondition === "大于等于" && item.stock >= v.value) ||
-      (v.scondition === "大于等于" && item.stock >= v.value) ||
-      (v.scondition === "小于" && item.stock < v.value) ||
-      (v.scondition === "大于" && item.stock > v.value);
-      if (isExit) {
-        level = v.level;
-        item.level = level;
-      }
-    })
-    if (level === "未知") {
-      item.level = "轻微";
-    }
-  });
+  // list.forEach((item) => {
+  //   let level = "未知";
+  //   item.materials?.values?.forEach(v => {
+  //     const isExit = (v.scondition === "小于等于" && item.stock <= v.value) ||
+  //       (v.scondition === "大于等于" && item.stock >= v.value) ||
+  //       (v.scondition === "大于等于" && item.stock >= v.value) ||
+  //       (v.scondition === "小于" && item.stock < v.value) ||
+  //       (v.scondition === "大于" && item.stock > v.value);
+  //     if (isExit) {
+  //       level = v.level;
+  //       item.level = level;
+  //     }
+  //   })
+  //   if (level === "未知") {
+  //     item.level = "轻微";
+  //   }
+  // });
   alarmInformationlist.value = list.map((item) => {
     const matchedLevel = imgList.find((v) => v.level === item.level);
     return {
@@ -418,7 +452,7 @@ const materialsChange = async (val) => {
   }
 };
 
-const changeMaterials = (item)=>{
+const changeMaterials = (item) => {
   rbstatus.value = true
   receiveFormData2.value.materialName = item.materialsInfo.name;
   receivelistFun2();
@@ -437,38 +471,31 @@ const bigscreenLBoption = {
     top: "24%",
     containLabel: true,
   },
-
   tooltip: {
     trigger: "item",
   },
   series: [
     {
-      // name: "Access From",
       type: "pie",
-      radius: ["40%", "70%"],
-      avoidLabelOverlap: false,
-      label: {
-        show: false,
-        position: "center",
-      },
+
       emphasis: {
         label: {
           show: true,
-          fontSize: 40,
+          fontSize: 6,
           fontWeight: "bold",
         },
       },
-      labelLine: {
-        show: false,
+      label: {
+        show: true,
+        color: "#fff", // 设置普通状态下字体为白色
+        fontSize: 10,  // 可选：字体大小
       },
       data: [
-        { value: 1048, name: "Search Engine" },
-        { value: 735, name: "Direct" },
-        { value: 580, name: "Email" },
-        { value: 484, name: "Union Ads" },
+
       ],
     },
   ],
+
 };
 const dosagetypeStatisticsFun = async () => {
   const { data } = await dosagetypeStatistics({ name: materialsName.value });
@@ -500,43 +527,51 @@ const bigscreenRToption = {
     containLabel: true,
   },
 
+  // legend: {
+  //   data: [
+  //     {
+  //       name: "生产领用",
+  //       itemStyle: {
+  //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+  //           { offset: 0, color: "#3EE6FF" }, // 浅色（顶部）
+  //           { offset: 1, color: "#258A99" }, // 深色（底部）
+  //         ]),
+  //       },
+  //     },
+  //     {
+  //       name: "研发领用",
+  //       itemStyle: {
+  //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+  //           { offset: 0, color: "#FF72A6" }, // 浅色（顶部）
+  //           { offset: 1, color: "#FF3657" }, // 深色（底部）
+  //         ]),
+  //       },
+  //     },
+  //     {
+  //       name: "其他领用",
+  //       itemStyle: {
+  //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+  //           { offset: 0, color: "#549CF0" }, // 浅色（顶部）
+  //           { offset: 1, color: "#2070CE" }, // 深色（底部）
+  //         ]),
+  //       },
+  //     },
+  //   ],
+  //   top: "20px",
+  //   textStyle: {
+  //     color: "#ffffff",
+  //   },
+  // },
+
   legend: {
-    data: [
-      {
-        name: "生产领用",
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "#3EE6FF" }, // 浅色（顶部）
-            { offset: 1, color: "#258A99" }, // 深色（底部）
-          ]),
-        },
-      },
-      {
-        name: "研发领用",
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "#FF72A6" }, // 浅色（顶部）
-            { offset: 1, color: "#FF3657" }, // 深色（底部）
-          ]),
-        },
-      },
-      {
-        name: "其他领用",
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: "#549CF0" }, // 浅色（顶部）
-            { offset: 1, color: "#2070CE" }, // 深色（底部）
-          ]),
-        },
-      },
-    ],
+    data: ["生产用量", "维修用量", "其它用量"],
     top: "20px",
     textStyle: {
       color: "#ffffff",
     },
   },
-
-  tooltip: {},
+  tooltip: {
+  },
   dataset: {
     source: [],
   },
@@ -593,29 +628,30 @@ const allByReceiveExplainFun = async () => {
   updateBigscreenRToption(
     data.xdata,
     data.productionData,
-    data.researchData,
+    data.maintenanceData,
     data.otherData
   );
   if (bigscreenRTRef.value) {
     bigscreenRTChart = echarts.init(bigscreenRTRef.value);
-    bigscreenRTChart.setOption(bigscreenRToption);
+    bigscreenRTChart.setOption(bigscreenRToption, true);
   }
 };
 const updateBigscreenRToption = (
   xdata: string[],
   productionData: number[],
-  researchData: number[],
+  maintenance: number[],
   otherData: number[]
 ) => {
   bigscreenRToption.dataset.source = [
-    ["product", "生产领用", "研发领用", "其他领用"], // 表头
+    ["product", "生产用量", "维修用量", "其它用量"], // 表头
     ...xdata.map((item, index) => [
       item,
-      productionData[index] || 0,
-      researchData[index] || 0,
-      otherData[index] || 0,
+      productionData != null ? (productionData[index] || 0) : 0,
+      maintenance != null ? (maintenance[index] || 0) : 0,
+      otherData != null ? (otherData[index] || 0) : 0,
     ]),
   ];
+  console.log("bigscreenRToption.dataset.source", bigscreenRToption.dataset.source)
 };
 
 //用量趋势分析
@@ -699,7 +735,7 @@ const receivestatisticsFun = async () => {
   console.log("====================asd")
 };
 const timeLeftClick = () => {
- 
+
   receivestatisticsData.value.startTime = dayjs(receivestatisticsData.value.startTime)
     .subtract(7, "day")
     .startOf("day")
@@ -712,16 +748,31 @@ const timeLeftClick = () => {
 };
 const timeRightClick = () => {
 
-  receivestatisticsData.value.startTime = dayjs(receivestatisticsData.value.startTime )
+  receivestatisticsData.value.startTime = dayjs(receivestatisticsData.value.startTime)
     .add(7, "day")
     .startOf("day")
     .format("YYYY-MM-DD HH:mm:ss");
-  receivestatisticsData.value.endTime = dayjs(receivestatisticsData.value.endTime )
+  receivestatisticsData.value.endTime = dayjs(receivestatisticsData.value.endTime)
     .add(7, "day")
     .endOf("day")
     .format("YYYY-MM-DD HH:mm:ss");
   receivestatisticsFun(); // 更新数据
 };
+
+
+const materailsTypes = ref([]);
+
+const typsTimer = useIntervalFn(() => {
+  typsTimer.pause();
+  materialFilesTypes().then(res => {
+    materailsTypes.value = res.data.data;
+  }).catch(err => {
+
+  }).finally(() => {
+    typsTimer.resume();
+  });
+}, 5000);
+
 
 window.onresize = function () {
   bigscreenLCChart.resize();
@@ -731,12 +782,18 @@ window.onresize = function () {
 };
 
 onMounted(() => {
-  receivelistFun();
-  alarmInformationlistFun();
-  materialFilesListFun();
-  receivestatisticsFun();
-  typeStatisticsFun();
-  allByReceiveExplainFun();
+  materialFilesTypes().then((res) => {
+    materailsTypes.value = res.data.data;
+    if (materailsTypes.value.length > 0) {
+      materialsName.value = materailsTypes.value[0];
+    }
+    receivelistFun();
+    alarmInformationlistFun();
+    materialFilesListFun();
+    receivestatisticsFun();
+    typeStatisticsFun();
+    allByReceiveExplainFun();
+  })
 });
 </script>
 
@@ -847,11 +904,19 @@ $design-height: 1080;
           justify-content: space-between;
           align-items: center;
 
+
+
           span {
             width: 33%;
             color: #ffffff;
             font-size: adaptiveFontSize(14);
             text-align: center;
+            white-space: nowrap;
+            /* 不换行 */
+            overflow: hidden;
+            /* 超出隐藏 */
+            text-overflow: ellipsis;
+            /* 显示省略号 */
 
             &:nth-child(3) {
               font-size: adaptiveFontSize(20);
@@ -1201,6 +1266,12 @@ $design-height: 1080;
             color: #ffffff;
             font-size: adaptiveFontSize(12);
             text-align: center;
+            white-space: nowrap;
+            /* 不换行 */
+            overflow: hidden;
+            /* 超出隐藏 */
+            text-overflow: ellipsis;
+            /* 显示省略号 */
           }
         }
       }
@@ -1377,5 +1448,10 @@ $design-height: 1080;
   border-color: rgba(255, 255, 255, 0);
   font-size: 12px;
   border-radius: 2px;
+}
+
+.alarm_active {
+  border-bottom: 2px solid rgb(90, 98, 192);
+  /* 黑色横线，也可以换颜色 */
 }
 </style>

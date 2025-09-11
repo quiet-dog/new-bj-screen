@@ -14,6 +14,21 @@ importers:
       '@element-plus/icons-vue':
         specifier: ^2.3.1
         version: 2.3.1(vue@3.5.10(typescript@5.6.2))
+      '@iconify-icons/ep':
+        specifier: ^1.2.12
+        version: 1.2.12
+      '@iconify-icons/ri':
+        specifier: ^1.2.10
+        version: 1.2.10
+      '@iconify-json/ri':
+        specifier: ^1.2.5
+        version: 1.2.5
+      '@iconify/json':
+        specifier: ^2.2.347
+        version: 2.2.359
+      '@iconify/vue':
+        specifier: ^5.0.0
+        version: 5.0.0(vue@3.5.10(typescript@5.6.2))
       '@jiaminghi/data-view':
         specifier: ^2.10.0
         version: 2.10.0
@@ -44,6 +59,9 @@ importers:
       echarts:
         specifier: ^5.5.1
         version: 5.5.1
+      echarts-gl:
+        specifier: ^2.0.9
+        version: 2.0.9(echarts@5.5.1)
       element-plus:
         specifier: ^2.8.4
         version: 2.8.4(vue@3.5.10(typescript@5.6.2))
@@ -280,6 +298,26 @@ packages:
 
   '@floating-ui/utils@0.2.8':
     resolution: {integrity: sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==}
+
+  '@iconify-icons/ep@1.2.12':
+    resolution: {integrity: sha512-8EJULn048sQq3fvytpQ5j40omnVOdBKpo+sXdYM35NRrqCe1BihxBesMcCOLWaocqkWia6uTQ3cnRHff4ZA11w==}
+
+  '@iconify-icons/ri@1.2.10':
+    resolution: {integrity: sha512-wNaXsQYK55WDUWCbcjvnwnODV4Jtsp+VC0duPanibEVu876TUYf6kdgTGtH7/GErBCNdJuJJbncG7vbOaeQi7w==}
+
+  '@iconify-json/ri@1.2.5':
+    resolution: {integrity: sha512-kWGimOXMZrlYusjBKKXYOWcKhbOHusFsmrmRGmjS7rH0BpML5A9/fy8KHZqFOwZfC4M6amObQYbh8BqO5cMC3w==}
+
+  '@iconify/json@2.2.359':
+    resolution: {integrity: sha512-nOIaROD3xeLiFGvJu0YIgeu4Hqbmz6T71b0lsFv1TY6Uu6Lk/5Z8GhDByIE2/zfgxvxfv3f+5A/DkLHmMXYu8Q==}
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+
+  '@iconify/vue@5.0.0':
+    resolution: {integrity: sha512-C+KuEWIF5nSBrobFJhT//JS87OZ++QDORB6f2q2Wm6fl2mueSTpFBeBsveK0KW9hWiZ4mNiPjsh6Zs4jjdROSg==}
+    peerDependencies:
+      vue: '>=3'
 
   '@jiaminghi/bezier-curve@0.0.9':
     resolution: {integrity: sha512-u9xJPOEl6Dri2E9FfmJoGxYQY7vYJkURNX04Vj64tdi535tPrpkuf9Sm0lNr3QTKdHQh0DdNRsaa62FLQNQEEw==}
@@ -775,6 +813,9 @@ packages:
   classnames@2.5.1:
     resolution: {integrity: sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==}
 
+  claygl@1.3.0:
+    resolution: {integrity: sha512-+gGtJjT6SSHD2l2yC3MCubW/sCV40tZuSs5opdtn79vFSGUgp/lH139RNEQ6Jy078/L0aV8odCw8RSrUcMfLaQ==}
+
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
@@ -814,6 +855,11 @@ packages:
     resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
     engines: {node: '>=0.10'}
     hasBin: true
+
+  echarts-gl@2.0.9:
+    resolution: {integrity: sha512-oKeMdkkkpJGWOzjgZUsF41DOh6cMsyrGGXimbjK2l6Xeq/dBQu4ShG2w2Dzrs/1bD27b2pLTGSaUzouY191gzA==}
+    peerDependencies:
+      echarts: ^5.1.2
 
   echarts@5.5.1:
     resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
@@ -1355,6 +1401,30 @@ snapshots:
 
   '@floating-ui/utils@0.2.8': {}
 
+  '@iconify-icons/ep@1.2.12':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-icons/ri@1.2.10':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/ri@1.2.5':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/json@2.2.359':
+    dependencies:
+      '@iconify/types': 2.0.0
+      pathe: 1.1.2
+
+  '@iconify/types@2.0.0': {}
+
+  '@iconify/vue@5.0.0(vue@3.5.10(typescript@5.6.2))':
+    dependencies:
+      '@iconify/types': 2.0.0
+      vue: 3.5.10(typescript@5.6.2)
+
   '@jiaminghi/bezier-curve@0.0.9':
     dependencies:
       '@babel/runtime': 7.25.6
@@ -1822,6 +1892,8 @@ snapshots:
 
   classnames@2.5.1: {}
 
+  claygl@1.3.0: {}
+
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
@@ -1845,6 +1917,12 @@ snapshots:
   delayed-stream@1.0.0: {}
 
   detect-libc@1.0.3: {}
+
+  echarts-gl@2.0.9(echarts@5.5.1):
+    dependencies:
+      claygl: 1.3.0
+      echarts: 5.5.1
+      zrender: 5.6.0
 
   echarts@5.5.1:
     dependencies:

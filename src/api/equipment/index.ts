@@ -11,6 +11,12 @@ export interface equipmentRepairListRes {
 export function equipmentRepairList(params: equipmentRepairListRes) {
   return http.get("/manage/equipment-repair", { params });
 }
+
+export function dailyCishuInspectionList(params: any) {
+  return http.get("/manage/equipment-daily-inspection/getCishu", {
+    params,
+  });
+}
 //获取日常巡检记录列表
 export interface dailyInspectionRes {
   pageNum: number;
@@ -25,23 +31,23 @@ export function dailyInspectionList(params: dailyInspectionRes) {
 }
 
 export function getThresholdInfo(id) {
-  return http.get("/manage/threshold/"+id );
+  return http.get("/manage/threshold/" + id);
 }
 
 export function submitThresholdInfo(data) {
-  for(let i = 0; i < data.values.length; i++){
-    if(data.values[i].min != null ){
+  for (let i = 0; i < data.values.length; i++) {
+    if (data.values[i].min != null) {
       data.values[i].min = Number(data.values[i].min)
     }
-    if(data.values[i].max != null ){
+    if (data.values[i].max != null) {
       data.values[i].max = Number(data.values[i].max)
     }
   }
-  return http.put("/manage/threshold/"+data.thresholdId,{
+  return http.put("/manage/threshold/" + data.thresholdId, {
     ...data,
-    emergencyIds:data.emergencys,
-    sopIds:data.sops
-  } );
+    emergencyIds: data.emergencys,
+    sopIds: data.sops
+  });
 }
 
 //获取设备档案列表
@@ -62,6 +68,11 @@ export interface historicalStatisticsRes {
 }
 export function historicalStatisticsList(params: historicalStatisticsRes) {
   return http.get("/manage/equipment-data/history", { params });
+}
+
+// 获取运行时长
+export function getRunningTime(id: number) {
+  return http.get("/manage/threshold/runTime/" + id);
 }
 
 //维修统计分析

@@ -43,6 +43,10 @@
         </div>
       </div>
     </div>
+
+    <a class="third_path" :href="hres" target="_blank">
+      风险评估系统
+    </a>
   </div>
 </template>
 
@@ -53,6 +57,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+const hres = ref(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=628e2892c1b6a84d1e13a0a13bb89cc0`)
 let times: any;
 let timer: any;
 const time = ref<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
@@ -276,5 +281,19 @@ $design-height: 1080;
       }
     }
   }
+}
+
+.third_path{
+  // background: red;
+  position: fixed;
+  width: adaptiveWidth(200);
+  height: adaptiveHeight(50);
+  top: adaptiveHeight(20);
+  left: adaptiveWidth(100);
+  color: white;
+  text-align: center;
+  line-height: adaptiveHeight(50);
+  font-size:adaptiveFontSize(30);
+   cursor: pointer;
 }
 </style>

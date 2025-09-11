@@ -147,7 +147,7 @@
             <span style="font-size: 18px">工艺要素</span>
             <span style="font-size: 28px; padding-left: 25px">{{
               processTotal
-            }}</span>
+              }}</span>
           </div>
           <div>
             <span>
@@ -639,8 +639,11 @@ const processSelstClick = async (item, v, i) => {
       j.status = false;
     }
   });
-  processFormData.value.craftArchiveId = item.craftArchiveId;
-  const { data } = await processList(processFormData.value);
+  // processFormData.value.craftArchiveId = item.craftArchiveId;
+  const { data } = await processList({
+    ...processFormData.value,
+    craftArchiveId:item.craftArchiveId
+  });
   processlist2.value = data.data.rows;
 };
 
@@ -666,6 +669,13 @@ const nodelistFun = async () => {
     return { ...item, img: imgList[index % imgList.length], status: false };
   });
 };
+
+const nodelistFunTimer = useIntervalFn(() => {
+  nodelistFunTimer.pause();
+  nodelistFun().finally(() => {
+    nodelistFunTimer.resume();
+  })
+}, 10000)
 const lbShow = ref(false);
 const lbInfo = ref()
 const lbClick = (item: any) => {
@@ -1363,6 +1373,10 @@ $design-height: 1080;
           justify-content: space-between;
           align-items: center;
           cursor: pointer;
+          background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
+          background-size: 100% 100%;
+          // 上下间隔
+          margin-bottom: adaptiveHeight(10);
 
           div {
             width: 33%;

@@ -66,55 +66,43 @@
     <div class="bigscreen_lb_bottom">
       <div class="bigscreen_lb_bottom_nei" ref="bigscreenLBRef"></div>
     </div>
-    <div v-show="hisShow"  class="lb_table ltTrendDialog">
+    <div v-show="hisShow" class="lb_table ltTrendDialog">
       <div class="ltTrendDialog_top">
-      <span>报警列表</span>
-      <img @click="closeShow" :src="img9" alt="" srcset="" />
-    </div>
-      <div class="ltTrendDialog_bottom">
-        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle" id="tableMy" header-row-class-name="headerTr" style="width: 100%;background: #002547;" height="100%" :data="hisList">
-        <el-table-column width="150" fixed prop="createTime" label="报警时间">
-          <template #default="{ row }">
-            <span>{{ 
-              dayjs(row.createTime).format("YYYY-MM-DD hh:mm:ss")  }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column fixed width="80" prop="level" label="报警级别">
-          <template #default="{ row }">
-            <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
-              {{ row.level ? row.level : "-" }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <!-- <el-table-column prop="type" label="类型">
-          <template #default="{ row }">
-            <span>{{ row.type }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column fixed width="80" prop="level" label="数值">
-          <template #default="{ row }">
-            {{ getValue(row) }}
-          </template>
-        </el-table-column>
-        <el-table-column width="100" prop="description" label="报警编号">
-          <template #default="{ row }">
-            <span>{{ row.eventId }}</span>
-          </template>
-        </el-table-column> -->
-        <el-table-column  prop="description" label="报警描述">
-          <template #default="{ row }">
-            <span>{{ row.description }}</span>
-          </template>
-        </el-table-column>
-
-
-      </ElTable>
+        <span>报警列表</span>
+        <img @click="closeShow" :src="img9" alt="" srcset="" />
       </div>
-   
+      <div class="ltTrendDialog_bottom">
+        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle" id="tableMy"
+          header-row-class-name="headerTr" style="width: 100%;background: #002547;" height="100%" :data="hisList">
+          <el-table-column width="150" fixed prop="createTime" label="报警时间">
+            <template #default="{ row }">
+              <span>{{
+                row.createTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column fixed width="80" prop="level" label="报警级别">
+            <template #default="{ row }">
+              <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
+                {{ row.level ? row.level : "-" }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="description" label="报警描述">
+            <template #default="{ row }">
+              <span>{{ row.description }}</span>
+            </template>
+          </el-table-column>
+          <template #append>
+            <el-pagination id="popperHis" v-model:current-page="hisPage" v-model:page-size="hisPageSize" :background="false" :small="true"
+              @change="changeHisPag" layout="prev, pager, next" :total="hisTotal" />
+          </template>
+        </ElTable>
+      </div>
+
     </div>
   </div>
   <center></center>
-  <div  class="bigscreen_rt">
+  <div class="bigscreen_rt">
     <div class="bigscreen_rt_top">
       <div class="bigscreen_rt_top_l">
         <img src="/public/img/光标.png" alt="" />
@@ -159,7 +147,7 @@
               class="bigscreen_rc_bottom_rnei">
               <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
                 dayjs(item.createTime).format("YYYY-MM-DD")
-                }}</span>
+              }}</span>
               <div :style="{
                 background: `url(${item.img}) no-repeat`,
                 'background-size': '100% 100%',
@@ -283,20 +271,20 @@ import { useIntervalFn } from "@vueuse/core";
 import { getChannelListApi, getStreamUrlApi } from "../../api/video/index.ts";
 import Video from "./components/Video.vue";
 
-const getValue = (item)=>{
-  if(item.type == "设备报警"){
+const getValue = (item) => {
+  if (item.type == "设备报警") {
     let unit = "";
-    if(item.threshold){
+    if (item.threshold) {
       return item.equipmentValue + item.threshold?.unit
     }
   }
-  if (item.type= "环境报警"){
+  if (item.type = "环境报警") {
     return item.environmentValue + item.environment?.unitName
   }
-  if(item.type == "物料报警"){
+  if (item.type == "物料报警") {
     return item.materialsValue + item.materials?.unit
   }
-  if(item.type == "工艺节点报警"){
+  if (item.type == "工艺节点报警") {
     return item.equipmentValue + item.threshold?.unit
   }
   return "未知"
@@ -441,7 +429,7 @@ const { pause, resume, isActive } = useIntervalFn(() => {
   alarmEventslistFunLt().finally(() => {
     resume();
   });
-}, 50000);
+}, 10000);
 const neiClick = (item: { eventId: any }) => {
   alarmEvnetListLt.value.forEach((v) => {
     if (item.eventId == v.eventId) {
@@ -625,7 +613,7 @@ const getstatisticsList = async () => {
   bigscreenRBoption.series[3].data = data.data[3].data;
   if (bigscreenRBRef.value) {
     bigscreenRBChart = echarts.init(bigscreenRBRef.value);
-    bigscreenRBChart.setOption(bigscreenRBoption);
+    bigscreenRBChart.setOption(bigscreenRBoption,true);
   }
 };
 const rbRadioTimer = useIntervalFn(() => {
@@ -633,7 +621,7 @@ const rbRadioTimer = useIntervalFn(() => {
   getstatisticsList().finally(() => {
     rbRadioTimer.resume();
   });
-}, 50000);
+}, 10000);
 const rbRadioChange = (val: string) => {
   rbRadio.value = val;
   getstatisticsList();
@@ -731,8 +719,15 @@ let hisStart = "";
 let hisEnd = "";
 let hisIndex = 0;
 let hisList = ref([])
+let hisTotal = ref(0);
+let hisPage = ref(1);
+let hisPageSize = ref(10);
 let hisDayType = ref("week");
 const hisShow = ref(false);
+const changeHisPag = (currentPage: number, pageSize: number) => {
+  // console.log("currentPage", currentPage, "pageSize", pageSize);
+  getEmEvent();
+}
 // 修改报警级别样式映射函数
 const getLevelStyle = (level: string) => {
   const colorMap = {
@@ -799,6 +794,20 @@ const getLevelStyle = (level: string) => {
 
 const lbRadio = ref("week");
 const bigScreenInit = ref(false)
+
+const getEmEvent = () => {
+  alarmEventsList({
+    beginTime: hisStart,
+    endTime: hisEnd,
+    pageNum: hisPage.value,
+    pageSize: hisPageSize.value,
+    orderColumn: "createTime",
+    orderDirection: "descending"
+  }).then((res) => {
+    hisList.value = res.data.data.rows;
+    hisTotal.value = res.data.data.total;
+  })
+}
 const geteventTotalFun = async () => {
   const { data } = await geteventTotal({ dayType: lbRadio.value });
 
@@ -809,7 +818,7 @@ const geteventTotalFun = async () => {
     if (!bigScreenInit.value) {
       bigScreenInit.value = true;
       bigscreenLBChart = echarts.init(bigscreenLBRef.value);
-    bigscreenLBChart.setOption(bigscreenLBoption);
+      bigscreenLBChart.setOption(bigscreenLBoption);
       bigscreenLBChart.off().on("click", params => {
         let cuData = "";
         let enData = "";
@@ -820,27 +829,33 @@ const geteventTotalFun = async () => {
           hisDayType.value = lbRadio.value;
           if (lbRadio.value === "week") {
             // 将年份换成今年的年份
-            cuData = dayjs().subtract(6-hisIndex,"day").startOf("day").format("YYYY-MM-DD");
+            cuData = dayjs().subtract(6 - hisIndex, "day").startOf("day").format("YYYY-MM-DD");
             enData = dayjs(cuData).endOf("day").format("YYYY-MM-DD")
           } else {
             cuData = dayjs(params.name).startOf("month").format("YYYY-MM-DD")
             enData = dayjs(cuData).endOf("month").format("YYYY-MM-DD")
           }
 
+          hisPage.value = 1;
+          hisPageSize.value = 10;
           hisStart = cuData;
           hisEnd = enData;
-          alarmEventsList({
-            beginTime: cuData,
-            endTime: enData,
-            pageNum: 1,
-            pageSize: 100
-          }).then((res) => {
-            hisList.value = res.data.data.rows;
-          })
+          getEmEvent();
+          // alarmEventsList({
+          //   beginTime: cuData,
+          //   endTime: enData,
+          //   pageNum: hisPage.value,
+          //   pageSize: hisPageSize.value,
+          //   orderColumn: "createTime",
+          //   orderDirection: "descending"
+          // }).then((res) => {
+          //   hisList.value = res.data.data.rows;
+          //   hisTotal.value = res.data.data.total;
+          // })
         }
       });
     }
-    bigscreenLBChart.setOption(bigscreenLBoption);
+    bigscreenLBChart.setOption(bigscreenLBoption,true);
 
   }
 };
@@ -849,7 +864,7 @@ const lbRadioTimer = useIntervalFn(() => {
   geteventTotalFun().finally(() => {
     lbRadioTimer.resume();
   });
-}, 50000);
+}, 10000);
 const lbRadioChange = (val: string) => {
   lbRadio.value = val;
   geteventTotalFun();
@@ -867,8 +882,8 @@ const getVideoList = () => {
   });
 };
 
-const closeShow =()=>{
-  hisShow.value =false
+const closeShow = () => {
+  hisShow.value = false
 }
 
 function tableHeaderColor(data) {
@@ -925,8 +940,8 @@ $design-height: 1080;
 
 
 
-:deep(.headerTr){
-  --el-table-header-bg-color: rgba(255,255,255,0.2) !important;
+:deep(.headerTr) {
+  --el-table-header-bg-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .ltTrendDialog {
@@ -941,7 +956,7 @@ $design-height: 1080;
   position: fixed;
 
   .ltTrendDialog_top {
-    
+
 
     width: 100%;
     height: adaptiveHeight(45);
@@ -956,7 +971,7 @@ $design-height: 1080;
       font-family: youshe;
     }
 
-    .myInput{
+    .myInput {
       width: adaptiveWidth(120);
       position: relative;
       right: adaptiveWidth(120);
@@ -1820,5 +1835,12 @@ $design-height: 1080;
   border-radius: 2px;
 }
 
+#popperHis :deep(> ul > li){
+  --el-pagination-button-color: white;
+  background: transparent !important;
+}
+#popperHis :deep(button){
+  background: transparent !important;
+}
 
 </style>

@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AlarmFile: typeof import('./src/components/AlarmFile/index.vue')['default']
     Center: typeof import('./src/components/center.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCascader: typeof import('element-plus/es')['ElCascader']
@@ -17,7 +18,9 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
+    ElLink: typeof import('element-plus/es')['ElLink']
     ElOption: typeof import('element-plus/es')['ElOption']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
@@ -34,6 +37,7 @@ declare module 'vue' {
     Officereview: typeof import('./src/components/officereview.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Select: typeof import('./src/components/ReIcon/src/Select.vue')['default']
     Tufour: typeof import('./src/components/tufour/index.vue')['default']
     Tuone: typeof import('./src/components/tuone/index.vue')['default']
     Tuthree: typeof import('./src/components/tuthree/index.vue')['default']

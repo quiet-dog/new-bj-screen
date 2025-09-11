@@ -19,8 +19,19 @@
             step: 5,
           }" hover class="scrool">
             <div class="bigscreen_lt_bottom_nei_b" v-for="(item, index) in environmentFileList">
-              <span>{{ `${item?.environment?.description}-${item?.environment?.unitName}` }}</span>
-              <span>{{ item?.environment?.tag }}</span>
+              <span>
+                <!-- {{ `${item?.environment?.description}-${item?.environment?.unitName}` }} -->
+                <!-- <too -->
+                <el-tooltip class="box-item" effect="dark"
+                  :content="`${item?.environment?.description}-${item?.environment?.unitName}`" placement="top-start">
+                  {{ `${item?.environment?.description}-${item?.environment?.unitName}` }}
+                </el-tooltip>
+              </span>
+              <span>
+                <el-tooltip :content="item?.environment?.tag" placement="top-start" class="box-item" effect="dark">
+                  {{ item?.environment?.tag }}
+                </el-tooltip>
+              </span>
               <span :class="getValueColorClass(item)">{{ item.value }}</span>
               <span>{{ item.createTime }}</span>
             </div>
@@ -64,49 +75,36 @@
         <img @click="closeShow" :src="img9" alt="" srcset="" />
       </div>
       <div class="ltTrendDialog_bottom">
-        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle" style="width: 100%;background: #002547;" height="100%" :data="hisList">
+        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle"
+          style="width: 100%;background: #002547;" height="100%" :data="hisList">
           <el-table-column width="150" fixed="left" prop="createTime" label="报警时间">
             <template #default="{ row }">
               <span>{{ row.createTime }}</span>
             </template>
           </el-table-column>
-          <el-table-column width="100"  prop="equipment.equipmentName" label="设备名称">
+          <el-table-column width="100" prop="equipment.equipmentName" label="设备名称">
           </el-table-column>
-          <el-table-column width="100"  prop="equipmentValue" label="数据">
+          <el-table-column width="100" prop="equipmentValue" label="数据">
             <template #default="{ row }">
               <span :style="{ color: getEquipmentDataColorType(row) }">{{ row.equipmentValue }}</span>
-              </template>
+            </template>
           </el-table-column>
-          <el-table-column  width="80" prop="level" label="报警级别">
+          <el-table-column width="80" prop="level" label="报警级别">
             <template #default="{ row }">
               <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
                 {{ row.level ? row.level : "-" }}
               </el-tag>
             </template>
           </el-table-column>
-          <!-- <el-table-column prop="type" label="类型">
-            <template #default="{ row }">
-              <span>{{ row.type }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column fixed width="80" prop="level" label="数值">
-            <template #default="{ row }">
-              {{ getValue(row) }}
-            </template>
-          </el-table-column>
-          <el-table-column width="100" prop="description" label="报警编号">
-            <template #default="{ row }">
-              <span>{{ row.eventId }}</span>
-            </template>
-          </el-table-column> -->
-          <el-table-column width="200"  prop="description" label="描述">
+          <el-table-column width="200" prop="description" label="描述">
             <template #default="{ row }">
               <span>{{ row.description }}</span>
             </template>
           </el-table-column>
-
-
+          <template #append>
+            <el-pagination id="popperHis" v-model:current-page="hisPage" v-model:page-size="hisPageSize"
+              :background="false" :small="true" @change="changeHisPag" layout="prev, pager, next" :total="hisTotal" />
+          </template>
         </ElTable>
       </div>
     </div>
@@ -122,9 +120,9 @@
         <img src="/public/img/光标.png" alt="" />
         <span>区域报警统计</span>
       </div>
-     <el-radio-group v-model="powerByAreaTotalStaticData.dayType" @change="powerByAreaTotalStaticFun" class="group">
+      <el-radio-group v-model="powerByAreaTotalStaticData.dayType" @change="powerByAreaTotalStaticFun" class="group">
         <el-radio-button label="周" value="week" />
-       <el-radio-button label="年" value="year" />
+        <el-radio-button label="年" value="year" />
       </el-radio-group>
     </div>
     <div class="bigscreen_rt_bottom">
@@ -135,14 +133,15 @@
         <span>报警列表</span>
         <img @click="closeRtShow" :src="img9" alt="" srcset="" />
       </div>
-      <div  class="ltTrendDialog_bottom">
-        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle" style="width: 100%;background: #002547;" height="100%" :data="powerInfoList">
+      <div class="ltTrendDialog_bottom">
+        <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle"
+          style="width: 100%;background: #002547;" height="100%" :data="powerInfoList">
           <el-table-column width="150" fixed prop="createTime" label="报警时间">
             <template #default="{ row }">
               <span>{{ row.createTime }}</span>
             </template>
           </el-table-column>
-        
+
           <el-table-column fixed width="80" prop="level" label="报警级别">
             <template #default="{ row }">
               <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
@@ -150,17 +149,20 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column  prop="description" label="描述">
+          <el-table-column prop="description" label="描述">
             <template #default="{ row }">
               <span>{{ row.description }}</span>
             </template>
           </el-table-column>
-
-
+          <template #append>
+            <el-pagination id="popperHiss" v-model:current-page="alarmTable.pageNum"
+              v-model:page-size="alarmTable.pageSize" :background="false" :small="true" @change="changeTableEvent"
+              layout="prev, pager, next" :total="alarmTableTotal" />
+          </template>
         </ElTable>
       </div>
-      </div>
     </div>
+  </div>
   <div class="bigscreen_rb">
     <div class="bigscreen_rb_top">
       <div class="bigscreen_rb_top_l">
@@ -180,7 +182,8 @@
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div @click="clickFormItem(item.thresholdId)" class="bigscreen_rb_bottom_nei_b" v-for="item in equipmentlist">
+            <div @click="clickFormItem(item.thresholdId)" class="bigscreen_rb_bottom_nei_b"
+              v-for="item in equipmentlist">
               <span>
                 {{ item.thresholdId }}
               </span>
@@ -193,58 +196,31 @@
       </div>
     </div>
   </div>
-  <el-dialog title="阈值设置"
-    width="900"
-    align-center v-model="centerDialogVisible">
+  <el-dialog title="阈值设置" width="900" align-center v-model="centerDialogVisible">
     <el-form :model="formData" label-width="120px" :rules="rules" ref="formRef">
       <el-form-item label="级别层级：">
-        <el-input-number
-          v-model="num"
-          :min="1"
-          :max="5"
-          @change="handleChange"
-        />
+        <el-input-number v-model="num" :min="1" :max="5" @change="handleChange" />
       </el-form-item>
       <el-row v-for="(item, index) in formData.values" :key="index">
         <el-col :span="12">
           <el-form-item label="报警级别：">
-            <el-select
-              v-model="item.level"
-              placeholder="请选择报警级别"
-              style="width: 300px"
-            >
-              <el-option
-                v-for="option in alarmLevelOptions"
-                :key="option.value"
-                :label="option.label"
-                :value="option.value"
-              />
+            <el-select v-model="item.level" placeholder="请选择报警级别" style="width: 300px">
+              <el-option v-for="option in alarmLevelOptions" :key="option.value" :label="option.label"
+                :value="option.value" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="指标区间：">
-            <div
-              style="
+            <div style="
                 width: 300px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-              "
-            >
-              <el-input
-                v-model="item.min"
-                placeholder="开始区间"
-                autocomplete="off"
-                style="width: 130px"
-              />
+              ">
+              <el-input v-model="item.min" placeholder="开始区间" autocomplete="off" style="width: 130px" />
               <span>至</span>
-              <el-input
-                v-model="item.max"
-                placeholder="结束区间"
-                autocomplete="off"
-                style="width: 130px"
-              />
+              <el-input v-model="item.max" placeholder="结束区间" autocomplete="off" style="width: 130px" />
             </div>
           </el-form-item>
         </el-col>
@@ -279,8 +255,11 @@ import { useIntervalFn } from '@vueuse/core'
 import img9 from "../../../public/img/叉号.png";
 import { type } from '../../../auto-imports';
 import { useEditThHook } from "./editTh.tsx";
+import isoWeek from 'dayjs/plugin/isoWeek';
 
-const {formData,centerDialogVisible,clickFormItem,alarmLevelOptions,num,handleChange,submitFormThreshold} = useEditThHook()
+dayjs.extend(isoWeek);
+
+const { formData, centerDialogVisible, clickFormItem, alarmLevelOptions, num, handleChange, submitFormThreshold } = useEditThHook()
 const getValue = (item) => {
   if (item.type == "设备报警") {
     let unit = "";
@@ -300,6 +279,10 @@ const getValue = (item) => {
   return "未知"
 }
 const hisDeviceName = ref("")
+
+function changeHisPag() {
+  getHisTable()
+}
 
 // 修改获取设备数据颜色的方法
 const getEquipmentDataColor = row => {
@@ -470,6 +453,9 @@ let histData = ([])
 let hisStart = "";
 let hisEnd = "";
 let hisIndex = 0;
+let hisPage = ref(1);
+let hisTotal = ref(0);
+let hisPageSize = ref(10);
 let hisList = ref([])
 let hisDayType = ref("week");
 const hisShow = ref(false);
@@ -651,7 +637,7 @@ const historyStatistics = async () => {
           hisDayType.value = historyStatisticsData.value.dayType;
           if (historyStatisticsData.value.dayType === "week") {
             // 将年份换成今年的年份
-            cuData =dayjs().subtract(6-hisIndex,"day").startOf("day").format("YYYY-MM-DD");
+            cuData = dayjs().subtract(6 - hisIndex, "day").startOf("day").format("YYYY-MM-DD");
             enData = dayjs(cuData).endOf("day").format("YYYY-MM-DD")
           } else {
             cuData = dayjs(params.name).startOf("month").format("YYYY-MM-DD")
@@ -660,24 +646,43 @@ const historyStatistics = async () => {
 
           hisStart = cuData;
           hisEnd = enData;
-          alarmEventsList({
-            beginTime: cuData,
-            endTime: enData,
-            pageNum: 1,
-            pageSize: 100,
-            type: "设备报警",
-            deviceName: hisDeviceName.value
-          }).then((res) => {
-            hisList.value = res.data.data.rows;
-          })
+          hisPage.value = 1
+          hisPageSize.value = 10
+          getHisTable();
+          // alarmEventsList({
+          //   beginTime: hisStart,
+          //   endTime: hisEnd,
+          //   pageNum: hisPage.value,
+          //   pageSize: hisPageSize.value,
+          //   type: "设备报警",
+          //   deviceName: hisDeviceName.value
+          // }).then((res) => {
+          //   hisList.value = res.data.data.rows;
+          // })
         }
       });
     }
     isInit.value = true;
-    bigscreenLBChart.setOption(bigscreenLBoption);
+    bigscreenLBChart.setOption(bigscreenLBoption, true);
   }
 
 };
+
+function getHisTable() {
+  alarmEventsList({
+    beginTime: hisStart,
+    endTime: hisEnd,
+    pageNum: hisPage.value,
+    pageSize: hisPageSize.value,
+    type: "设备报警",
+    deviceName: hisDeviceName.value,
+    orderColumn: "createTime",
+    orderDirection: "descending",
+  }).then((res) => {
+    hisList.value = res.data.data.rows;
+    hisTotal.value = res.data.data.total;
+  })
+}
 
 const downloadFile = () => {
   exportAlarmEvents({
@@ -710,7 +715,7 @@ const historyStatisticsTimer = useIntervalFn(() => {
   historyStatistics().finally(() => {
     historyStatisticsTimer.resume();
   })
-}, 5000)
+}, 10000)
 
 //设备数据
 const equipmentFormData = ref({
@@ -734,7 +739,7 @@ const equipmentListTimer = useIntervalFn(() => {
   equipmentListFun().finally(() => {
     equipmentListTimer.resume();
   })
-}, 5000)
+}, 10000)
 
 let bigscreenRTChart: any = null;
 const bigscreenRTRef = ref();
@@ -803,32 +808,47 @@ const powerByAreaTotalStaticFun = async () => {
   bigscreenRToption.xAxis.data = data.data.times;
   bigscreenRToption.series[0].data = data.data.data;
   if (bigscreenRTRef.value) {
-    if (!powerInit){
+    if (!powerInit) {
       bigscreenRTChart = echarts.init(bigscreenRTRef.value);
-      bigscreenRTChart.off().on("click",(params)=>{
+      bigscreenRTChart.off().on("click", (params) => {
         rtShow.value = true
-        if (params.dataIndex!= powerIndex || params.name != powerArea || powetDayType != powerByAreaTotalStaticData.value.dayType){
+        if (params.dataIndex != powerIndex || params.name != powerArea || powetDayType != powerByAreaTotalStaticData.value.dayType) {
           powerIndex = params.dataIndex;
           powerArea = params.name;
           powetDayType = powerByAreaTotalStaticData.value.dayType;
-          alarmEventsList({
-            pageNum: 1,
-            pageSize: 100,
-            area: params.name,
-            beginTime: powetDayType == "week"? dayjs().startOf("week").format("YYYY-MM-DD"):dayjs().startOf("year").format("YYYY-MM-DD"),
-            endTime: powetDayType == "week"? dayjs().endOf("week").format("YYYY-MM-DD"):dayjs().endOf("year").format("YYYY-MM-DD"),
-          }).then(res=>{
-            powerInfoList.value = res.data.data.rows;
-            console.log("powerInfoList",powerInfoList.value)
-          })
+          alarmTable.value.pageNum = 1;
+          alarmTable.value.pageSize = 10;
+          // alarmTable.value.beginTime = powetDayType == "week" ? dayjs().startOf("isoweek").format("YYYY-MM-DD") : dayjs().startOf("year").format("YYYY-MM-DD")
+          // alarmTable.value.endTime = powetDayType == "week" ? dayjs().endOf("isoweek").format("YYYY-MM-DD") : dayjs().endOf("year").format("YYYY-MM-DD")
+          alarmTable.value.beginTime = powetDayType == "week" ? dayjs().subtract(6, "day").format("YYYY-MM-DD") : dayjs().startOf("year").format("YYYY-MM-DD")
+          alarmTable.value.endTime = powetDayType == "week" ? dayjs().format("YYYY-MM-DD") : dayjs().endOf("year").format("YYYY-MM-DD")
+          alarmTable.value.area = params.name
+          changeTableEvent()
         }
-        
+
       })
     }
     powerInit = true;
     bigscreenRTChart.setOption(bigscreenRToption);
   }
 };
+const alarmTable = ref({
+  pageNum: 1,
+  pageSize: 10,
+  beginTime: "",
+  endTime: "",
+  orderColumn: "createTime",
+  orderDirection: "descending",
+  area: "",
+})
+const alarmTableTotal = ref(0)
+function changeTableEvent() {
+  alarmEventsList({ ...alarmTable.value }).then(res => {
+    powerInfoList.value = res.data.data.rows;
+    console.log("powerInfoList", powerInfoList.value)
+    alarmTableTotal.value = res.data.data.total;
+  })
+}
 const closeRtShow = () => {
   rtShow.value = false;
 }
@@ -891,7 +911,7 @@ $design-height: 1080;
   @return #{$px / $design-width * 100}vw;
 }
 
-.rt_table{
+.rt_table {
   width: adaptiveWidth(500);
   height: adaptiveHeight(400);
   position: absolute;
@@ -899,7 +919,7 @@ $design-height: 1080;
   right: adaptiveWidth(470);
   z-index: 999;
   background-color: red;
-  
+
 }
 
 .lb_table {
@@ -956,13 +976,14 @@ $design-height: 1080;
       cursor: pointer;
     }
   }
+
   .ltTrendDialog_bottom {
     width: adaptiveWidth(450);
     height: calc(90% - adaptiveHeight(60));
     margin-left: adaptiveWidth(25);
     margin-top: adaptiveHeight(35);
   }
-  
+
 }
 
 
@@ -999,13 +1020,14 @@ $design-height: 1080;
       cursor: pointer;
     }
   }
+
   .ltTrendDialog_bottom {
     width: adaptiveWidth(450);
     height: calc(90% - adaptiveHeight(60));
     margin-left: adaptiveWidth(25);
     margin-top: adaptiveHeight(35);
   }
-  
+
 }
 
 
@@ -1036,7 +1058,8 @@ $design-height: 1080;
 .bigscreen_rb {
   width: adaptiveWidth(443);
   height: adaptiveHeight(445);
-  position: relative;;
+  position: relative;
+  ;
 }
 
 .bigscreen_lt {
@@ -1133,6 +1156,9 @@ $design-height: 1080;
         align-items: center;
         margin-top: adaptiveHeight(5);
         cursor: pointer;
+        background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
+        background-size: 100% 100%;
+        margin-bottom: adaptiveHeight(5);
 
         span {
           width: 33%;
@@ -1353,6 +1379,9 @@ $design-height: 1080;
           justify-content: space-between;
           align-items: center;
           margin-top: adaptiveHeight(5);
+          background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
+          background-size: 100% 100%;
+          margin-bottom: adaptiveHeight(5);
 
           span {
             width: 25%;
@@ -1453,5 +1482,23 @@ $design-height: 1080;
   border-color: rgba(255, 255, 255, 0);
   font-size: adaptiveFontSize(12);
   border-radius: 2px;
+}
+
+#popperHis :deep(> ul > li) {
+  --el-pagination-button-color: white;
+  background: transparent !important;
+}
+
+#popperHis :deep(button) {
+  background: transparent !important;
+}
+
+#popperHiss :deep(> ul > li) {
+  --el-pagination-button-color: white;
+  background: transparent !important;
+}
+
+#popperHiss :deep(button) {
+  background: transparent !important;
 }
 </style>
