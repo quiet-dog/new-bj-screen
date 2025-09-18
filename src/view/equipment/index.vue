@@ -53,7 +53,7 @@
           <span>设备型号</span>
           <span>安装时间</span>
         </div>
-        <div @mouseenter="equipmentListTimer.pause()" @mouseleave="equipmentListTimer.resume()"
+        <div @mouseenter="jianceTimer.pause()" @mouseleave="jianceTimer.resume()"
           class="bigscreen_lc_bottom_neib">
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
@@ -167,6 +167,7 @@
       <div class="bigscreen_rb_top_l">
         <img src="/public/img/光标.png" alt="" />
         <span>巡检记录</span>
+        <ElButton link style="color: white;" @click="handleOpenXunJianQushi" class="bigscreen_rb_top_l_rg">巡检趋势分析</ElButton>
       </div>
     </div>
     <div class="bigscreen_rb_bottom">
@@ -287,7 +288,6 @@
       <div class="rbDialog_top">
         <span>巡检记录详情</span>
         <img :src="img9" alt="" srcset="" @click="rbcanleClick(item)" />
-        <ElButton link style="color: white;" @click="handleOpenXunJianQushi" class="bigscreen_rb_top_l_rg">巡检趋势分析</ElButton>
       </div>
       <div class="rbDialog_bottom">
         <div class="rbDialog_bottoml">
@@ -532,7 +532,7 @@ const equipmentListFun = async () => {
     return {
       ...item,
       id: item.equipmentId,
-      name: item.equipmentName,
+      name: item.equipmentName+(item.equipmentCode != null || item.equipmentCode != "" ? "("+item.equipmentCode+")" : ""),
       thresholdList: list,
     };
   });
@@ -565,7 +565,6 @@ const bigscreenLBoption = {
     top: "15%",
     containLabel: true,
   },
-
   xAxis: {
     type: "category",
     data: [],
@@ -591,6 +590,16 @@ const bigscreenLBoption = {
     trigger: 'axis', //坐标轴触发，主要在柱状图，折线图等会使用类目轴的图表中使用
     axisPointer: {// 坐标轴指示器，坐标轴触发有效
       type: 'line' // 默认为直线，可选为：'line' | 'shadow'
+    },
+    formatter: function (params) {
+      console.log(params)
+      return `
+      设备名称: ${params[0].equipmentName} <br/>
+      设备编号: ${params[0].equipmentCode} <br/>
+      传感器: ${params[0].sensorName} <br/>
+      单位: ${params[0].unitName} <br/>
+      值: ${params[0].value}
+    `;
     }
   },
   series: [
@@ -630,6 +639,17 @@ const historicalStatisticsListFun = async () => {
   });
   bigscreenLBoption.xAxis.data = data.time;
   bigscreenLBoption.series[0].data = data.data;
+  if(Array.isArray(data.data) && data.data.length > 0){
+    bigscreenLBoption.series[0].data = data.data.map((item) => {
+      return {
+        value: item,
+        equipmentName: data.equipmentName,
+        equipmentCode: data.equipmentCode,
+        unitName: data.unitName,
+        sensorName: data.sensorName,
+      }
+    })
+  }
   if (bigscreenLBRef.value && bigscreenLBChart == null) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
   }
@@ -1397,6 +1417,7 @@ $design-height: 1080;
     .bigscreen_rb_top_l {
       display: flex;
       align-items: center;
+      width: 100%;
 
       img {
         margin-left: adaptiveWidth(11);
@@ -1405,7 +1426,7 @@ $design-height: 1080;
       span {
         font-weight: 600;
         font-size: adaptiveFontSize(16);
-        text-align: center;
+        // text-align: center;
         font-style: normal;
         text-transform: none;
         background: linear-gradient(to bottom,
@@ -1417,6 +1438,8 @@ $design-height: 1080;
         -webkit-text-fill-color: transparent;
         /* 使文本颜色透明 */
         padding-left: adaptiveWidth(10);
+        width: adaptiveWidth(100);
+        box-sizing: border-box;
       }
     }
 

@@ -352,16 +352,16 @@
                 </template>
                 <template #description>
                   <div>
-                    <span>操作描述：</span>
-                    <span>{{ item.operationDescription }}</span>
+                    <span style="color: #ffffff;">操作描述：</span>
+                    <span style="color: #ffffff;">{{ item.operationDescription }}</span>
                   </div>
                   <div>
-                    <span>操作方式：</span>
-                    <span>{{ item.operationMethod }}</span>
+                    <span style="color: #ffffff;">操作方式：</span>
+                    <span style="color: #ffffff;">{{ item.operationMethod }}</span>
                   </div>
                   <div>
-                    <span>所需时间：</span>
-                    <span>{{ item.requiredTime }}</span>
+                    <span style="color: #ffffff;">所需时间：</span>
+                    <span style="color: #ffffff;">{{ item.requiredTime }}</span>
                   </div>
                   <!-- <div>
                     <span>是否为高风险：</span>

@@ -115,11 +115,16 @@ export default {
     fileUrl: {
       immediate: true,
       handler(newUrl) {
-        var encodedUrl = encodeURIComponent(`http://${location.hostname}:9000/biology` + newUrl);
+        // var encodedUrl = encodeURIComponent(`http://${location.hostname}:9000/biology` + newUrl);
+        // var encodedUrl = encodeURIComponent(`${location.origin}/minioapi/biology` + newUrl);
+        // var encodedUrl = encodeURIComponent(`http://${location.hostname}:9000/biology`+newUrl);
+        var encodedUrl = encodeURIComponent(`${location.origin}/minioapi/biology` + newUrl);
         console.error("fileUrl", newUrl);
         //var encodedUrl = encodeURIComponent(`http://192.168.0.11:9000/biology` + newUrl);
         // 然后使用 btoa 对编码后的 URL 进行 Base64 编码
         var base64Url = btoa(encodedUrl);
+        // this.src = location.origin + "/kkfile/onlinePreview?url=" + encodeURIComponent(base64Url);
+        // this.src = "http://"+location.hostname+":8012" + "/onlinePreview?url=" + encodeURIComponent(base64Url);
         this.src = location.origin + "/kkfile/onlinePreview?url=" + encodeURIComponent(base64Url);
         console.error("src", this.src);
       }

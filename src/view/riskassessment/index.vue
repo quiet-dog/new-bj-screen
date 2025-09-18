@@ -14,7 +14,7 @@
           <span>数值</span>
           <span>时间</span>
         </div>
-        <div class="bigscreen_lt_bottom_neib">
+        <div class="bigscreen_lt_bottom_neib" @mouseenter="environmentFileTimer.pause" @mouseleave="environmentFileTimer.resume">
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
