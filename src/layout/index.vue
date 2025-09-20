@@ -10,9 +10,9 @@
       <div class="bigscreen_header_r">
         <span>{{ time }}</span>
         <span>{{ dayOfWeek }}</span>
-        <img src="/public/img/天气图标.png" alt="" />
+        <!-- <img src="/public/img/天气图标.png" alt="" />
         <img src="/public/img/温度计.png" alt="" />
-        <span>26℃</span>
+        <span>26℃</span> -->
       </div>
     </div>
     <div class="bigscreen_center">
@@ -212,7 +212,7 @@ $design-height: 1080;
       display: flex;
       align-items: center;
       position: absolute;
-      right: 0;
+      right: adaptiveWidth(50);
       span {
         font-size: adaptiveFontSize(20);
         color: rgba(255, 255, 255, 1);
@@ -223,16 +223,16 @@ $design-height: 1080;
           padding-right: adaptiveWidth(40);
         }
       }
-      img {
-        &:nth-child(3) {
-          width: adaptiveWidth(44);
-          height: adaptiveHeight(44);
-          padding-left: adaptiveWidth(25);
-        }
-        &:nth-child(4) {
-          padding-left: adaptiveWidth(6);
-        }
-      }
+      // img {
+      //   &:nth-child(3) {
+      //     width: adaptiveWidth(44);
+      //     height: adaptiveHeight(44);
+      //     padding-left: adaptiveWidth(25);
+      //   }
+      //   &:nth-child(4) {
+      //     padding-left: adaptiveWidth(6);
+      //   }
+      // }
     }
   }
   .bigscreen_center {

@@ -25,7 +25,7 @@
               <!-- <span style="padding-left: 25px">{{ item.materials?.name }}</span> -->
               <span>{{
                 dayjs(item.createTime).format("YYYY-MM-DD")
-              }}</span>
+                }}</span>
               <span>{{ item.level }}</span>
             </div>
           </div>
@@ -186,7 +186,7 @@
           <div v-for="(item, index) in receivelist2" :key="index" class="bigscreen_rc_bottom_rnei">
             <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
               dayjs(item.createTime).format("YYYY-MM-DD")
-            }}</span>
+              }}</span>
             <div :style="{
               background: `url(${item.background}) no-repeat`,
               'background-size': '100% 100%',
@@ -1416,12 +1416,21 @@ $design-height: 1080;
   height: adaptiveHeight(24);
   right: 0;
   z-index: 2;
+  --el-input-bg-color: rgba(255, 255, 255, 0);
+
+  :deep(.is-focus) {
+    // --el-input-focus-border-color: blue;
+  }
+
+  :deep(input) {
+    caret-color: white;
+  }
 }
 
 .inputcss :deep(.el-input__wrapper) {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: none;
+  // background-color: rgba(255, 255, 255, 0);
+  // border: 1px solid rgba(255, 255, 255, 0.2);
+  // box-shadow: none;
   font-size: adaptiveFontSize(12);
 }
 

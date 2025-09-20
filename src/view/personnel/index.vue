@@ -1259,12 +1259,22 @@ $design-height: 1080;
   width: adaptiveWidth(148);
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(11);
+
+  --el-input-bg-color: rgba(255, 255, 255, 0);
+
+  :deep(.is-focus) {
+    // --el-input-focus-border-color: blue;
+  }
+
+  :deep(input) {
+    caret-color: white;
+  }
 }
 
 .inputcss :deep(.el-input__wrapper) {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: none;
+  // background-color: rgba(255, 255, 255, 0);
+  // border: 1px solid rgba(255, 255, 255, 0.2);
+  // box-shadow: none;
   font-size: adaptiveFontSize(12);
 }
 

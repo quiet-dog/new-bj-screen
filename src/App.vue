@@ -227,6 +227,7 @@ $design-height: 1080;
   top: adaptiveHeight(750);
   width: adaptiveWidth(300);
   height: adaptiveHeight(200);
+  overflow: hidden;
 }
 </style>
 <style>

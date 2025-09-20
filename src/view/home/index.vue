@@ -500,6 +500,7 @@ const bigscreenRBoption = {
   },
   tooltip: {
     trigger: "axis",
+    // 显示的提示框里面的圆点颜色跟下面legend的itemStyle的color一致
   },
   legend: {
     data: [
@@ -559,6 +560,10 @@ const bigscreenRBoption = {
         "RGBA(255, 169, 19, 0.5)",
         "rgba(255, 169, 19, 0)"
       ),
+      // 图例的圆点颜色跟下面lineStyle的color一致
+      itemStyle: {
+        color: "RGBA(255, 169, 19, 1)",
+      },
     },
     {
       name: "环境报警",
@@ -573,6 +578,9 @@ const bigscreenRBoption = {
         "RGBA(225, 110, 122, 0.5)",
         "rgba(225, 110, 122, 0)"
       ),
+      itemStyle: {
+        color: "RGBA(225, 110, 122, 1)",
+      },
     },
     {
       name: "物料报警",
@@ -587,6 +595,9 @@ const bigscreenRBoption = {
         "RGBA(65, 195, 142, 0.5)",
         "rgba(65, 195, 142, 0)"
       ),
+      itemStyle: {
+        color: "RGBA(65, 195, 142, 1)",
+      },
     },
     {
       name: "工艺节点报警",
@@ -601,6 +612,9 @@ const bigscreenRBoption = {
         "RGBA(210, 114, 255, 0.5)",
         "rgba(210, 114, 255, 0)"
       ),
+      itemStyle: {
+        color: "RGBA(210, 114, 255, 1)",
+      },
     },
   ],
 };
@@ -1789,12 +1803,20 @@ $design-height: 1080;
   // width: adaptiveWidth(148);
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(10);
+  --el-input-bg-color:rgba(255, 255, 255, 0);
+
+  :deep(.is-focus) {
+    // --el-input-focus-border-color: blue;
+  }
+  :deep(input){
+    caret-color: white; 
+  }
 }
 
 .inputcss :deep(.el-input__wrapper) {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: none;
+  // background-color: rgba(255, 255, 255, 0);
+  // border: 1px solid rgba(255, 255, 255, 0.2);
+  // box-shadow: none;
 
   .el-input__inner {
     font-size: adaptiveFontSize(12);

@@ -53,8 +53,7 @@
           <span>设备型号</span>
           <span>安装时间</span>
         </div>
-        <div @mouseenter="jianceTimer.pause()" @mouseleave="jianceTimer.resume()"
-          class="bigscreen_lc_bottom_neib">
+        <div @mouseenter="jianceTimer.pause()" @mouseleave="jianceTimer.resume()" class="bigscreen_lc_bottom_neib">
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
@@ -167,7 +166,8 @@
       <div class="bigscreen_rb_top_l">
         <img src="/public/img/光标.png" alt="" />
         <span>巡检记录</span>
-        <ElButton link style="color: white;" @click="handleOpenXunJianQushi" class="bigscreen_rb_top_l_rg">巡检趋势分析</ElButton>
+        <ElButton link style="color: white;" @click="handleOpenXunJianQushi" class="bigscreen_rb_top_l_rg">巡检趋势分析
+        </ElButton>
       </div>
     </div>
     <div class="bigscreen_rb_bottom">
@@ -228,11 +228,11 @@
           <img src="/public/img/zuo.svg" alt="" @click="ciShuLeftClick" style="margin-left: 5px" />
           <span>{{
             dayjs(ciShuTimer.startTime).format("MM月DD日")
-            }}</span>
+          }}</span>
           <span>-</span>
           <span>{{
             dayjs(ciShuTimer.endTime).format("MM月DD日")
-            }}</span>
+          }}</span>
           <img src="/public/img/you.svg" alt="" @click="ciShuRightClick" style="margin-right: 5px" />
         </div>
       </div>
@@ -532,7 +532,7 @@ const equipmentListFun = async () => {
     return {
       ...item,
       id: item.equipmentId,
-      name: item.equipmentName+(item.equipmentCode != null || item.equipmentCode != "" ? "("+item.equipmentCode+")" : ""),
+      name: item.equipmentName + (item.equipmentCode != null || item.equipmentCode != "" ? "(" + item.equipmentCode + ")" : ""),
       thresholdList: list,
     };
   });
@@ -594,10 +594,10 @@ const bigscreenLBoption = {
     formatter: function (params) {
       console.log(params)
       return `
-      设备名称: ${params[0].equipmentName} <br/>
-      设备编号: ${params[0].equipmentCode} <br/>
-      传感器: ${params[0].sensorName} <br/>
-      单位: ${params[0].unitName} <br/>
+      设备名称: ${params[0].data.equipmentName} <br/>
+      设备编号: ${params[0].data.equipmentCode} <br/>
+      传感器: ${params[0].data.sensorName} <br/>
+      单位: ${params[0].data.unitName} <br/>
       值: ${params[0].value}
     `;
     }
@@ -639,7 +639,7 @@ const historicalStatisticsListFun = async () => {
   });
   bigscreenLBoption.xAxis.data = data.time;
   bigscreenLBoption.series[0].data = data.data;
-  if(Array.isArray(data.data) && data.data.length > 0){
+  if (Array.isArray(data.data) && data.data.length > 0) {
     bigscreenLBoption.series[0].data = data.data.map((item) => {
       return {
         value: item,
@@ -653,7 +653,7 @@ const historicalStatisticsListFun = async () => {
   if (bigscreenLBRef.value && bigscreenLBChart == null) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
   }
-  bigscreenLBChart.setOption(bigscreenLBoption,true);
+  bigscreenLBChart.setOption(bigscreenLBoption, true);
   getRunningTime(thresholdId.value).then(res => {
     runningTime.value = res.data.data;
   })
@@ -865,7 +865,7 @@ const { ciShuTimer,
   ciShuRightClick,
   dailyCishuInspectionListFunc,
   qushiRef,
-  ciShuDig,handleOpenXunJianQushi } = useXunJianQushiHook()
+  ciShuDig, handleOpenXunJianQushi } = useXunJianQushiHook()
 
 onMounted(() => {
   equipmentRepairListFun();
@@ -1811,12 +1811,21 @@ $design-height: 1080;
   width: adaptiveWidth(148);
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(11);
+  --el-input-bg-color: rgba(255, 255, 255, 0);
+
+  :deep(.is-focus) {
+    // --el-input-focus-border-color: blue;
+  }
+
+  :deep(input) {
+    caret-color: white;
+  }
 }
 
 .inputcss :deep(.el-input__wrapper) {
-  background-color: rgba(255, 255, 255, 0);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: none;
+  // background-color: rgba(255, 255, 255, 0);
+  // border: 1px solid rgba(255, 255, 255, 0.2);
+  // box-shadow: none;
   font-size: adaptiveFontSize(12);
 }
 
