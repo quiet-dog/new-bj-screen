@@ -1828,6 +1828,9 @@ $design-height: 1080;
   width: adaptiveWidth(148);
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(11);
+
+  --el-text-color-placeholder:white;
+  --el-input-text-color:white;
 }
 
 .inputcss :deep(.el-input__wrapper) {

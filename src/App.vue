@@ -1,5 +1,6 @@
 <template>
-  <router-view></router-view>
+    <router-view></router-view>
+
   <audio style="display: none;" controls ref="audu">
     <source :src="Vide" type="audio/mpeg" />
   </audio>

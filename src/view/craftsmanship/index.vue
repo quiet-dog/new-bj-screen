@@ -1636,6 +1636,9 @@ $design-height: 1080;
 .inputcss {
   --el-input-bg-color: rgba(255, 255, 255, 0);
 
+  --el-text-color-placeholder:white;
+  --el-input-text-color:white;
+
   :deep(.is-focus) {
     // --el-input-focus-border-color: blue;
   }

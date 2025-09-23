@@ -6,6 +6,9 @@ import "element-plus/dist/index.css";
 import "./assets/font/font.scss";
 // import { createPinia } from "pinia";
 import { store } from "./store/index";
+import ElementPlus from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+
 import {
     IconifyIconOffline,
     IconifyIconOnline,
@@ -18,6 +21,7 @@ import {
 // const pinia = createPinia();
 
 createApp(App)
+    .use(ElementPlus, { locale: zhCn })
     .component("IconifyIconOffline", IconifyIconOffline)
     .component("IconifyIconOnline", IconifyIconOnline)
     .component("FontIcon", FontIcon)
