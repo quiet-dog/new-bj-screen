@@ -122,7 +122,7 @@ export const useDeviceStore = defineStore("pure-app", () => {
     http.get("/manage/threshold", {
         params: {
             pageNum: 1,
-            pageSize: 1000
+            pageSize: 200
         }
     }).then((res) => {
         res.data.data.rows.forEach((item: any) => {
@@ -158,7 +158,7 @@ export const useDeviceStore = defineStore("pure-app", () => {
     http.get("/manage/environment", {
         params: {
             pageNum: 1,
-            pageSize: 1000
+            pageSize: 200
         }
     }).then((res) => {
 

@@ -10,17 +10,14 @@
       <div class="bigscreen_lt_bottom_l">
         <img src="/public/img/报警信息图标.png" alt="" />
         <div class="bigscreen_lt_bottom_lt">
-          <!-- <div style="text-align: center">
-            <span>98</span>
-            <span>%</span>
-          </div> -->
           <div>政策法规类</div>
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
         <Vue3SeamlessScroll style="width: 100%;overflow: hidden;" :list="alarmInformationlistValue" hover
           class="scrool scroolMy">
-          <div class="bigscreen_lt_bottom_r_nei" v-for="(item, index) in alarmInformationlistValue">
+          <div style="cursor: pointer;" class="bigscreen_lt_bottom_r_nei" @click="openLtDialogShow(item)"
+            v-for="(item, index) in alarmInformationlistValue">
             <div>
               {{ item?.eventName }}
             </div>
@@ -54,7 +51,7 @@
         <img src="/public/img/you.svg" alt="" @click="timeRightClick" style="margin-right: 5px" />
       </div>
       <div class="chakanqushi">
-        <span @click="openShowQushi">查看趋势</span>
+        <span @click="openShowQushi" style="cursor: pointer;">查看趋势</span>
       </div>
     </div>
     <div class="bigscreen_lc_bottom">
@@ -62,7 +59,7 @@
     </div>
     <div v-show="qushiShow" class="lc_table lcTrendDialog">
       <div class="lcTrendDialog_top">
-        <span>趋势详情</span>
+        <span>环境报警趋势</span>
         <img @click="closeQushiShow" :src="img9" alt="" srcset="" />
       </div>
       <div class="lcTrendDialog_bottom" ref="lcQushiRef">
@@ -129,19 +126,19 @@
           <el-scrollbar height="100%">
             <el-form id="formStyle" :model="eventInfoDetail">
               <el-form-item label="事件编号">
-                <span> {{ eventInfoDetail.emergencyEventId }}</span>
+                <span> {{ eventInfoDetail?.emergencyEventId }}</span>
               </el-form-item>
               <el-form-item label="事件名称">
-                {{ eventInfoDetail.eventName }}
+                {{ eventInfoDetail?.eventName }}
               </el-form-item>
               <el-form-item label="处理人员">
                 <span>{{ handlePerson }}</span>
               </el-form-item>
               <el-form-item label="处理内容">
-                {{ eventInfoDetail.content }}
+                {{ eventInfoDetail?.content }}
               </el-form-item>
               <el-form-item label="处理流程">
-                {{ eventInfoDetail.processingFlow }}
+                {{ eventInfoDetail?.processingFlow }}
               </el-form-item>
               <!-- <el-form-item label="报警信息">
             <el-input v-model="eventInfoDetail.processingFlow" readonly />
@@ -150,8 +147,9 @@
                 <!-- <el-tag @click="downloadFile(item.path)" v-for="item in files">
                   {{ item.fileName }}
                 </el-tag> -->
-                 <el-link type="primary" @click="downloadFile(item.path)" v-for="item in files">{{ item.fileName }}</el-link>
-               
+                <el-link type="primary" @click="downloadFile(item.path)" v-for="item in files">{{ item.fileName
+                }}</el-link>
+
               </el-form-item>
             </el-form>
           </el-scrollbar>
@@ -262,6 +260,28 @@
       </div>
     </div>
   </template>
+
+  <div v-show="ltDialogShow" class="ltTrendDialog">
+    <div class="ltTrendDialog_top">
+      <span>事件详情</span>
+      <img :src="img9" alt="" srcset="" @click="closeLtDialogShow" />
+    </div>
+    <div class="ltTrendDialog_bottom">
+      <el-scrollbar height="100%">
+        <el-descriptions :column="1" size="small" direction="horizontal" class="lt_descriptions">
+          <el-descriptions-item label="事件编号：">{{ ltCurrentItem?.emergencyEventId }}</el-descriptions-item>
+          <el-descriptions-item label="事件类型：">{{ ltCurrentItem?.type }}</el-descriptions-item>
+          <el-descriptions-item label="事件名称：">{{ ltCurrentItem?.eventName }}</el-descriptions-item>
+          <el-descriptions-item label="&nbsp;&nbsp;&nbsp;&nbsp;处理人：">{{ ltCurrentItem?.handlerNames
+          }}</el-descriptions-item>
+          <el-descriptions-item label="处理流程：">{{ ltCurrentItem?.processingFlow }}</el-descriptions-item>
+          <el-descriptions-item label="报警描述：">{{ltCurrentItem?.emergencyAlarmDTOs?.map(item =>
+            item.description)?.join(",")}}</el-descriptions-item>
+        </el-descriptions>
+      </el-scrollbar>
+    </div>
+  </div>
+  <DialogPreview ref="dialogPreviewRef" />
 </template>
 
 <script lang="ts" setup>
@@ -291,7 +311,10 @@ import { download } from "../../api/login";
 import { get3dOption, getHistoryData } from "./echart";
 import "echarts-gl"
 import { useIntervalFn } from "@vueuse/core";
+import DialogPreview from "../../components/DialogPreview/index.vue";
 
+
+const dialogPreviewRef = ref<InstanceType<typeof DialogPreview>>();
 const getHandlePerson = (item) => {
   // console.log("item",item)
   if (item.handlers && item.handlers.length > 0) {
@@ -305,7 +328,7 @@ const getHandlePerson = (item) => {
 
 const qushiShow = ref(false)
 const lcQushiRef = ref()
-const lcQushiChart = ref()
+let lcQushiChart: any = null
 const qushiOptions = {
   title: {
     text: '趋势统计',
@@ -332,11 +355,13 @@ const qushiOptions = {
       color: '#ffffff',
       fontSize: 12
     },
+    top: 40
   },
   grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
+    left: '10%',      // 两边一样，图形就居中
+    right: '10%',
+    top: '25%',       // 留出标题和图例的空间
+    bottom: '10%',
     containLabel: true
   },
   toolbox: {
@@ -347,10 +372,29 @@ const qushiOptions = {
   xAxis: {
     // type: 'category',
     boundaryGap: false,
-    data: []
+    data: [],
+    axisLabel: {
+      color: '#ffffff'
+    },
+    splitLine: {
+      lineStyle: {
+        type: 'dashed',
+        color: '#ffffff'
+      }
+    }
   },
   yAxis: {
-    type: 'value'
+    type: 'value',
+    // 字体白色
+    axisLabel: {
+      color: '#ffffff'
+    },
+    splitLine: {
+      lineStyle: {
+        type: 'dashed',
+        color: '#ffffff'
+      }
+    }
   },
   series: [
 
@@ -363,13 +407,22 @@ function openShowQushi() {
     endTime: areaStatisticsFormData.value.endTime,
   }).then(res => {
     qushiOptions.xAxis.data = res.data.data.xdata
+    qushiOptions.title.text = "趋势统计(" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ")"
     qushiOptions.series = res.data.data.series
     qushiOptions.legend.data = res.data.data.series.map(item => item.name)
-    if (lcQushiRef.value) {
-      lcQushiChart.value = echarts.init(lcQushiRef.value);
-      lcQushiChart.value.setOption(qushiOptions);
-      console.log("lcQushiRef.value", qushiOptions.xAxis.data, qushiOptions.series)
+    qushiOptions.yAxis.min = 1
+    if (Array.isArray(res.data.data.series) && res.data.data.series.length > 0) {
+      res.data.data.series.forEach(item => {
+        qushiOptions.yAxis.max = Math.max(...item.data, 6)
+      })
+    } else {
+      qushiOptions.yAxis.max = 6
     }
+    console.log("qushiOptions", qushiOptions)
+    if (lcQushiChart == null) {
+      lcQushiChart = echarts.init(lcQushiRef.value);
+    }
+    lcQushiChart.setOption(qushiOptions, true);
   })
 }
 function closeQushiShow() {
@@ -541,7 +594,8 @@ const previewcanleClick = (item: any) => {
 };
 
 const downloadFile = (item) => {
-  download(item)
+  console.log("itemitemitem", item)
+  dialogPreviewRef.value.open(item)
 }
 
 //事件报告
@@ -628,6 +682,17 @@ const alarmInfoTimer = useIntervalFn(() => {
     alarmInfoTimer.resume();
   });
 }, 5000);
+const ltDialogShow = ref(false)
+const ltCurrentItem = ref({})
+function openLtDialogShow(item) {
+  ltCurrentItem.value = item
+  ltDialogShow.value = true
+}
+function closeLtDialogShow() {
+  ltDialogShow.value = false
+}
+
+
 
 const zxSelect = ref("环境报警类");
 const zxChangeSelect = () => {
@@ -640,16 +705,28 @@ const areaStatisticsFormData = ref({
 });
 const areaStatisticsFun = async () => {
   const { data } = await areaStatistics(areaStatisticsFormData.value);
-  // bigscreenLCoption.series[0].data = data.data.map((itme) => {
-  //   return {
-  //     value: itme.count,
-  //     name: itme.manufacturer,
-  //   };
-  // });
-  bigscreenLCoption = get3dOption(data.data)
-  if (bigscreenLCChart) {
-    bigscreenLCChart.setOption(bigscreenLCoption, true);
+
+  if (Array.isArray(data.data) && data.data.length > 0) {
+    bigscreenLCoption = get3dOption(data.data)
+  } else {
+    // 直接在echarts中显示暂无数据,不显示圆环
+    bigscreenLCoption.series = [];
+    const title = {
+      text: "暂无数据",
+      show: true,
+      left: "center",
+      top: "center",
+      textStyle: {
+        color: "#ffffff",
+      },
+    }
+    bigscreenLCoption.title = title
   }
+
+  if (bigscreenLCChart == null) {
+    bigscreenLCChart = echarts.init(bigscreenLCRef.value);
+  }
+  bigscreenLCChart.setOption(bigscreenLCoption, true);
 };
 
 const areaStatisticsTimer = useIntervalFn(() => {
@@ -754,18 +831,14 @@ const closeEventInfoShow = () => {
 };
 
 onMounted(() => {
-  if (bigscreenLBRef.value) {
+  if (bigscreenLBChart == null) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
     bigscreenLBChart.setOption(bigscreenLBoption, true);
   }
 
-  if (bigscreenLCRef.value) {
+  if (bigscreenLCChart == null) {
     bigscreenLCChart = echarts.init(bigscreenLCRef.value);
     bigscreenLCChart.setOption(bigscreenLCoption, true);
-  }
-  if (lcQushiRef.value) {
-    // lcQushiChart.value = echarts.init(lcQushiRef.value);
-    // lcQushiChart.value.setOption(qushiOptions, true);
   }
   policieslistFun();
   soplistFun();
@@ -981,7 +1054,7 @@ $design-height: 1080;
   align-items: center;
   // 添加下划线
   // border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
+  // cursor: pointer;
   background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
   background-size: 100% 100%;
   margin-bottom: adaptiveHeight(5);
@@ -1067,7 +1140,7 @@ $design-height: 1080;
       }
     }
 
-    .chakanqushi{
+    .chakanqushi {
       color: white;
       font-size: adaptiveFontSize(15);
       margin-right: adaptiveWidth(10);
@@ -1829,8 +1902,8 @@ $design-height: 1080;
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(11);
 
-  --el-text-color-placeholder:white;
-  --el-input-text-color:white;
+  --el-text-color-placeholder: white;
+  --el-input-text-color: white;
 }
 
 .inputcss :deep(.el-input__wrapper) {
@@ -1935,5 +2008,60 @@ $design-height: 1080;
     margin-left: adaptiveWidth(25);
     margin-top: adaptiveHeight(35);
   }
+}
+
+
+
+.ltTrendDialog {
+  width: adaptiveWidth(440);
+  height: adaptiveHeight(280);
+  background: url("/public/img/弹窗背景.png") no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  top: adaptiveHeight(100);
+  left: adaptiveWidth(480);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0 0 10px 0;
+
+  .ltTrendDialog_top {
+    width: 100%;
+    height: adaptiveHeight(45);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      font-size: adaptiveFontSize(20);
+      color: #ffffff;
+      padding-left: adaptiveWidth(15);
+      font-family: youshe;
+    }
+
+    img {
+      width: adaptiveWidth(8);
+      height: adaptiveHeight(8);
+      padding-right: adaptiveWidth(10);
+      cursor: pointer;
+    }
+  }
+
+  .ltTrendDialog_bottom {
+    width: 100%;
+    // height: 100%;
+    flex: 1;
+
+    box-sizing: border-box;
+    padding: 5px 10px;
+    overflow: auto;
+  }
+}
+
+.lt_descriptions {
+  --el-fill-color-blank: transparent;
+  --el-text-color-primary: white;
+  --el-text-color-regular: white;
 }
 </style>

@@ -38,6 +38,11 @@ export function alarmEventsList(params: alarmEventsListRes) {
   return http.get("/manage/event", { params });
 }
 
+// getGongYiJieDianTodayAlarmCount
+export function getGongYiJieDianTodayAlarmCount() {
+  return http.get("/manage/event/getGongYiJieDianTodayAlarmCount");
+}
+
 export function alarmMateEventsList(params: alarmEventsListRes) {
   return http.get("/manage/alarm", { params });
 }

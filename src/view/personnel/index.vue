@@ -97,21 +97,10 @@
       </div>
     </div>
     <div class="bigscreen_rt_bottom">
-      <!-- <swiper
-        :slides-per-view="1"
-        :space-between="10"
-        pagination
-        style="width: 100%; height: 100%"
-      > -->
       <div class="rtDialog_bottom">
-        <!-- <img src="/public/img/监控视频尺寸.png" alt="" /> -->
-        <Video style="width:100%" class="rtDialog_bottom_video" ref="videoRef" />
-        <!-- <div>倍速播放×1</div> -->
+        <!-- <Video style="width:100%" class="rtDialog_bottom_video" ref="videoRef" /> -->
+        <Rt />
       </div>
-      <!-- <swiper-slide v-for="(item, index) in slides" :key="index">
-          <img :src="item.image" alt="" />
-        </swiper-slide> -->
-      <!-- </swiper> -->
     </div>
   </div>
   <div class="bigscreen_rb">
@@ -193,7 +182,7 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import img1 from "../../../public/img/视频监控尺寸.png";
 import img9 from "../../../public/img/叉号.png";
-import Video from "../home/components/Video.vue";
+import Rt from "./rt/index.vue";
 
 import {
   indicatorStatistics,
@@ -614,40 +603,40 @@ const healthySelect = reactive([
   },
 ]);
 
-const videoRef = ref(null);
+// const videoRef = ref(null);
 const videoInfo = ref({});
 const channelQuery = ref({
   name: "",
   pageNum: 1,
   pageSize: 1,
 });
-const getVideoList = () => {
-  nextTick(() => {
-    getChannelListApi(channelQuery.value).then((res) => {
+// const getVideoList = () => {
+//   nextTick(() => {
+//     getChannelListApi(channelQuery.value).then((res) => {
 
-      videoInfo.value = res.data.data.List[0];
-      getStreamUrlApi(videoInfo.value.channelid).then((ress) => {
-        const url = new URL(ress.data.data.wsflv);
-        url.host = location.host;
-        videoRef.value.play(url.toString());
-        videoRef.value.setChannelId(ress.data.data.channelId);
-        channelQuery.value.pageNum += 1;
-        if (channelQuery.value.pageNum > ress.data.data.Total) {
-          channelQuery.value.pageNum = 1;
-        }
-      }).catch((err) => {
-        channelQuery.value.pageNum = 1
-      });
-    });
-  });
+//       videoInfo.value = res.data.data.List[0];
+//       getStreamUrlApi(videoInfo.value.channelid).then((ress) => {
+//         const url = new URL(ress.data.data.wsflv);
+//         url.host = location.host;
+//         videoRef.value.play(url.toString());
+//         videoRef.value.setChannelId(ress.data.data.channelId);
+//         channelQuery.value.pageNum += 1;
+//         if (channelQuery.value.pageNum > ress.data.data.Total) {
+//           channelQuery.value.pageNum = 1;
+//         }
+//       }).catch((err) => {
+//         channelQuery.value.pageNum = 1
+//       });
+//     });
+//   });
 
-};
+// };
 
 
-const videoTimer = useIntervalFn(() => {
-  /* your function */
-  getVideoList();
-}, 20000)
+// const videoTimer = useIntervalFn(() => {
+//   /* your function */
+//   getVideoList();
+// }, 20000)
 
 const healthyStatisticsFun = async () => {
   const { data } = await healthyStatistics(healthyStatisticsData.value);
@@ -678,7 +667,7 @@ const showPersonnelDialogRef = ref(null);
 
 onMounted(() => {
   lbDialogBottomChart = echarts.init(showPersonnelDialogRef.value);
-  getVideoList();
+  // getVideoList();
   initChart();
   indicatorStatisticsList();
   healthylistFun();
@@ -686,7 +675,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  videoTimer.pause();
+  // videoTimer.pause();
 });
 </script>
 
@@ -716,15 +705,15 @@ $design-height: 1080;
   justify-content: center;
   overflow: hidden;
 
-  .rtDialog_bottom_video {
-    :deep(#container) {
-      width: adaptiveWidth(420);
-      height: adaptiveHeight(215);
-      object-fit: cover;
-    }
+  // .rtDialog_bottom_video {
+  //   :deep(#container) {
+  //     width: adaptiveWidth(420);
+  //     height: adaptiveHeight(215);
+  //     object-fit: cover;
+  //   }
 
-    object-fit: cover;
-  }
+  //   object-fit: cover;
+  // }
 }
 
 .bigscreen_lt,
@@ -1262,8 +1251,8 @@ $design-height: 1080;
 
   --el-input-bg-color: rgba(255, 255, 255, 0);
 
-  --el-text-color-placeholder:white;
-  --el-input-text-color:white;
+  --el-text-color-placeholder: white;
+  --el-input-text-color: white;
 
   :deep(.is-focus) {
     // --el-input-focus-border-color: blue;

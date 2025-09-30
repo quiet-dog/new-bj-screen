@@ -62,6 +62,23 @@ export function equipmentList(params: equipmentListRes) {
   return http.get("/manage/equipment", { params });
 }
 
+export function equipmentDetailList(params: equipmentListRes) {
+  return http.get("/manage/equipment/detail", { params });
+}
+
+export function equipmentDetail(id: number) {
+  return http.get("/manage/equipment/" + id);
+}
+
+export function equipmentAlarmCount(params: string) {
+  return http.get("/manage/equipment/alarmCount", {
+    params: {
+      dayType: params
+    }
+  });
+}
+
+
 //获取设备数据历史统计
 export interface historicalStatisticsRes {
   thresholdId: number;

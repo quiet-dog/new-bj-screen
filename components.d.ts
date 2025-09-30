@@ -9,10 +9,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     AlarmFile: typeof import('./src/components/AlarmFile/index.vue')['default']
     Center: typeof import('./src/components/center.vue')['default']
+    DialogPreview: typeof import('./src/components/DialogPreview/index.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElCascader: typeof import('element-plus/es')['ElCascader']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
+    ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
@@ -43,5 +45,8 @@ declare module 'vue' {
     Tuone: typeof import('./src/components/tuone/index.vue')['default']
     Tuthree: typeof import('./src/components/tuthree/index.vue')['default']
     Tutwo: typeof import('./src/components/tutwo/index.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
   }
 }

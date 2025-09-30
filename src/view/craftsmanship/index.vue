@@ -10,7 +10,7 @@
       <div class="bigscreen_lt_bottom_t">
         <img src="/public/img/craftsmanship/infoIcon.png" alt="" />
         <div class="bigscreen_lt_bottom_tdiv">
-          <span>报警信息</span>
+          <span>今日报警信息</span>
           <br />
           <span>Alarm message</span>
         </div>
@@ -26,7 +26,7 @@
             <span>一般</span>
             <span>
               {{
-                alarmEventslist.filter((item) => item.level == "一般").length
+                jinRiGongYiJieDianAlarmCount["一般"]
               }}
             </span>
           </div>
@@ -43,7 +43,7 @@
             <span>重要</span>
             <span>
               {{
-                alarmEventslist.filter((item) => item.level == "重要").length
+                jinRiGongYiJieDianAlarmCount["重要"]
               }}
             </span>
           </div>
@@ -60,7 +60,7 @@
             <span>紧急</span>
             <span>
               {{
-                alarmEventslist.filter((item) => item.level == "紧急").length
+                jinRiGongYiJieDianAlarmCount["紧急"]
               }}
             </span>
           </div>
@@ -73,7 +73,14 @@
               <img :src="item.img" alt="" />
               <div>
                 <span style="margin-left: 25px">{{ item.level }}</span>
-                <span>{{ item.craftNode?.nodeName }}</span>
+                <el-tooltip placement="top-start">
+                  <template #content>
+                    <span>{{ item.craftNode?.nodeName }}</span>
+                    <br/>
+                    <span>{{ item?.createTime }}</span>
+                  </template>
+                  <span>{{ item.craftNode?.nodeName }}</span>
+                </el-tooltip>
                 <span>节点故障</span>
               </div>
             </div>
@@ -241,7 +248,7 @@
       </div>
       <div>
         <span>所属工艺：</span>
-        <span>病毒加工艺</span>
+        <span>{{ lbInfo?.craftArchive?.craftArchiveName }}</span>
       </div>
       <div>
         <span>节点顺序：</span>
@@ -383,7 +390,7 @@ import { ref, onMounted } from "vue";
 import * as echarts from "echarts";
 import { Search } from "@element-plus/icons-vue";
 import { archiveList, nodeList, processList } from "../../api/craftsmanship";
-import { alarmEventsList } from "../../api/incident";
+import { alarmEventsList, getGongYiJieDianTodayAlarmCount } from "../../api/incident";
 import center from "../../components/center.vue";
 import img9 from "../../../public/img/叉号.png";
 import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
@@ -738,6 +745,24 @@ const alarmEventsListFun = async () => {
     };
   });
 };
+const jinRiGongYiJieDianAlarmCount = ref({
+  "轻微": 0,
+  "一般": 0,
+  "中度": 0,
+  "重要": 0,
+  "紧急": 0,
+});
+async function getJinRiGongYiJieDianAlarmCount() {
+  getGongYiJieDianTodayAlarmCount().then(res => {
+    jinRiGongYiJieDianAlarmCount.value = res.data.data;
+  })
+}
+const jinRiGongYiJieDianAlarmCountTimer = useIntervalFn(() => {
+  jinRiGongYiJieDianAlarmCountTimer.pause();
+  getJinRiGongYiJieDianAlarmCount().finally(() => {
+    jinRiGongYiJieDianAlarmCountTimer.resume();
+  })
+}, 5000)
 
 const alarmEventsTimer = useIntervalFn(() => {
   alarmEventsTimer.pause();
@@ -802,6 +827,7 @@ onMounted(() => {
   nodelistFun();
   alarmEventsListFun();
   processlistFun();
+  getJinRiGongYiJieDianAlarmCount()
 });
 </script>
 
@@ -924,7 +950,7 @@ $design-height: 1080;
 
           span {
             &:nth-child(1) {
-              font-size: adaptiveFontSize(18);
+              font-size: adaptiveFontSize(12);
             }
 
             &:nth-child(3) {
@@ -1636,8 +1662,8 @@ $design-height: 1080;
 .inputcss {
   --el-input-bg-color: rgba(255, 255, 255, 0);
 
-  --el-text-color-placeholder:white;
-  --el-input-text-color:white;
+  --el-text-color-placeholder: white;
+  --el-input-text-color: white;
 
   :deep(.is-focus) {
     // --el-input-focus-border-color: blue;

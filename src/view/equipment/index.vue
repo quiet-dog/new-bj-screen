@@ -7,7 +7,9 @@
       </div>
     </div>
     <div class="bigscreen_lt_bottom">
-      <div @mouseenter="ltequipmentlistTimer.pause()" @mouseleave="ltequipmentlistTimer.resume()"
+
+      <Lt />
+      <!-- <div @mouseenter="ltequipmentlistTimer.pause()" @mouseleave="ltequipmentlistTimer.resume()"
         class="bigscreen_lt_bottomnei">
         <Vue3SeamlessScroll :list="ltequipmentlist" :step="1" :singleHeight="70" hover class="scrool">
           <div class="bigscreen_lt_bottom_nei" v-for="(item, index) in ltequipmentlist">
@@ -33,7 +35,7 @@
             </div>
           </div>
         </Vue3SeamlessScroll>
-      </div>
+      </div> -->
     </div>
   </div>
   <div class="bigscreen_lc">
@@ -90,16 +92,23 @@
         <img src="/public/img/光标.png" alt="" />
         <span>设备运行状态</span>
       </div>
-      <el-cascader :options="equipmentlist2" v-model="equipmentIds" @change="cascaderChange" class="cascaderCss" :props="{
+      <!-- <el-cascader :options="equipmentlist2" v-model="equipmentIds" @change="cascaderChange" class="cascaderCss" :props="{
         value: 'id',
         label: 'name',
         children: 'thresholdList',
-      }" />
+      }" /> -->
+      <el-select @change="getThresholdInfo" v-model="lbEquipmentId" size="small" class="selectcss">
+        <!-- @vue-expect-error -->
+        <el-option v-infinite-scroll="loadMoreEquipment" v-for="item in lbEquipmentList" :key="item?.equipmentId"
+          :label="`${item?.equipmentName} (${item?.equipmentCode} - ${item?.installationLocation})`" :value="item?.equipmentId" />
+
+      </el-select>
     </div>
     <div class="bigscreen_lb_bottom">
-      <h1>运行时间:{{ runningTime }}</h1>
-      <div @mouseenter="historicalStatisticsListTimer.pause()" @mouseleave="historicalStatisticsListTimer.resume()"
-        class="bigscreen_lb_bottom_nei" ref="bigscreenLBRef"></div>
+      <!-- <h1>运行时间:{{ runningTime }}</h1> -->
+      <!-- <div @mouseenter="historicalStatisticsListTimer.pause()" @mouseleave="historicalStatisticsListTimer.resume()"
+        class="bigscreen_lb_bottom_nei" ref="bigscreenLBRef"></div> -->
+      <Lb ref="lbRef" />
     </div>
   </div>
   <center></center>
@@ -115,12 +124,17 @@
       <div class="bigscreen_rt_bottom_nei">
         <img src="/public/img/监控报告图标.png" alt="" />
         <div class="bigscreen_rt_bottom_r">
-          <div @click="rtClick(item)" v-for="item in videoList">
-            <span>{{ item.name }}</span>
-          </div>
-          <!-- <div @click="rtClick"><span>JK218 科学大道点位1</span></div>
-          <div><span>JK218 科学大道点位1</span></div>
-          <div><span>JK218 科学大道点位1</span></div> -->
+          <!-- <div @click="rtClick(item)" v-for="item in videoList">
+            <span>{{ item?.name }}</span>
+          </div> -->
+          <Vue3SeamlessScroll :list="videoList" :class-option="{
+            step: 5,
+          }" hover>
+            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
+              class="video_item">
+              <span>{{ item?.name }}</span>
+            </div>
+          </Vue3SeamlessScroll>
         </div>
       </div>
     </div>
@@ -228,11 +242,11 @@
           <img src="/public/img/zuo.svg" alt="" @click="ciShuLeftClick" style="margin-left: 5px" />
           <span>{{
             dayjs(ciShuTimer.startTime).format("MM月DD日")
-          }}</span>
+            }}</span>
           <span>-</span>
           <span>{{
             dayjs(ciShuTimer.endTime).format("MM月DD日")
-          }}</span>
+            }}</span>
           <img src="/public/img/you.svg" alt="" @click="ciShuRightClick" style="margin-right: 5px" />
         </div>
       </div>
@@ -368,6 +382,8 @@ import Video from "../home/components/Video.vue";
 import { thresholdDataList } from "../../api/riskassessment";
 import { useIntervalFn } from '@vueuse/core'
 import { useXunJianQushiHook } from "./qushi";
+import Lt from "./lt/index.vue";
+import Lb from "./lb/index.vue";
 
 
 const rtStatus = ref(false);
@@ -381,13 +397,6 @@ const rtClick = (item) => {
     videoRef.value.play(url.toString());
     videoRef.value.setChannelId(res.data.data.channelId);
   });
-  // nextTick(() => {
-  //   getStreamUrlApi(item.channelid).then((res) => {
-  //     console.log("res.data.data.wsflv", res.data.data.wsflv);
-  //     videoRef.value.play(res.data.data.wsflv);
-  //     videoRef.value.setChannelId(res.data.data.channelId);
-  //   });
-  // });
 };
 const rtcanleClick = () => {
   rtStatus.value = false;
@@ -497,12 +506,12 @@ const ltequipmentListFun = async () => {
     }
   })
 };
-const ltequipmentlistTimer = useIntervalFn(() => {
-  ltequipmentlistTimer.pause();
-  ltequipmentListFun().finally(() => {
-    ltequipmentlistTimer.resume();
-  })
-}, 100000)
+// const ltequipmentlistTimer = useIntervalFn(() => {
+//   ltequipmentlistTimer.pause();
+//   ltequipmentListFun().finally(() => {
+//     ltequipmentlistTimer.resume();
+//   })
+// }, 100000)
 
 //设备台账
 const equipmentFormData = ref({
@@ -520,29 +529,29 @@ const equipmentListFun = async () => {
   const { data } = await equipmentList(equipmentFormData.value);
   let list = data.data.rows;
   equipmentlist.value = list;
-  equipmentlist2.value = data.data.rows.map((item) => {
-    const list = item.thresholdList.map((v) => {
-      return {
-        ...v,
-        id: v.thresholdId,
-        name: v.sensorName,
-        label: v.sensorName,
-      };
-    });
-    return {
-      ...item,
-      id: item.equipmentId,
-      name: item.equipmentName + (item.equipmentCode != null || item.equipmentCode != "" ? "(" + item.equipmentCode + ")" : ""),
-      thresholdList: list,
-    };
-  });
+  // equipmentlist2.value = data.data.rows.map((item) => {
+  //   const list = item.thresholdList.map((v) => {
+  //     return {
+  //       ...v,
+  //       id: v.thresholdId,
+  //       name: v.sensorName,
+  //       label: v.sensorName,
+  //     };
+  //   });
+  //   return {
+  //     ...item,
+  //     id: item.equipmentId,
+  //     name: item.equipmentName + (item.equipmentCode != null || item.equipmentCode != "" ? "(" + item.equipmentCode + ")" : ""),
+  //     thresholdList: list,
+  //   };
+  // });
   equipmentId.value = data.data.rows[0].equipmentId;
-  equipmentIds.value = [
-    equipmentlist2.value[0].equipmentId,
-    equipmentlist2.value[0].thresholdList[0].thresholdId,
-  ];
-  thresholdId.value = equipmentlist2.value[0].thresholdList[0].thresholdId;
-  historicalStatisticsListFun();
+  // equipmentIds.value = [
+  //   equipmentlist2.value[0].equipmentId,
+  //   equipmentlist2.value[0].thresholdList[0].thresholdId,
+  // ];
+  // thresholdId.value = equipmentlist2.value[0].thresholdList[0].thresholdId;
+  // historicalStatisticsListFun();
 };
 const searchEquipment = (val) => {
   equipmentListFun();
@@ -633,43 +642,44 @@ const bigscreenLBoption = {
 };
 const thresholdId = ref(0);
 const runningTime = ref("0");
-const historicalStatisticsListFun = async () => {
-  const { data } = await historicalStatisticsList({
-    thresholdId: thresholdId.value,
-  });
-  bigscreenLBoption.xAxis.data = data.time;
-  bigscreenLBoption.series[0].data = data.data;
-  if (Array.isArray(data.data) && data.data.length > 0) {
-    bigscreenLBoption.series[0].data = data.data.map((item) => {
-      return {
-        value: item,
-        equipmentName: data.equipmentName,
-        equipmentCode: data.equipmentCode,
-        unitName: data.unitName,
-        sensorName: data.sensorName,
-      }
-    })
-  }
-  if (bigscreenLBRef.value && bigscreenLBChart == null) {
-    bigscreenLBChart = echarts.init(bigscreenLBRef.value);
-  }
-  bigscreenLBChart.setOption(bigscreenLBoption, true);
-  getRunningTime(thresholdId.value).then(res => {
-    runningTime.value = res.data.data;
-  })
+// const historicalStatisticsListFun = async () => {
+//   const { data } = await historicalStatisticsList({
+//     thresholdId: thresholdId.value,
+//   });
+//   bigscreenLBoption.xAxis.data = data.time;
+//   bigscreenLBoption.series[0].data = data.data;
+//   if (Array.isArray(data.data) && data.data.length > 0) {
+//     bigscreenLBoption.series[0].data = data.data.map((item) => {
+//       return {
+//         value: item,
+//         equipmentName: data.equipmentName,
+//         equipmentCode: data.equipmentCode,
+//         unitName: data.unitName,
+//         sensorName: data.sensorName,
+//       }
+//     })
+//   }
+//   if (bigscreenLBRef.value && bigscreenLBChart == null) {
+//     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
+//   }
+//   bigscreenLBChart.setOption(bigscreenLBoption, true);
+//   getRunningTime(thresholdId.value).then(res => {
+//     runningTime.value = res.data.data;
+//   })
 
-};
-const historicalStatisticsListTimer = useIntervalFn(() => {
-  historicalStatisticsListTimer.pause();
-  historicalStatisticsListFun().finally(() => {
-    historicalStatisticsListTimer.resume();
-  })
-}, 10000)
+// };
+// const historicalStatisticsListTimer = useIntervalFn(() => {
+//   historicalStatisticsListTimer.pause();
+//   historicalStatisticsListFun().finally(() => {
+//     historicalStatisticsListTimer.resume();
+//   })
+// }, 10000)
 
 const cascaderChange = (val) => {
   thresholdId.value = val[1];
-  historicalStatisticsListFun();
+  // historicalStatisticsListFun();
 };
+
 
 //维修记录
 const repairformData = ref<equipmentRepairListRes>({
@@ -745,9 +755,8 @@ const bigscreenRCoption = {
         return Math.round(value);
       }
     },
-    // interval: 20,
-    min: 'dataMin',
-    max: 'dataMax',
+    minInterval: 1,
+    data: [0, 1, 2, 3, 4, 5, 6],
   },
   series: [
     {
@@ -777,10 +786,17 @@ async function getYzData() {
   });
   bigscreenRCoption.xAxis.data = data.data.times;
   bigscreenRCoption.series[0].data = data.data.data;
-  if (bigscreenRCRef.value) {
-    bigscreenRCChart = echarts.init(bigscreenRCRef.value);
-    bigscreenRCChart.setOption(bigscreenRCoption);
+  if (Array.isArray(data.data.data) && data.data.data.length > 0) {
+      // @ts-ignore
+      bigscreenRCoption.yAxis.min = 1;
+      // @ts-ignore
+      bigscreenRCoption.yAxis.max = Math.max(...data.data.data, 6); // 至少6
   }
+
+  if (bigscreenRCChart == null) {
+    bigscreenRCChart = echarts.init(bigscreenRCRef.value);
+  }
+  bigscreenRCChart.setOption(bigscreenRCoption, true);
 }
 const rctClick = async () => {
   rcStatus.value = !rcStatus.value;
@@ -855,8 +871,41 @@ const jianceTimer = useIntervalFn(() => {
   })
 }, 10000)
 
+
+const lbEquipmentList = ref([]);
+const lbEquipmentId = ref(0);
+const lbRef = ref<InstanceType<typeof Lb>>()
+const lbEquipmentPage = ref({
+  equipmentName: "",
+  pageNum: 1,
+  pageSize: 10,
+  orderColumn: "createTime",
+  orderDirection: "descending",
+  total: 0,
+});
+function lbEquipmentListFun() {
+  equipmentList(lbEquipmentPage.value).then(res => {
+    // @ts-ignore
+    lbEquipmentList.value = [...lbEquipmentList.value, ...res.data.data.rows];
+    lbEquipmentPage.value.total = res.data.data.total;
+    if (Array.isArray(res.data.data.rows) && res.data.data.rows.length > 0 && lbEquipmentId.value == 0) {
+      lbEquipmentId.value = res.data.data.rows[0].equipmentId;
+      getThresholdInfo(lbEquipmentId.value)
+    }
+  })
+}
+function getThresholdInfo(val) {
+  lbRef.value?.getEquipmentInfo(val)
+}
+function loadMoreEquipment() {
+  if (lbEquipmentPage.value.pageNum < lbEquipmentPage.value.total) {
+    lbEquipmentPage.value.pageNum += 1;
+    lbEquipmentListFun();
+  }
+}
+
 window.onresize = function () {
-  bigscreenLBChart.resize();
+  // bigscreenLBChart.resize();
 };
 
 
@@ -873,6 +922,7 @@ onMounted(() => {
   equipmentListFun();
   ltequipmentListFun();
   getVideoList()
+  lbEquipmentListFun()
 });
 </script>
 
@@ -1244,25 +1294,26 @@ $design-height: 1080;
       .bigscreen_rt_bottom_r {
         width: adaptiveWidth(218);
         height: adaptiveHeight(167);
-        display: flex;
-        flex-direction: column;
+        // display: flex;
+        // flex-direction: column;
         justify-content: space-between;
+        overflow: hidden;
 
-        div {
-          width: 100%;
-          height: adaptiveHeight(41);
-          background: url("/public/img/半透明背景1.png") no-repeat;
-          background-size: 100% 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        // div {
+        //   width: 100%;
+        //   height: adaptiveHeight(41);
+        //   background: url("/public/img/半透明背景1.png") no-repeat;
+        //   background-size: 100% 100%;
+        //   display: flex;
+        //   align-items: center;
+        //   justify-content: center;
 
-          span {
-            font-size: adaptiveFontSize(14);
-            color: rgba(255, 255, 255, 1);
-            margin-left: adaptiveWidth(10);
-          }
-        }
+        //   span {
+        //     font-size: adaptiveFontSize(14);
+        //     color: rgba(255, 255, 255, 1);
+        //     margin-left: adaptiveFontSize(10);
+        //   }
+        // }
       }
     }
   }
@@ -1794,8 +1845,9 @@ $design-height: 1080;
 
 :deep(.selectcss) {
   .el-select__wrapper {
+    --el-border-color: white;
     background-color: transparent !important;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+    // box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
   }
 
   .el-select__placeholder {
@@ -1803,7 +1855,8 @@ $design-height: 1080;
   }
 
   .el-select__selected-item {
-    color: rgba(255, 255, 255, 0.6) !important;
+    // color: rgba(255, 255, 255, 0.6) !important;
+    color: white !important;
   }
 }
 
@@ -1813,8 +1866,8 @@ $design-height: 1080;
   margin-right: adaptiveWidth(11);
   --el-input-bg-color: rgba(255, 255, 255, 0);
 
-  --el-text-color-placeholder:white;
-  --el-input-text-color:white;
+  --el-text-color-placeholder: white;
+  --el-input-text-color: white;
 
   :deep(.is-focus) {
     // --el-input-focus-border-color: blue;
@@ -1934,5 +1987,30 @@ $design-height: 1080;
 .bigscreen_rb_top_l_rg {
   margin-left: auto;
   margin-right: adaptiveWidth(12);
+}
+
+.selectcss {
+  --el-border-color: white;
+  width: adaptiveWidth(155);
+  margin-right: adaptiveWidth(11);
+}
+
+
+.video_item {
+  width: adaptiveWidth(200);
+  height: adaptiveHeight(41);
+  background: url("/public/img/半透明背景1.png") no-repeat;
+  background-size: 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-bottom: adaptiveHeight(10);
+
+  span {
+    font-size: adaptiveFontSize(14);
+    color: rgba(255, 255, 255, 1);
+    margin-left: adaptiveFontSize(10);
+  }
 }
 </style>

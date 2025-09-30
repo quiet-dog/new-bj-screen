@@ -185,8 +185,13 @@
             step: 5,
           }" hover class="scrool">
             <div v-for="(item, index) in alarmEventslist" :key="index" class="bigscreen_lc_bottom_rnei">
-              <ElTooltip :content="item.description">
-                <span>{{ item.description }}</span>
+              <ElTooltip >
+                <template #content>
+                  <span>{{ item?.description }}</span>
+                  <br/>
+                  <span>{{ item?.createTime }}</span>
+                </template>
+                <span>{{ item?.description }}</span>
               </ElTooltip>
               <div :style="{
                 background: ` url(${item.img}) no-repeat`,
@@ -304,7 +309,7 @@
     <div class="bigscreen_rt_top">
       <div class="bigscreen_rt_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>监控报告</span>
+        <span>实时监控</span>
       </div>
       <!-- @keyup.enter="getVideoList" -->
       <el-input class="inputcss" v-model="channelQuery.name" @keyup.enter="getVideoList"
@@ -320,8 +325,8 @@
           <Vue3SeamlessScroll :list="videoList" :class-option="{
             step: 5,
           }" hover>
-            <div @click="rtClick(item)" v-for="(item, index) in videoList" :key="index" class="video_item">
-              <span>{{ item.name }}</span>
+            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index" class="video_item">
+              <span>{{ item?.name }}</span>
             </div>
           </Vue3SeamlessScroll>
         </div>
@@ -348,7 +353,7 @@
           <Vue3SeamlessScroll :list="policieslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div v-for="(item, index) in policieslist" @click="rcClick(item)" :key="index"
+            <div style="cursor: pointer;" v-for="(item, index) in policieslist" @click="rcClick(item)" :key="index"
               class="bigscreen_rc_bottom_rnei">
               <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
                 dayjs(item.createTime).format("YYYY-MM-DD")
@@ -422,7 +427,7 @@
     </div>
     <div class="ltTrendDialog_bottom">
       <ElTable :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle" id="tableMy"
-        header-row-class-name="headerTr" style="width: 100%;background: #002547;" class="list_table"
+        header-row-class-name="headerTr" height="100%" style="width: 100%;background: #002547;" class="list_table"
         :data="getTargetTypeList()">
 
         <el-table-column width="60" fixed prop="eventId" label="编号">
@@ -955,10 +960,10 @@ const bigscreenRBoption = {
       lineStyle: {
         color: "RGBA(255, 169, 19, 1)", // 线条颜色
       },
-      areaStyle: createAreaStyle(
-        "RGBA(255, 169, 19, 0.5)",
-        "rgba(255, 169, 19, 0)"
-      ),
+      // areaStyle: createAreaStyle(
+      //   "RGBA(255, 169, 19, 0.5)",
+      //   "rgba(255, 169, 19, 0)"
+      // ),
       // 图例的圆点颜色跟下面lineStyle的color一致
       itemStyle: {
         color: "RGBA(255, 169, 19, 1)",
@@ -973,10 +978,10 @@ const bigscreenRBoption = {
       lineStyle: {
         color: "RGBA(225, 110, 122, 1)", // 线条颜色
       },
-      areaStyle: createAreaStyle(
-        "RGBA(225, 110, 122, 0.5)",
-        "rgba(225, 110, 122, 0)"
-      ),
+      // areaStyle: createAreaStyle(
+      //   "RGBA(225, 110, 122, 0.5)",
+      //   "rgba(225, 110, 122, 0)"
+      // ),
       itemStyle: {
         color: "RGBA(225, 110, 122, 1)",
       },
@@ -990,10 +995,10 @@ const bigscreenRBoption = {
       lineStyle: {
         color: "RGBA(65, 195, 142, 1)", // 线条颜色
       },
-      areaStyle: createAreaStyle(
-        "RGBA(65, 195, 142, 0.5)",
-        "rgba(65, 195, 142, 0)"
-      ),
+      // areaStyle: createAreaStyle(
+      //   "RGBA(65, 195, 142, 0.5)",
+      //   "rgba(65, 195, 142, 0)"
+      // ),
       itemStyle: {
         color: "RGBA(65, 195, 142, 1)",
       },
@@ -1007,10 +1012,10 @@ const bigscreenRBoption = {
       lineStyle: {
         color: "RGBA(210, 114, 255, 1)", // 线条颜色
       },
-      areaStyle: createAreaStyle(
-        "RGBA(210, 114, 255, 0.5)",
-        "rgba(210, 114, 255, 0)"
-      ),
+      // areaStyle: createAreaStyle(
+      //   "RGBA(210, 114, 255, 0.5)",
+      //   "rgba(210, 114, 255, 0)"
+      // ),
       itemStyle: {
         color: "RGBA(210, 114, 255, 1)",
       },
@@ -2252,7 +2257,7 @@ $design-height: 1080;
 }
 
 .inputcss {
-  // width: adaptiveWidth(148);
+  width: adaptiveWidth(148);
   height: adaptiveHeight(24);
   margin-right: adaptiveWidth(10);
   --el-input-bg-color: rgba(255, 255, 255, 0);

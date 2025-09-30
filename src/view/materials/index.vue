@@ -3,11 +3,12 @@
     <div class="bigscreen_lt_top">
       <div class="bigscreen_lt_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span :class="alarmTypes == 0 ? 'alarm_active' : ''" @click="changeAlarmTypes(0)">报警信息</span>
-        <span style="color: white;">/</span><span :class="alarmTypes == 1 ? 'alarm_active' : ''"
+        <span :class="alarmTypes == 10 ? 'alarm_active' : ''" @click="changeAlarmTypes(0)">报警信息 &nbsp;(今日物料报警：{{
+          alarmInformationlistCountJinRi }})</span>
+        <!-- <span style="color: white;">/</span><span :class="alarmTypes == 1 ? 'alarm_active' : ''"
           @click="changeAlarmTypes(1)">领用报警</span>
         <span style="color: white;">/</span><span :class="alarmTypes == 2 ? 'alarm_active' : ''"
-          @click="changeAlarmTypes(2)">上报报警</span>
+          @click="changeAlarmTypes(2)">上报报警</span> -->
       </div>
     </div>
     <div class="bigscreen_lt_bottom">
@@ -138,6 +139,7 @@
       <div class="bigscreen_rb_bottom_nei">
         <div class="bigscreen_rb_bottom_nei_t">
           <span>物料名称</span>
+          <span>物料编号</span>
           <span>领用时间</span>
           <span>领用人员</span>
           <span>领用数量</span>
@@ -153,6 +155,14 @@
                   <span>
                     <img src="/public/img/equipment/tableicon.png" alt="" v-if="item.status" />
                     {{ item.materialsInfo.name }}
+                  </span>
+                </template>
+              </el-popover>
+              <el-popover class="box-item" title="" :content="item.materialsInfo.code" placement="top-start">
+                <template #reference>
+                  <span>
+                    <img src="/public/img/equipment/tableicon.png" alt="" v-if="item.status" />
+                    {{ item.materialsInfo.code }}
                   </span>
                 </template>
               </el-popover>
@@ -176,13 +186,13 @@
       <img :src="img9" alt="" srcset="" @click="rbcanleClick" />
     </div>
     <div class="rbDialog_bottom">
-      <el-input v-show="isShowInput" class="inputcss" v-model="receiveFormData2.materialName" @change="receivelistFun2"
+      <el-input :readonly="!isShowInput" class="inputcss" v-model="receiveFormData2.materialName" @change="receivelistFun2"
         style="width: 148px; height: 24px" placeholder="请输入物料名称" :prefix-icon="Search" />
-      <el-scrollbar class="bigscreen_rc_bottom_nei">
-        <div class="bigscreen_rc_bottom_l">
-          <img src="/public/img/圆形标记.png" alt="" />
-        </div>
-        <div class="bigscreen_rc_bottom_r">
+      <div class="bigscreen_rc_bottom_l">
+        <img src="/public/img/圆形标记.png" alt="" />
+      </div>
+      <div class="bigscreen_rc_bottom_r">
+        <el-scrollbar height="100%">
           <div v-for="(item, index) in receivelist2" :key="index" class="bigscreen_rc_bottom_rnei">
             <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
               dayjs(item.createTime).format("YYYY-MM-DD")
@@ -195,8 +205,8 @@
               <span>领用数量：{{ item.receiveNum }}</span>
             </div>
           </div>
-        </div>
-      </el-scrollbar>
+        </el-scrollbar>
+      </div>
     </div>
   </div>
 </template>
@@ -235,6 +245,7 @@ const alarmInformationData = ref({
 
 const alarmTypes = ref(0)
 const alarmInformationlist = ref<any[]>([]);
+const alarmInformationlistCountJinRi = ref(0);
 const changeAlarmTypes = (value) => {
   alarmTypes.value = value
   alarmInformationlistFun()
@@ -272,23 +283,6 @@ const alarmInformationlistFun = async () => {
       img: "/img/yiji_icon.png",
     },
   ];
-  // list.forEach((item) => {
-  //   let level = "未知";
-  //   item.materials?.values?.forEach(v => {
-  //     const isExit = (v.scondition === "小于等于" && item.stock <= v.value) ||
-  //       (v.scondition === "大于等于" && item.stock >= v.value) ||
-  //       (v.scondition === "大于等于" && item.stock >= v.value) ||
-  //       (v.scondition === "小于" && item.stock < v.value) ||
-  //       (v.scondition === "大于" && item.stock > v.value);
-  //     if (isExit) {
-  //       level = v.level;
-  //       item.level = level;
-  //     }
-  //   })
-  //   if (level === "未知") {
-  //     item.level = "轻微";
-  //   }
-  // });
   alarmInformationlist.value = list.map((item) => {
     const matchedLevel = imgList.find((v) => v.level === item.level);
     return {
@@ -297,6 +291,16 @@ const alarmInformationlistFun = async () => {
       status: "库存异常",
     };
   });
+  // alarmInformationlistCountJinRi
+  alarmMateEventsList({
+    type: "物料报警",
+    pageNum: 1,
+    pageSize: 1,
+    beginTime: dayjs().startOf("day").format("YYYY-MM-DD"),
+    endTime: dayjs().endOf("day").format("YYYY-MM-DD"),
+  }).then(res => {
+    alarmInformationlistCountJinRi.value = res.data.data.total;
+  })
 };
 
 const alarmInfomationTimer = useIntervalFn(() => {
@@ -330,6 +334,7 @@ const rbClick = async () => {
 };
 const rbcanleClick = () => {
   rbstatus.value = false;
+  receiveFormData2.value.materialName = "";
 };
 
 const receiveFormData2 = ref({
@@ -732,12 +737,17 @@ const receivestatisticsFun = async () => {
 
   bigscreenRCoption.xAxis.data = data.time;
   bigscreenRCoption.series[0].data = data.data;
-  if (bigscreenRCRef.value) {
+  if (bigscreenRCChart === null) {
     bigscreenRCChart = echarts.init(bigscreenRCRef.value);
-    bigscreenRCChart.setOption(bigscreenRCoption);
   }
+  bigscreenRCChart.setOption(bigscreenRCoption);
   console.log("====================asd")
 };
+const receivestatisticsFunTimer = useIntervalFn(() => {
+  receivestatisticsFun().finally(() => {
+    receivestatisticsFunTimer.resume();
+  })
+}, 5000)
 const timeLeftClick = () => {
 
   receivestatisticsData.value.startTime = dayjs(receivestatisticsData.value.startTime)
@@ -1245,7 +1255,7 @@ $design-height: 1080;
         align-items: center;
 
         span {
-          width: 25%;
+          width: 20%;
           font-size: adaptiveFontSize(14);
           color: #9eabb7;
           text-align: center;
@@ -1330,56 +1340,62 @@ $design-height: 1080;
         justify-content: center;
         align-items: center;
 
-        .bigscreen_rc_bottom_l {
-          width: adaptiveWidth(20);
-          height: adaptiveHeight(187);
-          background: url("/img/线.png") no-repeat;
-          background-size: 2px 100%;
-          background-position: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
 
-        .bigscreen_rc_bottom_r {
-          width: adaptiveWidth(381);
-          height: adaptiveHeight(187);
-          margin-left: adaptiveFontSize(15);
-          overflow-y: scroll !important;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          overflow: hidden;
 
-          .bigscreen_rc_bottom_rnei {
-            width: 100%;
-            height: adaptiveHeight(57);
-            margin-top: adaptiveHeight(5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
 
-            div {
-              width: 100%;
-              height: adaptiveHeight(38);
-              display: flex;
-              align-items: center;
+      }
+    }
+  }
+}
 
-              span {
-                color: rgba(255, 255, 255, 1);
-                font-size: adaptiveFontSize(12);
+.bigscreen_rc_bottom_l {
+  width: adaptiveWidth(20);
+  height: adaptiveHeight(187);
+  background: url("/img/线.png") no-repeat;
+  background-size: 2px 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+}
 
-                &:nth-child(1) {
-                  margin-left: adaptiveWidth(10);
-                }
+.bigscreen_rc_bottom_r {
+  width: adaptiveWidth(381);
+  height: adaptiveHeight(187);
+  margin-left: adaptiveFontSize(15);
+  // overflow-y: scroll !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
 
-                &:nth-child(2) {
-                  margin-left: adaptiveWidth(20);
-                }
-              }
-            }
-          }
-        }
+
+}
+
+.bigscreen_rc_bottom_rnei {
+  width: 100%;
+  height: adaptiveHeight(57);
+  margin-top: adaptiveHeight(5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  div {
+    width: 100%;
+    height: adaptiveHeight(38);
+    display: flex;
+    align-items: center;
+
+    span {
+      color: rgba(255, 255, 255, 1);
+      font-size: adaptiveFontSize(12);
+
+      &:nth-child(1) {
+        margin-left: adaptiveWidth(10);
+      }
+
+      &:nth-child(2) {
+        margin-left: adaptiveWidth(20);
       }
     }
   }
@@ -1422,8 +1438,8 @@ $design-height: 1080;
   right: 0;
   z-index: 2;
   --el-input-bg-color: rgba(255, 255, 255, 0);
-  --el-text-color-placeholder:white;
-  --el-input-text-color:white;
+  --el-text-color-placeholder: white;
+  --el-input-text-color: white;
 
   :deep(.is-focus) {
     // --el-input-focus-border-color: blue;

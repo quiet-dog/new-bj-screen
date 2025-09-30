@@ -182,7 +182,7 @@
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div @click="clickFormItem(item.thresholdId)" class="bigscreen_rb_bottom_nei_b"
+            <div style="cursor: pointer;" @click="clickFormItem(item.thresholdId)" class="bigscreen_rb_bottom_nei_b"
               v-for="item in equipmentlist">
               <span>
                 {{ item.thresholdId }}
@@ -1155,7 +1155,7 @@ $design-height: 1080;
         justify-content: space-between;
         align-items: center;
         margin-top: adaptiveHeight(5);
-        cursor: pointer;
+        // cursor: pointer;
         background: url("/public/img/craftsmanship/yaosuback.png") no-repeat;
         background-size: 100% 100%;
         margin-bottom: adaptiveHeight(5);

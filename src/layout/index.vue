@@ -22,31 +22,34 @@
     </div>
     <div class="bigscreen_bottom">
       <div class="bigscreen_bottom_nei">
-        <div
-          class="bigscreen_bottom_neis"
-          v-for="item in btnfun"
-          @click="bigscreenBtn(item.path)"
-        >
-          <div
-            :style="{
+        <div class="bigscreen_bottom_neis" v-for="item in btnfun" @click="bigscreenBtn(item.path)">
+
+          <template v-if="item.title == '风险评估'">
+            <div :style="{
               color: $route.path === item.path ? '#ffffff' : '#00ABFF',
-            }"
-          >
-            {{ item.title }}
-          </div>
-          <img
-            v-if="$route.path === item.path"
-            style="position: absolute; bottom: 0"
-            src="/public/img/切换图标.png"
-            alt=""
-          />
+            }">
+              <span class="fengxianpinggu" @click="getHres">风险评估系统</span>
+              {{ item.title }}
+            </div>
+          </template>
+          <template v-else>
+            <div :style="{
+              color: $route.path === item.path ? '#ffffff' : '#00ABFF',
+            }">
+              {{ item.title }}
+            </div>
+          </template>
+
+
+          <img v-if="$route.path === item.path" style="position: absolute; bottom: 0" src="/public/img/切换图标.png"
+            alt="" />
         </div>
       </div>
     </div>
 
-    <a class="third_path" :href="hres" target="_blank">
+    <!-- <a class="third_path" :href="hres" target="_blank">
       风险评估系统
-    </a>
+    </a> -->
   </div>
 </template>
 
@@ -58,6 +61,10 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const hres = ref(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=628e2892c1b6a84d1e13a0a13bb89cc0`)
+function getHres() {
+  window.open(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=628e2892c1b6a84d1e13a0a13bb89cc0`, '_blank');
+}
+
 let times: any;
 let timer: any;
 const time = ref<string>(dayjs().format("YYYY-MM-DD HH:mm:ss"));
@@ -144,6 +151,8 @@ const bigscreenBtn = (val: string) => {
   });
 };
 
+const fengxianpingguShow = ref(false);
+
 onMounted(() => {
   timer = setInterval(() => {
     time.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -174,7 +183,7 @@ $design-height: 1080;
   @return #{$px / $design-width * 100}vw;
 }
 
-.text-my{
+.text-my {
   font-size: adaptiveFontSize(30);
   color: white;
   // 水平居中
@@ -192,6 +201,7 @@ $design-height: 1080;
   // background-color: #002857;
   background-color: #021322;
   position: relative;
+
   .bigscreen_header {
     width: 100%;
     height: adaptiveHeight(251);
@@ -199,6 +209,7 @@ $design-height: 1080;
     background-size: 100% 100%;
     position: absolute;
     top: 0;
+
     .bigscreen_header_l {
       position: absolute;
       top: adaptiveHeight(18);
@@ -207,22 +218,27 @@ $design-height: 1080;
       width: adaptiveWidth(482);
       height: adaptiveHeight(63);
     }
+
     .bigscreen_header_r {
       height: adaptiveHeight(100);
       display: flex;
       align-items: center;
       position: absolute;
       right: adaptiveWidth(50);
+
       span {
         font-size: adaptiveFontSize(20);
         color: rgba(255, 255, 255, 1);
+
         &:nth-child(2) {
           padding-left: adaptiveWidth(30);
         }
+
         &:nth-child(5) {
           padding-right: adaptiveWidth(40);
         }
       }
+
       // img {
       //   &:nth-child(3) {
       //     width: adaptiveWidth(44);
@@ -235,10 +251,12 @@ $design-height: 1080;
       // }
     }
   }
+
   .bigscreen_center {
     width: 100%;
     height: 100%;
   }
+
   .bigscreen_bottom {
     width: 100%;
     height: adaptiveHeight(112);
@@ -246,6 +264,7 @@ $design-height: 1080;
     background-size: 100% 100%;
     position: absolute;
     bottom: 0;
+
     .bigscreen_bottom_nei {
       width: adaptiveWidth(960);
       height: adaptiveHeight(75);
@@ -256,6 +275,7 @@ $design-height: 1080;
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       .bigscreen_bottom_neis {
         div {
           width: adaptiveWidth(112);
@@ -266,11 +286,14 @@ $design-height: 1080;
           justify-content: center;
           align-items: center;
           cursor: pointer;
+          position: relative;
         }
+
         img {
           width: adaptiveWidth(34);
           height: adaptiveHeight(21);
         }
+
         width: adaptiveWidth(112);
         height: 100%;
         display: flex;
@@ -283,7 +306,7 @@ $design-height: 1080;
   }
 }
 
-.third_path{
+.third_path {
   // background: red;
   position: fixed;
   width: adaptiveWidth(200);
@@ -293,7 +316,24 @@ $design-height: 1080;
   color: white;
   text-align: center;
   line-height: adaptiveHeight(50);
-  font-size:adaptiveFontSize(30);
-   cursor: pointer;
+  font-size: adaptiveFontSize(30);
+  cursor: pointer;
+}
+
+.fengxianpinggu {
+  width: adaptiveWidth(112);
+  height: adaptiveHeight(56);
+  background: url("/img/dbwenan.png") no-repeat;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: adaptiveHeight(56);
+  background-size: 100% 100%;
+  position: absolute;
+  font-size: adaptiveFontSize(16);
+  top: adaptiveHeight(-66);
+  cursor: pointer;
+  // 缩放
+  transform: scale(0.8);
 }
 </style>
