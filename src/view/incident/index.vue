@@ -36,7 +36,7 @@
       <div class="bigscreen_lc_top_l">
         <img src="/public/img/光标.png" alt="" />
 
-        <span>区域统计</span>
+        <span>区域环境统计</span>
       </div>
       <div class="pickerCss">
         <img src="/public/img/zuo.svg" alt="" @click="timeLeftClick" style="margin-left: 5px" />
@@ -82,7 +82,36 @@
     <div class="bigscreen_lb_bottom">
       <div class="bigscreen_lb_bottom_nei" ref="bigscreenLBRef"></div>
     </div>
+    <div v-show="hisShow" class="lb_table ltTrendDialog">
+      <div class="ltTrendDialog_top">
+        <span>报警列表</span>
+        <img @click="closeShow" :src="img9" alt="" srcset="" />
+      </div>
+      <div class="ltTrendDialog_bottom">
+        <div class="list_table">
+          <ElTable ref="hisTableRef" :header-cell-style="tableHeaderColor" :cell-style="handleChangeCellStyle"
+            id="tableMy" header-row-class-name="headerTr" height="100%" style="width: 100%;background: #002547;"
+            class="list_table" :data="hisList">
+            <ElTableColumn prop="createTime" label="报警时间"></ElTableColumn>
+            <ElTableColumn prop="type" label="报警类型" width="100"></ElTableColumn>
+            <ElTableColumn prop="level" label="报警级别" width="100">
+              <template #default="{ row }">
+                <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
+                  {{ row.level ? row.level : "-" }}
+                </el-tag>
+              </template>
+            </ElTableColumn>
+            <ElTableColumn show-overflow-tooltip prop="description" label="报警描述"></ElTableColumn>
+            <template #append>
+              <el-pagination id="popperHis" v-model:current-page="hisShowQuery.pageNum"
+                v-model:page-size="hisShowQuery.pageSize" :background="false" :small="true"
+                @change="changeEmergencyPage" layout="prev, pager, next" :total="hisShowQuery.total" />
+            </template>
+          </ElTable>
+        </div>
+      </div>
 
+    </div>
     <!-- </BorderBox1> -->
   </div>
   <center></center>
@@ -272,7 +301,7 @@
           <el-descriptions-item label="事件编号：">{{ ltCurrentItem?.emergencyEventId }}</el-descriptions-item>
           <el-descriptions-item label="事件类型：">{{ ltCurrentItem?.type }}</el-descriptions-item>
           <el-descriptions-item label="事件名称：">{{ ltCurrentItem?.eventName }}</el-descriptions-item>
-          <el-descriptions-item label="&nbsp;&nbsp;&nbsp;&nbsp;处理人：">{{ ltCurrentItem?.handlerNames
+          <el-descriptions-item label="处理人：">{{ ltCurrentItem?.handlerNames
           }}</el-descriptions-item>
           <el-descriptions-item label="处理流程：">{{ ltCurrentItem?.processingFlow }}</el-descriptions-item>
           <el-descriptions-item label="报警描述：">{{ltCurrentItem?.emergencyAlarmDTOs?.map(item =>
@@ -299,6 +328,7 @@ import {
   getstatistics,
   emergencyEventList,
   getAreaStatisticsByDate,
+  getEmergencyListApi,
 } from "../../api/incident";
 import OfficePreview from "../../components/officereview.vue";
 import dayjs from "dayjs";
@@ -312,7 +342,72 @@ import { get3dOption, getHistoryData } from "./echart";
 import "echarts-gl"
 import { useIntervalFn } from "@vueuse/core";
 import DialogPreview from "../../components/DialogPreview/index.vue";
+import { ElTable, ElTableColumn } from "element-plus";
 
+
+// 修改报警级别样式映射函数
+const getLevelStyle = (level: string) => {
+  const colorMap = {
+    一级: {
+      color: "#F53F3F",
+      backgroundColor: "#FFECE8",
+      borderColor: "#F53F3F"
+    },
+    紧急: {
+      color: "#F53F3F",
+      backgroundColor: "#FFECE8",
+      borderColor: "#F53F3F"
+    },
+    二级: {
+      color: "#FF7D00",
+      backgroundColor: "#FFF3E8",
+      borderColor: "#FF7D00"
+    },
+    重要: {
+      color: "#FF7D00",
+      backgroundColor: "#FFF3E8",
+      borderColor: "#FF7D00"
+    },
+    三级: {
+      color: "#B99E00",
+      backgroundColor: "#FFF7CC",
+      borderColor: "#FADC19"
+    },
+    中度: {
+      color: "#B99E00",
+      backgroundColor: "#FFF7CC",
+      borderColor: "#FADC19"
+    },
+    四级: {
+      color: "#168CFF",
+      backgroundColor: "#E8F3FF",
+      borderColor: "#168CFF"
+    },
+    一般: {
+      color: "#168CFF",
+      backgroundColor: "#E8F3FF",
+      borderColor: "#168CFF"
+    },
+    五级: {
+      color: "#00B42A",
+      backgroundColor: "#E8FFEA",
+      borderColor: "#00B42A"
+    },
+
+    轻微: {
+      color: "#00B42A",
+      backgroundColor: "#E8FFEA",
+      borderColor: "#00B42A"
+    }
+  };
+  return (
+    colorMap[level] || {
+      color: "#000000",
+      backgroundColor: "transparent",
+      borderColor: "transparent"
+    }
+  );
+};
 
 const dialogPreviewRef = ref<InstanceType<typeof DialogPreview>>();
 const getHandlePerson = (item) => {
@@ -364,11 +459,11 @@ const qushiOptions = {
     bottom: '10%',
     containLabel: true
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {}
-    }
-  },
+  // toolbox: {
+  //   feature: {
+  //     saveAsImage: {}
+  //   }
+  // },
   xAxis: {
     // type: 'category',
     boundaryGap: false,
@@ -407,10 +502,10 @@ function openShowQushi() {
     endTime: areaStatisticsFormData.value.endTime,
   }).then(res => {
     qushiOptions.xAxis.data = res.data.data.xdata
-    qushiOptions.title.text = "趋势统计(" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ")"
+    qushiOptions.title.text = "事件类型统计(" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ")"
     qushiOptions.series = res.data.data.series
     qushiOptions.legend.data = res.data.data.series.map(item => item.name)
-    qushiOptions.yAxis.min = 1
+    qushiOptions.yAxis.min = 0
     if (Array.isArray(res.data.data.series) && res.data.data.series.length > 0) {
       res.data.data.series.forEach(item => {
         qushiOptions.yAxis.max = Math.max(...item.data, 6)
@@ -764,17 +859,65 @@ const timeRightClick = () => {
   areaStatisticsFun(); // 更新数据
 };
 
+const hisShow = ref(false)
+const hisTableRef = ref()
+const hisShowQuery = ref({
+  dStartTime: "",
+  dEndTime: "",
+  pageNum: 1,
+  pageSize: 10,
+  total: 0
+})
+const hisList = ref([])
 const historyStatistics = async () => {
   const { data } = await getEventAtatistics({
     type: zxSelect.value
   });
   // bigscreenLBoption.series[0].data = data.data.data;
   bigscreenLBoption = getHistoryData(data.data)
-  if (bigscreenLBRef.value) {
+  if (bigscreenLBChart == null) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
-    bigscreenLBChart.setOption(bigscreenLBoption);
   }
+  bigscreenLBChart.setOption(bigscreenLBoption, true);
+  bigscreenLBChart.off().on("click", (param) => {
+    hisShow.value = true;
+    hisShowQuery.value.dStartTime = dayjs().month(param.dataIndex).day(1).format("YYYY-MM-DD")
+    hisShowQuery.value.dEndTime = dayjs().month(param.dataIndex).endOf("month").format("YYYY-MM-DD")
+    hisShowQuery.value.pageNum = 1
+    getEmergencyList()
+  })
 };
+function getEmergencyList() {
+  getEmergencyListApi({
+    ...hisShowQuery.value,
+    dType: zxSelect.value
+  }).then(res => {
+    hisList.value = res.data.data.rows;
+    hisShowQuery.value.total = res.data.data.total;
+  })
+}
+
+function changeEmergencyPage() {
+  getEmergencyList()
+  hisTableRef.value.scrollTo(0, 0)
+}
+const closeShow = () => {
+  hisShow.value = false
+}
+
+function tableHeaderColor(data) {
+  return {
+    backgroundColor: "#002547",
+    color: "white",
+  };
+}
+
+function handleChangeCellStyle({ row, column, rowIndex, columnIndex }) {
+  return {
+    backgroundColor: "#002547",
+    color: "white",
+  }
+}
 
 const historyTimer = useIntervalFn(() => {
   historyTimer.pause();
@@ -1955,9 +2098,9 @@ $design-height: 1080;
 .lb_table {
   width: adaptiveWidth(500);
   height: adaptiveHeight(400);
-  left: adaptiveWidth(470);
-  top: adaptiveHeight(600);
-  background-color: red;
+  left: adaptiveWidth(470) !important;
+  top: adaptiveHeight(700) !important;
+  position: fixed !important;
 }
 
 .lcTrendDialog {
@@ -2063,5 +2206,21 @@ $design-height: 1080;
   --el-fill-color-blank: transparent;
   --el-text-color-primary: white;
   --el-text-color-regular: white;
+}
+
+
+
+.list_table {
+  width: 100%;
+  height: 100%;
+}
+
+#popperHis :deep(> ul > li) {
+  --el-pagination-button-color: white;
+  background: transparent !important;
+}
+
+#popperHis :deep(button) {
+  background: transparent !important;
 }
 </style>

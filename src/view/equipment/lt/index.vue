@@ -11,7 +11,8 @@
             </div>
         </div>
         <div class="container_bottom">
-            <el-scrollbar ref="scrollbarRef" height="100%">
+            <el-scrollbar @scroll="scrollEvent" v-infinite-scroll="loadMore" @mouseleave="mouseLeave"
+                @mouseenter="heightTimer.pause" ref="scrollbarRef" height="100%">
                 <!-- @vue-expect-error -->
                 <div v-for="item in data.list" :key="item.id" :class="{
                     'device_item': true,
@@ -21,10 +22,10 @@
                     <el-row class="device_item_row">
                         <el-col :span="8" class="device_item_row_col">
                             <!-- @vue-expect-error -->
-                            <el-tooltip :content="item.equipmentCode" placement="top">
+                            <el-tooltip :content="item?.equipmentCode" placement="top">
                                 <span>
                                     <!-- @vue-expect-error -->
-                                    {{ item.equipmentCode }}
+                                    {{ item?.equipmentCode }}
                                 </span>
                             </el-tooltip>
                         </el-col>
@@ -44,7 +45,7 @@
                                 </template>
                                 <span>
                                     <!-- @vue-expect-error -->
-                                    {{ item.equipmentName }}</span>
+                                    {{ item?.equipmentName }}</span>
                             </el-tooltip>
                         </el-col>
                         <el-col :span="8" class="device_item_row_col">
@@ -79,6 +80,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { useIntervalFn } from '@vueuse/core';
 import { equipmentDetailList, equipmentAlarmCount } from '../../../api/equipment';
 import { ElScrollbar } from 'element-plus';
 
@@ -101,7 +103,7 @@ function changeRadio(value) {
         total.value = res.data.data
     })
 }
-const getList = () => {
+const getList = async () => {
     // @ts-expect-error
     equipmentDetailList(query.value).then(res => {
         data.value.list = res.data.data.rows;
@@ -109,8 +111,45 @@ const getList = () => {
     })
 
 }
+
+const getListTimer = useIntervalFn(async () => {
+    getListTimer.pause()
+    getList().finally(() => {
+        getListTimer.resume()
+    })
+    equipmentAlarmCount(radio.value).then(res => {
+        total.value = res.data.data
+    })
+}, 5000)
+const height = ref(0)
+const targetHeight = ref(0)
+const heightTimer = useIntervalFn(() => {
+    if (height.value > 0) {
+        targetHeight.value++
+        if ((scrollbarRef.value?.wrapRef.scrollTop + scrollbarRef.value?.wrapRef.clientHeight) >= scrollbarRef.value?.wrapRef.scrollHeight) {
+            targetHeight.value = 0
+        }
+        scrollbarRef.value?.scrollTo(0, targetHeight.value)
+    }
+
+}, 10)
+function mouseLeave() {
+    heightTimer.resume()
+}
+
+function scrollEvent(value) {
+    // console.log()
+    // if (!heightTimer.isActive) {
+    targetHeight.value = value.scrollTop
+    // }
+}
+
 onMounted(() => {
-    getList();
+    getList().finally(() => {
+        setTimeout(() => {
+            height.value = scrollbarRef.value?.wrapRef?.firstElementChild.scrollHeight
+        }, 2000)
+    })
 })
 </script>
 <style lang="scss" scoped>

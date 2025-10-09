@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
             <div class="img">
                 <!-- 登录页面的背景图 -->
                 <!-- <component :is="toRaw(ll)" /> -->
-                 <img :src="ll" alt="" srcset="">
+                <img :src="ll" alt="" srcset="">
             </div>
             <div class="login-box">
                 <div class="login-form">
@@ -109,22 +109,21 @@ onBeforeUnmount(() => {
 
                     <Motion>
                         <h2 class="outline-none">
-                            <TypeIt :cursor="false" :speed="150" :values="['高风险安全风险车间<br/>智能化和实时动态监管平台']" />
+                            <TypeIt :cursor="false" :speed="150" :values="['高生物安全风险车间<br/>智能化风险管理和实时动态监管平台']" />
                         </h2>
                     </Motion>
 
                     <el-form size="large">
                         <Motion :delay="100">
                             <el-form-item prop="username">
-                                <el-input v-model="form.username" :prefix-icon="User" clearable
-                                    placeholder="账号" />
+                                <el-input v-model="form.username" :prefix-icon="User" clearable placeholder="账号" />
                             </el-form-item>
                         </Motion>
 
                         <Motion :delay="150">
                             <el-form-item prop="password">
-                                <el-input v-model="form.password" :prefix-icon="Lock" clearable
-                                    placeholder="密码" show-password />
+                                <el-input v-model="form.password" :prefix-icon="Lock" clearable placeholder="密码"
+                                    show-password />
                             </el-form-item>
                         </Motion>
 
@@ -148,12 +147,12 @@ onBeforeUnmount(() => {
     </div>
 </template>
 <style scoped>
-
-.select-none{
+.select-none {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
 }
+
 .main {
     width: 100vw;
     height: 100vh;
@@ -188,6 +187,7 @@ onBeforeUnmount(() => {
     padding: 20px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
+
 .img {
     align-items: center;
     display: flex;

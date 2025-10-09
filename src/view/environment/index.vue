@@ -462,12 +462,12 @@ const envrionmentStatisticsFun = async () => {
   if (data.data == null || data.data == undefined || data.data.unitNames == null || data.data.unitNames == undefined || data.data.unitNames.length == 0) {
     bigscreenLtdialogoption.series = [];
     bigscreenLtdialogoption.xAxis.data = data.data.unitNames;
-    bigscreenLtdialogoption.yAxis.min = 1;
+    bigscreenLtdialogoption.yAxis.min = 0;
     bigscreenLtdialogoption.yAxis.max = Math.max(...data.data.datas, 6);
     return;
   }
   bigscreenLtdialogoption.xAxis.data = data.data.unitNames;
-  bigscreenLtdialogoption.yAxis.min = 1;
+  bigscreenLtdialogoption.yAxis.min = 0;
   bigscreenLtdialogoption.yAxis.max = Math.max(...data.data.datas, 6);
   // bigscreenLtdialogoption.series = data.data.unitNames.map((name, index) => ({
   //   name: name,
@@ -484,7 +484,7 @@ const envrionmentStatisticsFun = async () => {
   //     fontSize: 12,
   //   }
   // }));
-  bigscreenLtdialogoption.series[0].data = data.data.unitNames.map((name, index)=>data.data.datas[index])
+  bigscreenLtdialogoption.series[0].data = data.data.unitNames.map((name, index) => data.data.datas[index])
 };
 const zsEchartData = async () => {
   await envrionmentStatisticsFun();
@@ -905,7 +905,7 @@ const powerByAreaTotalStaticFun = async () => {
     bigscreenRBoption.tooltip.formatter = function (params) {
       // params有多个
       return params.map(p => {
-        return `${p.marker}${p.seriesName}: ${p.value} ${data?.data?.unitName}`
+        return `${p.marker}${p.seriesName}: ${p.value == undefined || p.value == null ? '暂无数据' : p.value + ' ' + data?.data?.unitName}`
       }).join('<br/>');
     };
     bigscreenRBChart.setOption(bigscreenRBoption, true);

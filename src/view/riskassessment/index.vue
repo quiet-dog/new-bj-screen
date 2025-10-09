@@ -14,7 +14,8 @@
           <span>数值</span>
           <span>时间</span>
         </div>
-        <div class="bigscreen_lt_bottom_neib" @mouseenter="environmentFileTimer.pause" @mouseleave="environmentFileTimer.resume">
+        <div class="bigscreen_lt_bottom_neib" @mouseenter="environmentFileTimer.pause"
+          @mouseleave="environmentFileTimer.resume">
           <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
@@ -65,7 +66,8 @@
       <div class="ltTrendDialog_top">
         <span>报警列表</span>
         <div class="myInput">
-          <ElInput class="inputcss" placeholder="请输入设备名称" v-model="hisDeviceName" @change="changeHisList" />
+          <ElInput size="small" class="inputcss" placeholder="请输入设备名称" v-model="hisDeviceName"
+            @change="changeHisList" />
           <ElButton @click="downloadFile" type="primary" text="primary">
             <el-icon class="downloadMy">
               <Download />
@@ -937,6 +939,11 @@ $design-height: 1080;
   position: relative;
   right: adaptiveWidth(70);
   display: flex;
+
+  .inputcss {
+    top: adaptiveHeight(5);
+    position: relative;
+  }
 }
 
 .downloadMy {

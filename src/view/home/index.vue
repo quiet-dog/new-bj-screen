@@ -48,7 +48,8 @@
             </div>
           </div>
           <div class="lt_container_item">
-            <p @click="changeTargetType('环境报警')" style="cursor: pointer;">今日环境报警:{{ jinRiHuanJingBaoJingList.total }}</p>
+            <p @click="changeTargetType('环境报警')" style="cursor: pointer;">今日环境报警:{{ jinRiHuanJingBaoJingList.total }}
+            </p>
 
             <div class="lt_container_item_div">
 
@@ -126,7 +127,8 @@
 
           </div>
           <div class="lt_container_item">
-            <p @click="changeTargetType('工艺节点报警')" style="cursor: pointer;">今日工艺节点报警:{{ jinRiGongYiJieDianBaoJingList.total }}</p>
+            <p @click="changeTargetType('工艺节点报警')" style="cursor: pointer;">今日工艺节点报警:{{
+              jinRiGongYiJieDianBaoJingList.total }}</p>
             <div class="lt_container_item_div">
 
               <Swiper ref="jinRiGongYiJieDianBaoJingSwiper" class="swiper_container_item_div"
@@ -185,10 +187,10 @@
             step: 5,
           }" hover class="scrool">
             <div v-for="(item, index) in alarmEventslist" :key="index" class="bigscreen_lc_bottom_rnei">
-              <ElTooltip >
+              <ElTooltip>
                 <template #content>
                   <span>{{ item?.description }}</span>
-                  <br/>
+                  <br />
                   <span>{{ item?.createTime }}</span>
                 </template>
                 <span>{{ item?.description }}</span>
@@ -253,9 +255,8 @@
             </el-col>
             <el-col :span="8" v-if="lbRadio === 'year'">
               <el-form-item class="form_item_css date_picker_css" label="报警时间">
-                <el-date-picker :disabled-date="disableDate" v-model="eventCurrentTime"
-                  @change="getEmEventByTime" format="YYYY-MM-DD" class="select_css" size="small"
-                  placeholder="请选择报警时间" />
+                <el-date-picker :disabled-date="disableDate" v-model="eventCurrentTime" @change="getEmEventByTime"
+                  format="YYYY-MM-DD" class="select_css" size="small" placeholder="请选择报警时间" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -271,14 +272,14 @@
                 <span>{{ row.eventId }}</span>
               </template>
             </el-table-column>
-            <el-table-column fixed width="130" prop="level" label="报警级别">
+            <el-table-column fixed width="100" prop="level" label="报警级别">
               <template #default="{ row }">
                 <el-tag :style="getLevelStyle(row.level)" effect="plain" size="small">
                   {{ row.level ? row.level : "-" }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column width="130" prop="type" label="报警类型">
+            <el-table-column :width="hisList.some(u => u.type === '工艺节点报警') ? 100 : 80" prop="type" label="报警类型">
               <template #default="{ row }">
                 <span>{{ row.type }}</span>
               </template>
@@ -289,7 +290,7 @@
                   lbRadio == 'week' ? dayjs(row.createTime).format("HH:mm:ss") : row.createTime }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="description" label="报警描述">
+            <el-table-column show-overflow-tooltip prop="description" label="报警描述">
               <template #default="{ row }">
                 <span>{{ row.description }}</span>
               </template>
@@ -325,7 +326,8 @@
           <Vue3SeamlessScroll :list="videoList" :class-option="{
             step: 5,
           }" hover>
-            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index" class="video_item">
+            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
+              class="video_item">
               <span>{{ item?.name }}</span>
             </div>
           </Vue3SeamlessScroll>
@@ -449,7 +451,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="description" label="报警描述">
+        <el-table-column show-overflow-tooltip prop="description" label="报警描述">
           <template #default="{ row }">
             <span>{{ row.description }}</span>
           </template>
@@ -834,7 +836,7 @@ function changeTargetType(type: string) {
 }
 function closeTargetTypeShow() {
   targetTypeShow.value = false;
-  
+
 }
 function getTargetTypeList() {
   if (targetType.value == "设备报警") {
@@ -1452,15 +1454,15 @@ $design-height: 1080;
     }
   }
 
-  
+
 }
 
 .ltTrendDialog_bottom {
-    width: adaptiveWidth(550);
-    height: calc(90% - adaptiveHeight(60));
-    margin-left: adaptiveWidth(25);
-    margin-top: adaptiveHeight(35);
-  }
+  width: adaptiveWidth(550);
+  height: calc(90% - adaptiveHeight(60));
+  margin-left: adaptiveWidth(25);
+  margin-top: adaptiveHeight(35);
+}
 
 .bigscreen_lt,
 .bigscreen_lc,

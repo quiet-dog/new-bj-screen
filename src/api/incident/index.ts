@@ -84,3 +84,9 @@ export function geteventTotal(params: { dayType: string }) {
 export function getAreaStatisticsByDate(params: { beginTime: string; endTime: string }) {
   return http.post("/manage/event/getAreaStatisticsByDate", params);
 }
+
+export function getEmergencyListApi(params) {
+  return http.get("/manage/emergencyAlarm", {
+    params: params
+  })
+}
