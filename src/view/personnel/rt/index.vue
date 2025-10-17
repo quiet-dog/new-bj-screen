@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <Swiper @active-index-change="activeIndexChange" :modules="[Autoplay]" class="swiper_container"
-            :slides-per-view="1" :slides-per-group="1" :autoplay="{ delay: 2000, disableOnInteraction: false }">
+            :slides-per-view="1" :slides-per-group="1" :autoplay="{ delay: 5000, disableOnInteraction: false }">
             <SwiperSlide v-for="(item, index) in videoList" :key="index">
                 <VideoItem :active-index="activeIndex" :current-index="index" :title="item?.name" :channel-id="item?.channelid" />
             </SwiperSlide>
@@ -25,7 +25,7 @@ const videoList = ref([]);
 const channelQuery = ref({
     name: "",
     pageNum: 1,
-    pageSize: 1,
+    pageSize: 100,
 });
 
 const activeIndex = ref(0);

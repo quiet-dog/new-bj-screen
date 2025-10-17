@@ -29,12 +29,18 @@ const { jessibuca,
 
 const currentUrl = ref("")
 watch(() => activeIndex, (newVal) => {
-    if (newVal === currentIndex && channelId !== null && channelId !== "" && currentUrl.value !== "") {
+    if (newVal === currentIndex && channelId !== null && channelId !== "") {
         if (jessibuca == null) {
             create();
         }
-        play(currentUrl.value);
+        getStreamUrlApi(currentId.value).then((ress) => {
+            // 判断ress.data.data.wsflv是不是正确的地址
+            const url = new URL(ress.data.data.wsflv);
+            url.host = location.host;
+            currentUrl.value = url.toString();
+            play(currentUrl.value);
 
+        })
     } else {
         if (jessibuca != null) {
             jessibuca.destroy();

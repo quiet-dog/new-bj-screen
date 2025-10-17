@@ -1,15 +1,21 @@
 <template>
     <div class="container">
         <div class="equipment_info">
-            <span>
-                &nbsp;&nbsp;&nbsp;&nbsp;设备名称：{{ equipmentInfo.equipmentName }}&nbsp;&nbsp;({{ equipmentInfo.equipmentCode }}&nbsp;&nbsp;{{
+            <div class="title_container">
+                &nbsp;&nbsp;&nbsp;&nbsp;<el-tooltip :content="`设备名称： ${equipmentInfo?.equipmentName} &nbsp;&nbsp;(
+                    ${equipmentInfo?.equipmentCode} &nbsp;&nbsp;
+                    ${equipmentInfo.installationLocation} )`">
+                    设备名称：{{ equipmentInfo.equipmentName }}&nbsp;&nbsp;({{
+                    equipmentInfo.equipmentCode }}&nbsp;&nbsp;{{
                     equipmentInfo.installationLocation }})
-            </span>
+                </el-tooltip>
+            </div>
         </div>
         <div class="echarts_container" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
             <!-- 纵向 -->
-            <Swiper ref="swiperRef" @slide-change="slideChange" :modules="[Autoplay]" :loop="true" class="swiper_container" :slides-per-view="1"
-                :slides-per-group="1" direction="horizontal" :autoplay="{ delay: 2000, disableOnInteraction: false }">
+            <Swiper ref="swiperRef" @slide-change="slideChange" :modules="[Autoplay]" :loop="true"
+                class="swiper_container" :slides-per-view="1" :slides-per-group="1" direction="horizontal"
+                :autoplay="{ delay: 2000, disableOnInteraction: false }">
                 <SwiperSlide v-for="(item, index) in thresholdDataList" class="swiper_container_item" :key="index">
                     <div class="swiper_container_item_div">
                         <!-- @vue-expect-error -->
@@ -56,16 +62,16 @@ function getEquipmentInfo(id: number) {
     })
 }
 
-function slideChange(val){
-    console.log("=================slideChange",val);
+function slideChange(val) {
+    console.log("=================slideChange", val);
 }
 
-function mouseEnter(){
-    console.log("swiperRef.value",swiperRef.value?.$el.swiper);
+function mouseEnter() {
+    console.log("swiperRef.value", swiperRef.value?.$el.swiper);
     swiperRef.value?.$el?.swiper?.autoplay?.pause();
 }
 
-function mouseLeave(){
+function mouseLeave() {
     swiperRef.value?.$el?.swiper?.autoplay?.resume();
 }
 
@@ -105,6 +111,10 @@ $design-height: 1080;
     padding-top: 5px;
 }
 
+.equipment_info{
+    width: 100%;
+}
+
 
 .echarts_container {
     flex: 1;
@@ -133,5 +143,15 @@ $design-height: 1080;
     height: 100%;
     width: 100%;
     /* 这里可以占满 Slide 内部 */
+}
+
+.title_container {
+    white-space: nowrap;
+    /* 不换行 */
+    overflow: hidden;
+    /* 超出隐藏 */
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
+    width: 100%;
 }
 </style>

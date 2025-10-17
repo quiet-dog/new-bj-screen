@@ -27,8 +27,8 @@
           <template v-if="item.title == '风险评估'">
             <div :style="{
               color: $route.path === item.path ? '#ffffff' : '#00ABFF',
-            }">
-              <span class="fengxianpinggu" @click="getHres">风险评估系统</span>
+            }" >
+              <span v-show="$route.path ==='/riskassessment'" class="fengxianpinggu" @click="getHres">风险评估系统</span>
               {{ item.title }}
             </div>
           </template>

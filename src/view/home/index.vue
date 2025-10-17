@@ -20,13 +20,13 @@
 
                 <template v-if="jinRiSheBeiBaoJingInfo.total > 0">
                   <SwiperSlide class="lt_container_item_div_item" v-for="item in jinRiSheBeiBaoJingInfo.list"
-                    :key="item.eventId">
+                    :key="item?.eventId">
                     <div :style="{
                       'background': `url(/img/设备报警.png) no-repeat`,
                     }" class="swiper_container_item" @click="neiClick(item)">
-                      <span class="bigscreen_lt_nei_span">{{ item.type }}</span>
-                      <span class="bigscreen_lt_nei_span">{{ item.level }}</span>
-                      <span class="bigscreen_lt_nei_span">{{ item.createTime }}</span>
+                      <span class="bigscreen_lt_nei_span">{{ item?.type }}</span>
+                      <span class="bigscreen_lt_nei_span">{{ item?.level }}</span>
+                      <span class="bigscreen_lt_nei_span">{{ item?.createTime }}</span>
                     </div>
                   </SwiperSlide>
                 </template>
@@ -255,8 +255,9 @@
             </el-col>
             <el-col :span="8" v-if="lbRadio === 'year'">
               <el-form-item class="form_item_css date_picker_css" label="报警时间">
-                <el-date-picker :disabled-date="disableDate" v-model="eventCurrentTime" @change="getEmEventByTime"
-                  format="YYYY-MM-DD" class="select_css" size="small" placeholder="请选择报警时间" />
+                <el-date-picker :default-value="dataDefaultDate" :disabled-date="disableDate" v-model="eventCurrentTime"
+                  @change="getEmEventByTime" format="YYYY-MM-DD" class="select_css" size="small"
+                  placeholder="请选择报警时间" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -328,7 +329,11 @@
           }" hover>
             <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
               class="video_item">
-              <span>{{ item?.name }}</span>
+              <span>
+                <el-tooltip :content="item?.name">
+                  {{ item?.name }}
+                </el-tooltip>
+              </span>
             </div>
           </Vue3SeamlessScroll>
         </div>
@@ -359,12 +364,16 @@
               class="bigscreen_rc_bottom_rnei">
               <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
                 dayjs(item.createTime).format("YYYY-MM-DD")
-              }}</span>
+                }}</span>
               <div :style="{
                 background: `url(${item.img}) no-repeat`,
                 'background-size': '100% 100%',
               }">
-                <span style="margin-left: 10px">{{ item.policiesName }}</span>
+                <span class="zhengcefagui" style="margin-left: 10px">
+                  <el-tooltip :content="item?.policiesName">
+                    {{ item.policiesName }}
+                  </el-tooltip>
+                </span>
                 <img style="margin-right: 18px; cursor: pointer" src="/public/img/查看详情.png" alt="" />
               </div>
             </div>
@@ -396,7 +405,7 @@
       <img :src="img9" alt="" srcset="" @click="canleClick(item)" />
     </div>
     <div class="ltDialog_bottom">
-      <img :src="geTargetItemImg(targetItem?.type)" alt="" />
+      <img :src="geTargetItemImg(targetItem?.level)" alt="" />
       <div class="ltDialog_bottomr">
         <div class="ltDialog_bottomr_nei">
           <span>报警编号：</span>
@@ -681,25 +690,48 @@ const jinRiSheBeiBaoJingInfo = ref({
 })
 const targetItem = ref(null);
 const geTargetItemImg = (type: string) => {
+  // let imgList = [
+  //   {
+  //     type: "设备报警",
+  //     img: "/img/设备报警.png",
+  //   },
+  //   {
+  //     type: "环境报警",
+  //     img: "/img/环境数据.png",
+  //   },
+  //   {
+  //     type: "物料报警",
+  //     img: "/img/物料报警.png",
+  //   },
+  //   {
+  //     type: "工艺节点报警",
+  //     img: "/img/工艺节点.png",
+  //   },
+  // ]
+
   let imgList = [
     {
-      type: "设备报警",
-      img: "/img/设备报警.png",
+      level: "轻微",
+      img: "/img/wuji_ticon.png",
     },
     {
-      type: "环境报警",
-      img: "/img/环境数据.png",
+      level: "一般",
+      img: "/img/siji_ticon.png",
     },
     {
-      type: "物料报警",
-      img: "/img/物料报警.png",
+      level: "中度",
+      img: "/img/sanji_ticon.png",
     },
     {
-      type: "工艺节点报警",
-      img: "/img/工艺节点.png",
+      level: "重要",
+      img: "/img/erji_ticon.png",
     },
-  ]
-  return imgList.find((v) => v.type == type)?.img || "";
+    {
+      level: "紧急",
+      img: "/img/yiji_ticon.png",
+    },
+  ];
+  return imgList.find((v) => v.level == type)?.img || "";
 }
 const jinRiShebeiBaoJingListFun = async () => {
   const { data } = await alarmEventsList({
@@ -1259,6 +1291,7 @@ const getEmEventByTime = (time: Date) => {
 
 }
 
+const dataDefaultDate = ref('')
 const geteventTotalFun = async () => {
   const { data } = await geteventTotal({ dayType: lbRadio.value });
 
@@ -1285,6 +1318,7 @@ const geteventTotalFun = async () => {
           } else {
             cuData = dayjs(params.name).startOf("month").format("YYYY-MM-DD")
             enData = dayjs(cuData).endOf("month").format("YYYY-MM-DD")
+            dataDefaultDate.value =dayjs(params.name).startOf("month").toDate()
           }
 
           hisPage.value = 1;
@@ -2405,6 +2439,13 @@ $design-height: 1080;
     font-size: adaptiveFontSize(14);
     color: rgba(255, 255, 255, 1);
     margin-left: adaptiveFontSize(10);
+    white-space: nowrap;
+    /* 不换行 */
+    overflow: hidden;
+    /* 超出隐藏 */
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
+    width: adaptiveWidth(100);
   }
 }
 
@@ -2446,5 +2487,14 @@ $design-height: 1080;
 
 #tableMy :deep(.el-table__cell) {
   padding: 0 !important;
+}
+
+.zhengcefagui {
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 超出隐藏 */
+  text-overflow: ellipsis;
+  /* 超出显示省略号 */
 }
 </style>

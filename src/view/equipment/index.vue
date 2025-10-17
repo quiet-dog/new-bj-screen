@@ -132,7 +132,11 @@
           }" hover>
             <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
               class="video_item">
-              <span>{{ item?.name }}</span>
+              <span>
+                <el-tooltip :content="item?.name">
+                  {{ item?.name }}12313123131312312312312313132
+                </el-tooltip>
+              </span>
             </div>
           </Vue3SeamlessScroll>
         </div>
@@ -335,7 +339,7 @@
     </div>
   </template>
 
-  <div v-if="rcStatus" class="rctDialog">
+  <div v-show="rcStatus" class="rctDialog">
     <div class="rctDialog_top">
       <span>维修统计分析</span>
       <ElInput placeholder="请输入设备编号" v-model="yzInput" @keydown.enter="yzRadioChange" class="inputcss yzInput" />
@@ -791,6 +795,9 @@ async function getYzData() {
       bigscreenRCoption.yAxis.min = 1;
       // @ts-ignore
       bigscreenRCoption.yAxis.max = Math.max(...data.data.data, 6); // 至少6
+      if(bigscreenRCoption.yAxis.max >6){
+        bigscreenRCoption.yAxis.max +=10
+      }
   }
 
   if (bigscreenRCChart == null) {
@@ -854,7 +861,7 @@ function yzRadioChange() {
 const channelQuery = ref({
   name: "",
   pageNum: 1,
-  pageSize: 3,
+  pageSize: 100,
 });
 const videoList = ref([]);
 
@@ -2011,6 +2018,13 @@ $design-height: 1080;
     font-size: adaptiveFontSize(14);
     color: rgba(255, 255, 255, 1);
     margin-left: adaptiveFontSize(10);
+      /* 不换行 */
+    overflow: hidden;
+    /* 超出隐藏 */
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
+    width: adaptiveWidth(100);
+    white-space: nowrap;
   }
 }
 </style>

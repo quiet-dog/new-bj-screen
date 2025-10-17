@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="container_bottom">
-            <el-scrollbar @scroll="scrollEvent" v-infinite-scroll="loadMore" @mouseleave="mouseLeave"
+            <el-scrollbar @scroll="scrollEvent"  @mouseleave="mouseLeave"
                 @mouseenter="heightTimer.pause" ref="scrollbarRef" height="100%">
                 <!-- @vue-expect-error -->
                 <div v-for="item in data.list" :key="item.id" :class="{
@@ -132,7 +132,7 @@ const heightTimer = useIntervalFn(() => {
         scrollbarRef.value?.scrollTo(0, targetHeight.value)
     }
 
-}, 10)
+}, 20)
 function mouseLeave() {
     heightTimer.resume()
 }

@@ -24,7 +24,7 @@ const bigscreenLBoption = {
     },
     grid: {
         left: "8%",
-        right: "0%",
+        right: "8%",
         top: "10%",
         bottom: "15%",
         containLabel: false, // 不自动留出坐标轴标签空间
@@ -118,9 +118,12 @@ async function getEcharts() {
         })
     }
     // @ts-expect-error
-    bigscreenLBoption.yAxis.min = 1;
+    bigscreenLBoption.yAxis.min = 0;
     // @ts-expect-error
     bigscreenLBoption.yAxis.max = Math.max(...data.data, 6); // 至少6
+    if(bigscreenLBoption.yAxis.max>6){
+        bigscreenLBoption.yAxis.max+=10
+    }
     // @ts-expect-error
     if (echartT == null) {
         echartT = echarts.init(echartsRef.value);

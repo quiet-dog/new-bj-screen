@@ -252,7 +252,12 @@
                 background: `url(${item.img}) no-repeat`,
                 'background-size': '100% 100%',
               }">
-                <span style="margin-left: 10px">{{ item.policiesName }}</span>
+                <!-- <span style="margin-left: 10px">{{ item.policiesName }}</span> -->
+                <span class="zhengcefagui" style="margin-left: 10px">
+                  <el-tooltip :content="item?.policiesName">
+                    {{ item.policiesName }}
+                  </el-tooltip>
+                </span>
                 <img @click="rbClcik(item)" src="/public/img/查看详情.png" alt="" />
               </div>
             </div>
@@ -509,6 +514,9 @@ function openShowQushi() {
     if (Array.isArray(res.data.data.series) && res.data.data.series.length > 0) {
       res.data.data.series.forEach(item => {
         qushiOptions.yAxis.max = Math.max(...item.data, 6)
+        if(qushiOptions.yAxis.max > 6){
+          qushiOptions.yAxis.max = qushiOptions.yAxis.max+10
+        }
       })
     } else {
       qushiOptions.yAxis.max = 6
@@ -2222,5 +2230,11 @@ $design-height: 1080;
 
 #popperHis :deep(button) {
   background: transparent !important;
+}
+
+.zhengcefagui{
+  white-space: nowrap;        /* 不换行 */
+  overflow: hidden;           /* 超出隐藏 */
+  text-overflow: ellipsis;    /* 超出显示省略号 */
 }
 </style>

@@ -26,7 +26,7 @@
               <!-- <span style="padding-left: 25px">{{ item.materials?.name }}</span> -->
               <span>{{
                 dayjs(item.createTime).format("YYYY-MM-DD")
-                }}</span>
+              }}</span>
               <span>{{ item.level }}</span>
             </div>
           </div>
@@ -54,7 +54,7 @@
           top: 15px;
           z-index: 100;
         ">
-        <el-option v-for="item in materialFileslist" :key="item.materialsId" :label="item.name"
+        <el-option v-for="item in materialFileslist" :key="item.materialsId" :label="`${item?.name}-${item?.code}`"
           :value="item.materialsId" />
       </el-select>
       <div class="bigscreen_lc_bottom_nei" ref="bigscreenLCRef"></div>
@@ -119,7 +119,7 @@
           top: 15px;
           z-index: 100;
         ">
-        <el-option v-for="item in materialFileslist" :key="item.materialsId" :label="item.name"
+        <el-option v-for="item in materialFileslist" :key="item.materialsId" :label="`${item?.name}-${item.code}`"
           :value="item.materialsId" />
       </el-select>
       <div class="bigscreen_rc_bottom_nei" ref="bigscreenRCRef"></div>
@@ -186,8 +186,8 @@
       <img :src="img9" alt="" srcset="" @click="rbcanleClick" />
     </div>
     <div class="rbDialog_bottom">
-      <el-input :readonly="!isShowInput" class="inputcss" v-model="receiveFormData2.materialName" @change="receivelistFun2"
-        style="width: 148px; height: 24px" placeholder="请输入物料名称" :prefix-icon="Search" />
+      <el-input :readonly="!isShowInput" class="inputcss" v-model="receiveFormData2.materialName"
+        @change="receivelistFun2" style="width: 148px; height: 24px" placeholder="请输入物料名称" :prefix-icon="Search" />
       <div class="bigscreen_rc_bottom_l">
         <img src="/public/img/圆形标记.png" alt="" />
       </div>
@@ -196,7 +196,7 @@
           <div v-for="(item, index) in receivelist2" :key="index" class="bigscreen_rc_bottom_rnei">
             <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
               dayjs(item.createTime).format("YYYY-MM-DD")
-              }}</span>
+            }}</span>
             <div :style="{
               background: `url(${item.background}) no-repeat`,
               'background-size': '100% 100%',
@@ -329,7 +329,11 @@ const receivelistFun = async () => {
 const rbClick = async () => {
   isShowInput.value = true;
   rbstatus.value = !rbstatus.value;
-  receiveFormData2.value.materialName = "";
+  if (Array.isArray(receivelist.value) && receivelist.value.length > 0) {
+    receiveFormData2.value.materialName = receivelist.value[0].materialName;
+  } else {
+    receiveFormData2.value.materialName = "";
+  }
   await receivelistFun2();
 };
 const rbcanleClick = () => {

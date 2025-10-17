@@ -104,22 +104,10 @@
         <el-radio-button label="年" value="year" />
       </el-radio-group> -->
 
-      <div class="left-se">
-        <!-- <el-select
-        v-model="powerByAreaTotalStaticData.area"
-          filterable
-          placeholder="请选择区域"
-          style="width: 100%"
-           class="cascaderCss"
-           @change="powerByAreaTotalStaticFun"
-        >
-          <el-option v-for="area in allAreas" :key="area" :label="area" :value="area" />
-        </el-select> -->
-
-        <!-- <el-form-item label="日期：" class="form-item">
-          <el-date-picker v-model="powerByAreaTotalStaticData.timeRange" type="date" placeholder="选择日期" value-format="YYYY-MM-DD"
-            @change="handleTimeChange" />
-        </el-form-item> -->
+      <div class="left-se1">
+        <el-select :max-collapse-tags="0" collapse-tags style="width: 100%;" size="small" multiple @change="powerByAreaTotalStaticFun" v-model="powerByAreaTotalStaticData.areas" class="cascaderCss">
+          <el-option v-for="item in allAreas" :key="item" :label="item" :value="item" />
+        </el-select>
       </div>
       <div class="left-se">
         <el-select size="small" v-model="powerByAreaTotalStaticData.unitName" filterable placeholder="请选择指标"
@@ -133,7 +121,7 @@
     </div>
   </div>
 
-  <div v-if="ltstatus" class="ltDialog">
+  <div v-show="ltstatus" class="ltDialog">
     <div class="ltDialog_top">
       <span>报警历史分析</span>
       <el-radio-group v-model="envrionmentStatisticsData.dayType" class="group yzRadio" @change="zsRadioChange">
@@ -469,6 +457,9 @@ const envrionmentStatisticsFun = async () => {
   bigscreenLtdialogoption.xAxis.data = data.data.unitNames;
   bigscreenLtdialogoption.yAxis.min = 0;
   bigscreenLtdialogoption.yAxis.max = Math.max(...data.data.datas, 6);
+  if(bigscreenLtdialogoption.yAxis.max > 6){
+    bigscreenLtdialogoption.yAxis.max  =bigscreenLtdialogoption.yAxis.max+10
+  }
   // bigscreenLtdialogoption.series = data.data.unitNames.map((name, index) => ({
   //   name: name,
   //   type: 'bar',
@@ -877,6 +868,7 @@ const bigscreenRBoption = {
   },
 };
 const powerByAreaTotalStaticData = ref({
+  areas: [],
   // area:"控制区",
   unitName: "温度",
   beginTime: dayjs().startOf('day').format('YYYY-MM-DD'),
@@ -889,15 +881,16 @@ const powerByAreaTotalStaticFun = async () => {
     unitName: powerByAreaTotalStaticData.value.unitName,
     beginTime: dayjs().startOf('day').format('YYYY-MM-DD'),
     endTime: dayjs().add(1, 'day').startOf('day').format('YYYY-MM-DD'),
+    areas: powerByAreaTotalStaticData.value.areas,
   });
-  bigscreenRBoption.legend.data = data.data.series.map(item => item.name);
+  bigscreenRBoption.legend.data = data.data.series?.map(item => item.name);
   bigscreenRBoption.xAxis.data = data.data.xdata;
   bigscreenRBoption.series = data.data.series
 
   if (bigscreenRBChart == null) {
     bigscreenRBChart = echarts.init(bigscreenRBRef.value);
-
   }
+
   if (bigscreenRBoption.series.length == 0) {
     bigscreenRBChart.setOption(initQuYuOption, true)
   } else {
@@ -918,7 +911,14 @@ async function getAllAreasFunc() {
   getAreas().then(res => {
     allAreas.value = res.data.data;
     if (allAreas.value.length > 0) {
-      powerByAreaTotalStaticData.value.area = allAreas.value[0];
+      if(Array.isArray(allAreas.value)){
+        if(allAreas.value.length > 5 ){
+          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0,5)
+        }else{
+          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0,allAreas.value.length -1)
+        }
+      }
+
       // powerByAreaTotalStaticFun();
     }
   }).catch(err => {
@@ -1050,6 +1050,15 @@ $design-height: 1080;
   }
 }
 
+.left-se1{
+  width: adaptiveWidth(100);
+  position: relative;
+  left: - adaptiveWidth(50);
+}
+
+.left-se1 :deep(.el-tag){
+  background: none !important;
+}
 .left-se {
   width: adaptiveWidth(100);
   position: relative;
@@ -1316,6 +1325,7 @@ $design-height: 1080;
     .bigscreen_rb_top_l {
       display: flex;
       align-items: center;
+      width: adaptiveWidth(300);
 
       img {
         margin-left: 11px;

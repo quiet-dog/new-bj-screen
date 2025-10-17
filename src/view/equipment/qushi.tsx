@@ -111,6 +111,9 @@ export function useXunJianQushiHook() {
             options.yAxis.min = 1;
             // @ts-expect-error
             options.yAxis.max = Math.max(...res.data.data.data, 6); // 至少6
+            if (options.yAxis.max > 6) {
+                options.yAxis.max += 10
+            }
             // @ts-expect-error
             ciEchart.setOption(options, true)
         })
