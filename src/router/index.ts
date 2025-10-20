@@ -72,6 +72,14 @@ const routes: RouteRecordRaw[] = [
           title: "风险评估",
         },
       },
+      {
+        path: "/scada",
+        name: "scada",
+        component: () => import("../view/scada/index.vue"),
+        meta: {
+          title: "SCADA",
+        },
+      },
     ],
   },
   {

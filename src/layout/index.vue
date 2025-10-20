@@ -20,6 +20,16 @@
         <component :is="Component" />
       </router-view>
     </div>
+    <div class="bigscreen_bottom_lt">
+      <div class="bigscreen_bottom_neis" @click="bigscreenBtn('/scada')">
+        <div :style="{
+          color: $route.path === '/scada' ? '#ffffff' : '#00ABFF',
+        }">
+          综合数据
+        </div>
+        <img v-if="$route.path === '/scada'" style="position: absolute; bottom: 0" src="/img/切换图标.png" alt="" />
+      </div>
+    </div>
     <div class="bigscreen_bottom">
       <div class="bigscreen_bottom_nei">
         <div class="bigscreen_bottom_neis" v-for="item in btnfun" @click="bigscreenBtn(item.path)">
@@ -27,8 +37,8 @@
           <template v-if="item.title == '风险评估'">
             <div :style="{
               color: $route.path === item.path ? '#ffffff' : '#00ABFF',
-            }" >
-              <span v-show="$route.path ==='/riskassessment'" class="fengxianpinggu" @click="getHres">风险评估系统</span>
+            }">
+              <span v-show="$route.path === '/riskassessment'" class="fengxianpinggu" @click="getHres">风险评估系统</span>
               {{ item.title }}
             </div>
           </template>
@@ -255,6 +265,41 @@ $design-height: 1080;
   .bigscreen_center {
     width: 100%;
     height: 100%;
+  }
+
+  .bigscreen_bottom_lt {
+    height: adaptiveHeight(112);
+    position: absolute;
+    left: adaptiveWidth(480);
+    bottom: adaptiveHeight(80);
+
+    // width: adaptiveWidth(200);
+    .bigscreen_bottom_neis {
+      div {
+        width: adaptiveWidth(112);
+        height: adaptiveHeight(56);
+        background: url("/img/dbwenan.png") no-repeat;
+        background-size: 100% 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+      }
+
+      img {
+        width: adaptiveWidth(34);
+        height: adaptiveHeight(21);
+      }
+
+      width: adaptiveWidth(112);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: rgba(255, 255, 255, 1);
+      font-size: adaptiveFontSize(20);
+    }
   }
 
   .bigscreen_bottom {
