@@ -79,7 +79,7 @@
               </el-popover>
               <!-- <span>{{ item.equipmentName }}</span> -->
               <span>{{ item.equipmentType }}</span>
-              <span>{{ dayjs(item.purchaseDate).format("YYYY-MM-DD") }}</span>
+              <span>{{ item.purchaseDate ? dayjs(item.purchaseDate).format("YYYY-MM-DD"):"--" }}</span>
             </div>
           </Vue3SeamlessScroll>
         </div>

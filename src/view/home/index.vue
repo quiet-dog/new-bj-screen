@@ -127,7 +127,7 @@
 
           </div>
           <div class="lt_container_item">
-            <p @click="changeTargetType('工艺节点报警')" style="cursor: pointer;">今日工艺节点报警:{{
+            <p @click="changeTargetType('工艺节点报警')" style="cursor: pointer;">工艺节点报警:{{
               jinRiGongYiJieDianBaoJingList.total }}</p>
             <div class="lt_container_item_div">
 
