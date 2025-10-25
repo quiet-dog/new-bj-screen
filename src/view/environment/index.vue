@@ -10,21 +10,42 @@
       </div>
     </div>
     <div class="bigscreen_lt_bottom">
-      <!-- <div class="bigscreen_lt_bottom_nei">
-        <div class="bigscreen_lt_bottom_nei_t">
-          <span>描述</span>
-          <span>位号</span>
-          <span>信号</span>
-        </div>
-        <div class="bigscreen_lt_bottom_nei_b" v-for="(item, index) in environmentFileList"
-          @click="ltClick2(item, index)">
-          <span>{{ `${item.description}-${item.unitName}` }}</span>
-          <span>{{ item.tag }}</span>
-          <span>{{ item.esignal }}</span>
-        </div>
-      </div> -->
       <div class="lt_container">
-        <div :style="{
+        <swiper ref="ltSwiperRef" :modules="[Autoplay]" :space-between="20" :loop="true" class="lt_swiper_container" :slides-per-view="4"
+          :slides-per-group="1" direction="horizontal" :autoplay="{ delay: 2000, disableOnInteraction: false }">
+          <SwiperSlide class="lt_swiper_slide" @click="ltClick2(item)" v-for="(item, index) in envList" :key="index">
+            <div class="lt_swiper_slide_container" :style="{
+              backgroundImage: `url(${BeiJing})`,
+              cursor: 'pointer',
+              height:'100%',
+            }">
+              <div>
+                <img v-if="item.environment?.unitName === '温度'" :src="WenDu" alt="">
+                <img v-if="item.environment?.unitName === '湿度'" :src="ShiDu" alt="">
+                <img v-if="item.environment?.unitName === '压差'" :src="YaCha" alt="">
+              </div>
+              <div>{{
+                item.environment?.unitName }}
+                <br />
+                <span :class="getValueColorClass(item)">
+                  {{ item.value }}
+                </span>
+                <br />
+                {{ item.environment?.unitName == "温度" ? '℃' : item.environment?.unitName == "湿度" ? '%' :
+                  item.environment?.unitName == "压差" ? "Pa" : "" }}
+              </div>
+              <div class="lt_b">
+                <div>
+                  {{ item.environment?.description }}
+                </div>
+                <img :src="DiZuo" alt="" srcset="">
+              </div>
+            </div>
+
+
+          </SwiperSlide>
+        </swiper>
+        <!-- <div :style="{
           backgroundImage: `url(${BeiJing})`,
           cursor: 'pointer'
         }" @click="ltClick2(item)" v-for="(item, index) in envList" :key="index">
@@ -49,7 +70,7 @@
             </div>
             <img :src="DiZuo" alt="" srcset="">
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -105,7 +126,8 @@
       </el-radio-group> -->
 
       <div class="left-se1">
-        <el-select :max-collapse-tags="0" collapse-tags style="width: 100%;" size="small" multiple @change="powerByAreaTotalStaticFun" v-model="powerByAreaTotalStaticData.areas" class="cascaderCss">
+        <el-select :max-collapse-tags="0" collapse-tags style="width: 100%;" size="small" multiple
+          @change="powerByAreaTotalStaticFun" v-model="powerByAreaTotalStaticData.areas" class="cascaderCss">
           <el-option v-for="item in allAreas" :key="item" :label="item" :value="item" />
         </el-select>
       </div>
@@ -169,6 +191,11 @@ import BeiJing from "../../assets/env/背景.jpg";
 import { useIntervalFn } from "@vueuse/core";
 import dayjs from "dayjs";
 import { initQuYuOption } from ".";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import { Autoplay } from "swiper/modules";
+
 
 const zsRadio = ref("week");
 const zsRadioChange = async () => {
@@ -289,6 +316,9 @@ const bigscreenLBoption = {
       },
     },
   ],
+  tooltip: {
+    trigger: 'axis' // 可选值: 'item' | 'axis' | 'none'
+  },
 };
 const powerByTypeStatisticsData = ref({
   des: "",
@@ -331,15 +361,21 @@ const environmentFileFun = async () => {
   });
 };
 const envList = ref([]);
+const envListTotal = ref(0)
+const ltSwiperRef = ref()
 const getEnvList = () => {
   environmentalDetectionList({
     pageNum: 1,
-    pageSize: 4,
+    pageSize: 10,
     orderColumn: "createTime",
     orderDirection: "descending",
     isIgnore: true,
   }).then(res => {
-    envList.value = res.data.data.rows;
+    if (envListTotal.value != res.data.data.total) {
+      envListTotal.value = res.data.data.total;
+      envList.value = res.data.data.rows;
+      ltSwiperRef.value?.$el.swiper?.update();
+    }
   }).catch(err => {
 
   })
@@ -354,7 +390,12 @@ const getEnvListTimer = useIntervalFn(() => {
     orderDirection: "descending",
     isIgnore: true,
   }).then(res => {
-    envList.value = res.data.data.rows;
+    if(envListTotal.value != res.data.data.total){
+      envListTotal.value = res.data.data.total;
+      envList.value = res.data.data.rows;
+      ltSwiperRef.value?.$el.swiper?.update();
+
+    }
   }).catch(err => {
 
   }).finally(() => {
@@ -457,8 +498,8 @@ const envrionmentStatisticsFun = async () => {
   bigscreenLtdialogoption.xAxis.data = data.data.unitNames;
   bigscreenLtdialogoption.yAxis.min = 0;
   bigscreenLtdialogoption.yAxis.max = Math.max(...data.data.datas, 6);
-  if(bigscreenLtdialogoption.yAxis.max > 6){
-    bigscreenLtdialogoption.yAxis.max  =bigscreenLtdialogoption.yAxis.max+10
+  if (bigscreenLtdialogoption.yAxis.max > 6) {
+    bigscreenLtdialogoption.yAxis.max = bigscreenLtdialogoption.yAxis.max + 10
   }
   // bigscreenLtdialogoption.series = data.data.unitNames.map((name, index) => ({
   //   name: name,
@@ -911,11 +952,11 @@ async function getAllAreasFunc() {
   getAreas().then(res => {
     allAreas.value = res.data.data;
     if (allAreas.value.length > 0) {
-      if(Array.isArray(allAreas.value)){
-        if(allAreas.value.length > 5 ){
-          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0,5)
-        }else{
-          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0,allAreas.value.length -1)
+      if (Array.isArray(allAreas.value)) {
+        if (allAreas.value.length > 5) {
+          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0, 5)
+        } else {
+          powerByAreaTotalStaticData.value.areas = allAreas.value.slice(0, allAreas.value.length - 1)
         }
       }
 
@@ -1025,14 +1066,29 @@ $design-height: 1080;
   padding: 0 adaptiveWidth(10);
   // margin: 0 adaptiveWidth(10);
 
-  >div {
-    width: adaptiveWidth(90);
-    height: adaptiveHeight(350);
-    border-radius: adaptiveWidth(10);
-    // background-color: gray;
-    display: grid;
-    grid-template-rows: 1fr 2fr 1fr;
-  }
+
+}
+
+.lt_swiper_container {
+  width: 100%;
+  height: 100%;
+}
+
+.lt_swiper_slide {
+  width: adaptiveWidth(90);
+  height: adaptiveHeight(350);
+  // background-color: gray;
+
+}
+
+.lt_swiper_slide_container{
+  border-radius: adaptiveWidth(10);
+  display: grid;
+  grid-template-rows: 1fr 2fr 1fr;
+}
+
+.lt_swiper_container:deep(div.swiper-wrapper) {
+  align-items: center;
 }
 
 :deep(.cascaderCss) {
@@ -1050,15 +1106,16 @@ $design-height: 1080;
   }
 }
 
-.left-se1{
+.left-se1 {
   width: adaptiveWidth(100);
   position: relative;
   left: - adaptiveWidth(50);
 }
 
-.left-se1 :deep(.el-tag){
+.left-se1 :deep(.el-tag) {
   background: none !important;
 }
+
 .left-se {
   width: adaptiveWidth(100);
   position: relative;

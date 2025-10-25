@@ -40,6 +40,8 @@ declare module 'vue' {
     Officereview: typeof import('./src/components/officereview.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Scada_center: typeof import('./src/components/scada_center.vue')['default']
+    ScadaData: typeof import('./src/components/ScadaData/index.vue')['default']
     Select: typeof import('./src/components/ReIcon/src/Select.vue')['default']
     Tufour: typeof import('./src/components/tufour/index.vue')['default']
     Tuone: typeof import('./src/components/tuone/index.vue')['default']

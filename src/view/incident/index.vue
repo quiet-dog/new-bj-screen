@@ -43,11 +43,11 @@
 
         <span>{{
           dayjs(areaStatisticsFormData.startTime).format("MM月DD日")
-        }}</span>
+          }}</span>
         <span>-</span>
         <span>{{
           dayjs(areaStatisticsFormData.endTime).format("MM月DD日")
-        }}</span>
+          }}</span>
         <img src="/public/img/you.svg" alt="" @click="timeRightClick" style="margin-right: 5px" />
       </div>
       <div class="chakanqushi">
@@ -59,7 +59,7 @@
     </div>
     <div v-show="qushiShow" class="lc_table lcTrendDialog">
       <div class="lcTrendDialog_top">
-        <span>环境报警趋势</span>
+        <span>事件类型统计</span>
         <img @click="closeQushiShow" :src="img9" alt="" srcset="" />
       </div>
       <div class="lcTrendDialog_bottom" ref="lcQushiRef">
@@ -177,7 +177,7 @@
                   {{ item.fileName }}
                 </el-tag> -->
                 <el-link type="primary" @click="downloadFile(item.path)" v-for="item in files">{{ item.fileName
-                }}</el-link>
+                  }}</el-link>
 
               </el-form-item>
             </el-form>
@@ -307,10 +307,10 @@
           <el-descriptions-item label="事件类型：">{{ ltCurrentItem?.type }}</el-descriptions-item>
           <el-descriptions-item label="事件名称：">{{ ltCurrentItem?.eventName }}</el-descriptions-item>
           <el-descriptions-item label="处理人：">{{ ltCurrentItem?.handlerNames
-          }}</el-descriptions-item>
+            }}</el-descriptions-item>
           <el-descriptions-item label="处理流程：">{{ ltCurrentItem?.processingFlow }}</el-descriptions-item>
-          <el-descriptions-item label="报警描述：">{{ltCurrentItem?.emergencyAlarmDTOs?.map(item =>
-            item.description)?.join(",")}}</el-descriptions-item>
+          <!-- <el-descriptions-item label="报警描述：">{{ltCurrentItem?.emergencyAlarmDTOs?.map(item =>
+            item.description)?.join(",")}}</el-descriptions-item> -->
         </el-descriptions>
       </el-scrollbar>
     </div>
@@ -507,21 +507,20 @@ function openShowQushi() {
     endTime: areaStatisticsFormData.value.endTime,
   }).then(res => {
     qushiOptions.xAxis.data = res.data.data.xdata
-    qushiOptions.title.text = "事件类型统计(" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ")"
+    qushiOptions.title.text = "" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ""
     qushiOptions.series = res.data.data.series
     qushiOptions.legend.data = res.data.data.series.map(item => item.name)
     qushiOptions.yAxis.min = 0
     if (Array.isArray(res.data.data.series) && res.data.data.series.length > 0) {
+      let aaa = []
       res.data.data.series.forEach(item => {
-        qushiOptions.yAxis.max = Math.max(...item.data, 6)
-        if(qushiOptions.yAxis.max > 6){
-          qushiOptions.yAxis.max = qushiOptions.yAxis.max+10
-        }
+        aaa.push(...item.data)
       })
+      qushiOptions.yAxis.max = Math.max(...aaa, 6)
+      qushiOptions.yAxis.max = (qushiOptions.yAxis.max + 10)
     } else {
       qushiOptions.yAxis.max = 6
     }
-    console.log("qushiOptions", qushiOptions)
     if (lcQushiChart == null) {
       lcQushiChart = echarts.init(lcQushiRef.value);
     }
@@ -2232,9 +2231,12 @@ $design-height: 1080;
   background: transparent !important;
 }
 
-.zhengcefagui{
-  white-space: nowrap;        /* 不换行 */
-  overflow: hidden;           /* 超出隐藏 */
-  text-overflow: ellipsis;    /* 超出显示省略号 */
+.zhengcefagui {
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 超出隐藏 */
+  text-overflow: ellipsis;
+  /* 超出显示省略号 */
 }
 </style>
