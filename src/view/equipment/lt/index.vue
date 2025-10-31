@@ -11,10 +11,10 @@
             </div>
         </div>
         <div class="container_bottom">
-            <el-scrollbar @scroll="scrollEvent"  @mouseleave="mouseLeave"
-                @mouseenter="heightTimer.pause" ref="scrollbarRef" height="100%">
+            <el-scrollbar @scroll="scrollEvent" @mouseleave="mouseLeave" @mouseenter="heightTimer.pause"
+                ref="scrollbarRef" height="100%">
                 <!-- @vue-expect-error -->
-                <div v-for="item in data.list" :key="item.id" :class="{
+                <div v-for="(item,index) in data.list" :key="index" :class="{
                     'device_item': true,
                     'not_online': !item.isOnline,
                     'is_online': item.isOnline,
@@ -52,7 +52,7 @@
                             <el-tooltip placement="top">
                                 <template #content>
                                     <!-- @vue-expect-error -->
-                                    <template v-for="value in item?.sensorList">
+                                    <template v-for="(value,index) in item?.sensorList" :key="index">
                                         <span>
                                             {{ value?.key }}:
                                             <!-- @vue-expect-error -->
@@ -64,7 +64,7 @@
                                 </template>
                                 <div class="data_container">
                                     <!-- @vue-expect-error -->
-                                    <template v-for="(value, index) in item?.sensorList">
+                                    <template v-for="(value, index) in item?.sensorList" :key="index">
                                         <div v-if="index < 2">{{ value?.key }}:
                                             <!-- @vue-expect-error -->
                                             <span :style="{ color: item?.color }">{{ value?.value }}</span>
@@ -93,7 +93,7 @@ const data = ref({
 });
 const query = ref({
     pageNum: 1,
-    pageSize: 100,
+    pageSize: 30,
     orderColumn: "createTime",
     orderDirection: "descending",
 });
@@ -106,8 +106,10 @@ function changeRadio(value) {
 const getList = async () => {
     // @ts-expect-error
     equipmentDetailList(query.value).then(res => {
-        data.value.list = res.data.data.rows;
-        data.value.total = res.data.data.total;
+        if (data.value.total != res.data.data.total) {
+            data.value.list = res.data.data.rows;
+            data.value.total = res.data.data.total;
+        }
     })
 
 }
@@ -120,7 +122,7 @@ const getListTimer = useIntervalFn(async () => {
     equipmentAlarmCount(radio.value).then(res => {
         total.value = res.data.data
     })
-}, 5000)
+}, 10000)
 const height = ref(0)
 const targetHeight = ref(0)
 const heightTimer = useIntervalFn(() => {

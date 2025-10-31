@@ -11,13 +11,14 @@
     </div>
     <div class="bigscreen_lt_bottom">
       <div class="lt_container">
-        <swiper ref="ltSwiperRef" :modules="[Autoplay]" :space-between="20" :loop="true" class="lt_swiper_container" :slides-per-view="4"
-          :slides-per-group="1" direction="horizontal" :autoplay="{ delay: 2000, disableOnInteraction: false }">
+        <swiper ref="ltSwiperRef" :modules="[Autoplay]" :space-between="20" :loop="true" class="lt_swiper_container"
+          :slides-per-view="4" :slides-per-group="1" direction="horizontal"
+          :autoplay="{ delay: 2000, disableOnInteraction: false }">
           <SwiperSlide class="lt_swiper_slide" @click="ltClick2(item)" v-for="(item, index) in envList" :key="index">
             <div class="lt_swiper_slide_container" :style="{
               backgroundImage: `url(${BeiJing})`,
               cursor: 'pointer',
-              height:'100%',
+              height: '100%',
             }">
               <div>
                 <img v-if="item.environment?.unitName === '温度'" :src="WenDu" alt="">
@@ -327,7 +328,6 @@ const powerByTypeStatisticsData = ref({
 });
 const powerByTypeStatisticsFun = async () => {
   const { data } = await powerByTypeStatistics(powerByTypeStatisticsData.value);
-  console.log(data);
   bigscreenLBoption.xAxis.data = data.data.time;
   bigscreenLBoption.series[0].data = data.data.data;
   if (bigscreenLBChart == null) {
@@ -350,15 +350,20 @@ const environmentFileFormData = ref({
   orderDirection: "descending",
 });
 const environmentFileList = ref<any[]>([]);
+const environmentFileListTotal = ref(0)
 const environmentFileFun = async () => {
   const { data } = await environmentalFilesList(environmentFileFormData.value);
   let list = data.data.rows.slice(0, 9);
-  environmentFileList.value = list.map((item, index) => {
-    return {
-      ...item,
-      status: false,
-    };
-  });
+  if (environmentFileListTotal.value != data.data.total) {
+    environmentFileListTotal.value  = data.data.total
+    environmentFileList.value = list.map((item, index) => {
+      return {
+        ...item,
+        status: false,
+      };
+    });
+  }
+
 };
 const envList = ref([]);
 const envListTotal = ref(0)
@@ -390,7 +395,7 @@ const getEnvListTimer = useIntervalFn(() => {
     orderDirection: "descending",
     isIgnore: true,
   }).then(res => {
-    if(envListTotal.value != res.data.data.total){
+    if (envListTotal.value != res.data.data.total) {
       envListTotal.value = res.data.data.total;
       envList.value = res.data.data.rows;
       ltSwiperRef.value?.$el.swiper?.update();
@@ -976,7 +981,7 @@ const getAreasTimer = useIntervalFn(() => {
   }).finally(() => {
     getAreasTimer.resume();
   });
-}, 5000);
+}, 60000);
 
 window.onresize = function () {
   bigscreenLBChart.resize();
@@ -1081,7 +1086,7 @@ $design-height: 1080;
 
 }
 
-.lt_swiper_slide_container{
+.lt_swiper_slide_container {
   border-radius: adaptiveWidth(10);
   display: grid;
   grid-template-rows: 1fr 2fr 1fr;

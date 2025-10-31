@@ -4,7 +4,7 @@
 			<div class="equipment-code">{{ data.equipmentCode }}</div>
 		    <div class="equipment-area">{{ data.installationLocation }}</div>
 
-		<div v-for="threshold in data.thresholdList" class="equipment-threshold">
+		<div v-for="(threshold,index) in data.thresholdList" :key="index" class="equipment-threshold">
 			<div class="sensorName">{{ threshold.sensorName }}</div>
 			<div class="value">{{ threshold?.value || 0 }} {{ threshold.unit }}</div>
 

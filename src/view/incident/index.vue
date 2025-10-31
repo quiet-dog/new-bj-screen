@@ -14,18 +14,19 @@
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
-        <Vue3SeamlessScroll style="width: 100%;overflow: hidden;" :list="alarmInformationlistValue" hover
-          class="scrool scroolMy">
-          <div style="cursor: pointer;" class="bigscreen_lt_bottom_r_nei" @click="openLtDialogShow(item)"
-            v-for="(item, index) in alarmInformationlistValue">
-            <div>
-              {{ item?.eventName }}
-            </div>
-            <div>
-              {{ getHandlePerson(item) }}
-            </div>
+        <Vue3SeamlessScroll :key="alarmInformationlistValueTotal" style="width: 100%;overflow: hidden;"
+          :list="alarmInformationlistValue" hover class="scrool scroolMy">
+          <template v-slot="{ data }">
+            <div style="cursor: pointer;" class="bigscreen_lt_bottom_r_nei" @click="openLtDialogShow(data)">
+              <div>
+                {{ data?.eventName }}
+              </div>
+              <div>
+                {{ getHandlePerson(data) }}
+              </div>
 
-          </div>
+            </div>
+          </template>
         </Vue3SeamlessScroll>
 
       </div>
@@ -43,11 +44,11 @@
 
         <span>{{
           dayjs(areaStatisticsFormData.startTime).format("MM月DD日")
-          }}</span>
+        }}</span>
         <span>-</span>
         <span>{{
           dayjs(areaStatisticsFormData.endTime).format("MM月DD日")
-          }}</span>
+        }}</span>
         <img src="/public/img/you.svg" alt="" @click="timeRightClick" style="margin-right: 5px" />
       </div>
       <div class="chakanqushi">
@@ -128,19 +129,20 @@
       <div class="bigscreen_rt_bottom_nei">
         <img src="/public/img/事件报告图标.png" alt="" />
         <div class="bigscreen_rt_bottom_r">
-          <Vue3SeamlessScroll :list="alarmEventslist" :class-option="{
+          <Vue3SeamlessScroll :key="alarmEventslistTotal" :list="alarmEventslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div @click="openEventInfoShow(item)" v-for="(item, index) in alarmEventslist" :key="index"
-              class="bigscreen_rt_bottom_rnei">
-              <span>{{ item.eventName }}</span>
-              <div :style="{
-                background: ` url(${getBg(item)}) no-repeat`,
-                'background-size': '100% 100%',
-              }">
-                <span>{{ item.type }}</span>
+            <template v-slot="{ data }">
+              <div @click="openEventInfoShow(data)" class="bigscreen_rt_bottom_rnei">
+                <span>{{ data?.eventName }}</span>
+                <div :style="{
+                  background: ` url(${getBg(data)}) no-repeat`,
+                  'background-size': '100% 100%',
+                }">
+                  <span>{{ data?.type }}</span>
+                </div>
               </div>
-            </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -177,7 +179,7 @@
                   {{ item.fileName }}
                 </el-tag> -->
                 <el-link type="primary" @click="downloadFile(item.path)" v-for="item in files">{{ item.fileName
-                  }}</el-link>
+                }}</el-link>
 
               </el-form-item>
             </el-form>
@@ -205,18 +207,20 @@
         </div>
 
         <div class="sop_con" style="overflow-y: hidden;">
-          <Vue3SeamlessScroll :list="soplist" :class-option="{
+          <Vue3SeamlessScroll :key="soplistTotal" :list="soplist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div class="bigscreen_rc_bottom_nei_b" v-for="(item, index) in soplist" @click="rcClcik(item)">
-              <span>
-                {{ item.sopId }}
-              </span>
-              <ElTooltip :content="item.name">
-                <span>{{ item.name }}</span>
-              </ElTooltip>
-              <span>{{ item.scope }}</span>
-            </div>
+            <template v-slot="{ data }">
+              <div class="bigscreen_rc_bottom_nei_b" @click="rcClcik(data)">
+                <span>
+                  {{ data?.sopId }}
+                </span>
+                <ElTooltip :content="data?.name">
+                  <span>{{ data?.name }}</span>
+                </ElTooltip>
+                <span>{{ data?.scope }}</span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
 
@@ -242,25 +246,27 @@
           <img src="/public/img/圆形标记.png" alt="" />
         </div>
         <div class="bigscreen_rb_bottom_r">
-          <Vue3SeamlessScroll :list="policieslist" :class-option="{
+          <Vue3SeamlessScroll :key="policieslistTotal" :list="policieslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div v-for="(item, index) in policieslist" :key="index" class="bigscreen_rb_bottom_rnei">
+            <template v-slot="{data}">
+              <div class="bigscreen_rb_bottom_rnei">
               <span class="bigscreen_rb_bottom_rnei_span">
-                {{ dayjs(item.createTime).format("YYYY-MM-DD") }}</span>
+                {{ dayjs(data?.createTime).format("YYYY-MM-DD") }}</span>
               <div :style="{
-                background: `url(${item.img}) no-repeat`,
+                background: `url(${data?.img}) no-repeat`,
                 'background-size': '100% 100%',
               }">
                 <!-- <span style="margin-left: 10px">{{ item.policiesName }}</span> -->
                 <span class="zhengcefagui" style="margin-left: 10px">
-                  <el-tooltip :content="item?.policiesName">
-                    {{ item.policiesName }}
+                  <el-tooltip :content="data?.policiesName">
+                    {{ data?.policiesName }}
                   </el-tooltip>
                 </span>
-                <img @click="rbClcik(item)" src="/public/img/查看详情.png" alt="" />
+                <img @click="rbClcik(data)" src="/public/img/查看详情.png" alt="" />
               </div>
             </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -307,7 +313,7 @@
           <el-descriptions-item label="事件类型：">{{ ltCurrentItem?.type }}</el-descriptions-item>
           <el-descriptions-item label="事件名称：">{{ ltCurrentItem?.eventName }}</el-descriptions-item>
           <el-descriptions-item label="处理人：">{{ ltCurrentItem?.handlerNames
-            }}</el-descriptions-item>
+          }}</el-descriptions-item>
           <el-descriptions-item label="处理流程：">{{ ltCurrentItem?.processingFlow }}</el-descriptions-item>
           <!-- <el-descriptions-item label="报警描述：">{{ltCurrentItem?.emergencyAlarmDTOs?.map(item =>
             item.description)?.join(",")}}</el-descriptions-item> -->
@@ -323,7 +329,9 @@ import { ref, onMounted } from "vue";
 import * as echarts from "echarts";
 import { Search } from "@element-plus/icons-vue";
 import center from "../../components/center.vue";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
+
 import {
   getPoliciesListApi,
   sopList,
@@ -642,10 +650,14 @@ const sopFormData = ref({
   orderDirection: "descending",
 });
 const soplist = ref<any[]>([]);
+const soplistTotal = ref(0)
 const sopPreviewVisibleUrl = ref("");
 const soplistFun = async () => {
   const { data } = await sopList(sopFormData.value);
-  soplist.value = data.data.rows.slice(0, 5);
+  if (soplistTotal.value != data.data.rows) {
+    soplistTotal.value = data.data.total
+    soplist.value = data.data.rows.slice(0, 5);
+  }
 };
 const rcClcik = (item: any) => {
   soplist.value.forEach((v) => {
@@ -671,13 +683,18 @@ const policiesFormData = ref({
   orderDirection: "descending",
 });
 const policieslist = ref<any[]>([]);
+const policieslistTotal = ref(0)
 const previewVisibleUrl = ref("");
 const policieslistFun = async () => {
   const { data } = await getPoliciesListApi(policiesFormData.value);
   let imgList = [img5, img6, img7];
-  policieslist.value = data.data.rows.map((item, index) => {
+  if(policieslistTotal.value != data.data.total){
+    policieslistTotal.value = data.data.total
+ policieslist.value = data.data.rows.map((item, index) => {
     return { ...item, img: imgList[index % imgList.length], status: false };
   });
+  }
+ 
 };
 const rbClcik = (item: any) => {
   policieslist.value.forEach((v) => {
@@ -745,9 +762,13 @@ const getBg = (item) => {
   }
   return bg;
 }
+const alarmEventslistTotal = ref(0)
 const alarmEventslistFun = async () => {
   const { data } = await emergencyEventList(alarmEventsFormData.value);
-  alarmEventslist.value = data.data.rows;
+  if (alarmEventslistTotal.value != data.data.total) {
+    alarmEventslistTotal.value = data.data.total;
+    alarmEventslist.value = data.data.rows;
+  }
 };
 
 const alarmTimer = useIntervalFn(() => {
@@ -770,9 +791,13 @@ const alarmInformationFormData = ref({
   type: "政策法规类"
 });
 const alarmInformationlistValue = ref<any[]>([]);
+const alarmInformationlistValueTotal = ref(0)
 const alarmInformationlistFun = async () => {
   const { data } = await emergencyEventList(alarmInformationFormData.value);
-  alarmInformationlistValue.value = data.data.rows;
+  if (alarmInformationlistValueTotal.value != data.data.total) {
+    alarmInformationlistValue.value = data.data.rows;
+    alarmInformationlistValueTotal.value = data.data.total;
+  }
 };
 
 const alarmInfoTimer = useIntervalFn(() => {

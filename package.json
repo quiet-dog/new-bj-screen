@@ -40,7 +40,7 @@
     "vue-pdf-embed": "^2.1.1",
     "vue-router": "4",
     "vue-seamless-scroll": "^1.1.23",
-    "vue3-seamless-scroll": "^2.0.1"
+    "vue3-seamless-scroll": "^3.0.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",

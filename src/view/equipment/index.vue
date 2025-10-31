@@ -55,32 +55,33 @@
           <span>设备型号</span>
           <span>安装时间</span>
         </div>
-        <div @mouseenter="jianceTimer.pause()" @mouseleave="jianceTimer.resume()" class="bigscreen_lc_bottom_neib">
-          <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
-            step: 5,
-          }" hover class="scrool">
-            <div class="bigscreen_lc_bottom_nei_b" v-for="item in equipmentlist">
-              <el-popover effect="dark" class="box-item" :content="item.equipmentCode" placement="top-start">
-                <template #reference>
-                  <span>
-                    {{ item.equipmentCode }}
-                  </span>
-                </template>
-              </el-popover>
-              <!-- <span>
+        <div class="bigscreen_lc_bottom_neib">
+          <Vue3SeamlessScroll ref="equipmentlistRef" :key="equipmentlist.length" :list="equipmentlist" :direction="'up'"
+            hover class="scrool">
+            <template v-slot="{ data }">
+              <div class="bigscreen_lc_bottom_nei_b">
+                <el-popover effect="dark" class="box-item" :content="data?.equipmentCode" placement="top-start">
+                  <template #reference>
+                    <span>
+                      {{ data?.equipmentCode }}
+                    </span>
+                  </template>
+                </el-popover>
+                <!-- <span>
                 {{ item.equipmentCode }}
               </span> -->
-              <el-popover effect="dark" class="box-item" :content="item.equipmentName" placement="top-start">
-                <template #reference>
-                  <span>
-                    {{ item.equipmentName }}
-                  </span>
-                </template>
-              </el-popover>
-              <!-- <span>{{ item.equipmentName }}</span> -->
-              <span>{{ item.equipmentType }}</span>
-              <span>{{ item.purchaseDate ? dayjs(item.purchaseDate).format("YYYY-MM-DD"):"--" }}</span>
-            </div>
+                <el-popover effect="dark" class="box-item" :content="data?.equipmentName" placement="top-start">
+                  <template #reference>
+                    <span>
+                      {{ data?.equipmentName }}
+                    </span>
+                  </template>
+                </el-popover>
+                <!-- <span>{{ item.equipmentName }}</span> -->
+                <span>{{ data?.equipmentType }}</span>
+                <span>{{ data?.purchaseDate ? dayjs(data?.purchaseDate).format("YYYY-MM-DD") : "--" }}</span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -100,7 +101,8 @@
       <el-select @change="getThresholdInfo" v-model="lbEquipmentId" size="small" class="selectcss">
         <!-- @vue-expect-error -->
         <el-option v-infinite-scroll="loadMoreEquipment" v-for="item in lbEquipmentList" :key="item?.equipmentId"
-          :label="`${item?.equipmentName} (${item?.equipmentCode} - ${item?.installationLocation})`" :value="item?.equipmentId" />
+          :label="`${item?.equipmentName} (${item?.equipmentCode} - ${item?.installationLocation})`"
+          :value="item?.equipmentId" />
 
       </el-select>
     </div>
@@ -127,17 +129,16 @@
           <!-- <div @click="rtClick(item)" v-for="item in videoList">
             <span>{{ item?.name }}</span>
           </div> -->
-          <Vue3SeamlessScroll :list="videoList" :class-option="{
-            step: 5,
-          }" hover>
-            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
-              class="video_item">
-              <span>
-                <el-tooltip :content="item?.name">
-                  {{ item?.name }}12313123131312312312312313132
-                </el-tooltip>
-              </span>
-            </div>
+          <Vue3SeamlessScroll ref="videoListRef" :key="videoList.length" :list="videoList" :direction="'up'" hover>
+            <template v-slot="{ data }">
+              <div style="cursor: pointer;" @click="rtClick(data)" class="video_item">
+                <span>
+                  <el-tooltip :content="data?.name">
+                    {{ data?.name }}
+                  </el-tooltip>
+                </span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -163,17 +164,17 @@
           <span>维修人员</span>
         </div>
         <div class="bigscreen_rc_bottom_b" @mouseleave="repairListTimer.resume()" @mouseenter="repairListTimer.pause()">
-          <Vue3SeamlessScroll :list="repairList" :class-option="{
-            step: 5,
-          }" hover class="scrool">
-            <div :class="item.status
-              ? 'bigscreen_rc_bottom_nei_active'
-              : 'bigscreen_rc_bottom_nei_b'
-              " v-for="(item, index) in repairList" @click="rcClick(item)">
-              <span>{{ item.equipment.equipmentCode }}</span>
-              <span>{{ dayjs(item.createTime).format("YYYY-MM-DD") }}</span>
-              <span>{{ item.repairPersonnel }}</span>
-            </div>
+          <Vue3SeamlessScroll :key="repairListTotal" :list="repairList" :direction="'up'" hover class="scrool">
+            <template v-slot="{ data }">
+              <div :class="data?.status
+                ? 'bigscreen_rc_bottom_nei_active'
+                : 'bigscreen_rc_bottom_nei_b'
+                " @click="rcClick(data)">
+                <span>{{ data?.equipment.equipmentCode }}</span>
+                <span>{{ dayjs(data?.createTime).format("YYYY-MM-DD") }}</span>
+                <span>{{ data?.repairPersonnel }}</span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -198,40 +199,41 @@
         </div>
         <div @mouseenter="inspectionListTimer.pause()" @mouseleave="inspectionListTimer.pause()"
           class="bigscreen_rb_bottom_r_b">
-          <Vue3SeamlessScroll :list="inspectionlist" :class-option="{
-            step: 5,
-          }" hover class="scrool">
-            <div class="bigscreen_rb_bottom_r_nei" v-for="(item, index) in inspectionlist" @click="rbClick(item)">
-              <div class="bigscreen_rb_bottom_r_neis">
-                <div :style="{
-                  width: '13px',
-                  height: '13px',
-                  border: `1px solid ${index % 2 === 0 ? '#01D1E7' : '#DF9819'
-                    }`,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  margin: '0 15px',
-                }">
+          <Vue3SeamlessScroll :key="inspectionlistTotal" :list="inspectionlist" :direction="'up'" hover class="scrool">
+            <template v-slot="{ data }">
+              <div class="bigscreen_rb_bottom_r_nei" @click="rbClick(data)">
+                <div class="bigscreen_rb_bottom_r_neis">
                   <div :style="{
-                    width: '5px',
-                    height: '5px',
-                    background: index % 2 === 0 ? '#01D1E7' : '#DF9819',
-                  }"></div>
+                    width: '13px',
+                    height: '13px',
+                    border: `1px solid ${data?.recordId % 2 === 0 ? '#01D1E7' : '#DF9819'
+                      }`,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    margin: '0 15px',
+                  }">
+                    <div :style="{
+                      width: '5px',
+                      height: '5px',
+                      background: data?.recordId % 2 === 0 ? '#01D1E7' : '#DF9819',
+                    }"></div>
+                  </div>
+                  {{ data?.recordId }}
                 </div>
-                {{ item.recordId }}
+                <div class="bigscreen_rb_bottom_r_neis" style="color: #ffffff; font-size: 12px">
+                  {{ dayjs(data?.inspectionDate).format("YYYY-MM-DD") }}
+                </div>
+                <div class="bigscreen_rb_bottom_r_neis" :style="{
+                  color: data?.inspectionId % 2 === 0 ? '#01D1E7' : '#DF9819',
+                  fontSize: '12px',
+                  marginRight: '15px',
+                }">
+                  {{ data?.inspector }}
+                </div>
               </div>
-              <div class="bigscreen_rb_bottom_r_neis" style="color: #ffffff; font-size: 12px">
-                {{ dayjs(item.inspectionDate).format("YYYY-MM-DD") }}
-              </div>
-              <div class="bigscreen_rb_bottom_r_neis" :style="{
-                color: index % 2 === 0 ? '#01D1E7' : '#DF9819',
-                fontSize: '12px',
-                marginRight: '15px',
-              }">
-                {{ item.inspector }}
-              </div>
-            </div>
+            </template>
+
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -260,84 +262,82 @@
     </div>
   </div>
 
-  <template v-for="item in repairList">
-    <div v-if="item.status" class="rcDialog">
-      <div class="rcDialog_top">
-        <span>维修记录详情</span>
-        <img :src="img9" alt="" srcset="" @click="rccanleClick(item)" />
-      </div>
-      <div class="rcDialog_bottom">
-        <div class="rcDialog_bottoml">
-          <div>
-            <span>维修编号：</span>
-            <span>{{ item.recordId }}</span>
-          </div>
-          <div>
-            <span>设备编号：</span>
-            <span>{{ item.equipment.equipmentCode }}</span>
-          </div>
-          <div>
-            <span>维修时间：</span>
-            <span>{{ dayjs(item.repairDate).format("YYYY-MM-DD") }}</span>
-          </div>
-          <div>
-            <span>维修人员：</span>
-            <span>{{ item.repairPersonnel }}</span>
-          </div>
-          <div>
-            <span>维修费用：</span>
-            <span>{{ item.repairCost }}</span>
-          </div>
-          <div>
-            <span>维修内容：</span>
-            <span>{{ item.repairContent }}</span>
-          </div>
-          <div>
-            <span>维修原因：</span>
-            <span>{{ item.faultReason }}</span>
-          </div>
+  <div v-if="weiXiuDeatailShow" class="rcDialog">
+    <div class="rcDialog_top">
+      <span>维修记录详情</span>
+      <img :src="img9" alt="" srcset="" @click="rccanleClick" />
+    </div>
+    <div class="rcDialog_bottom">
+      <div class="rcDialog_bottoml">
+        <div>
+          <span>维修编号：</span>
+          <span>{{ weiXiuDeatail?.recordId }}</span>
+        </div>
+        <div>
+          <span>设备编号：</span>
+          <span>{{ weiXiuDeatail?.equipment?.equipmentCode }}</span>
+        </div>
+        <div>
+          <span>维修时间：</span>
+          <span>{{ dayjs(weiXiuDeatail?.repairDate).format("YYYY-MM-DD") }}</span>
+        </div>
+        <div>
+          <span>维修人员：</span>
+          <span>{{ weiXiuDeatail?.repairPersonnel }}</span>
+        </div>
+        <div>
+          <span>维修费用：</span>
+          <span>{{ weiXiuDeatail?.repairCost }}</span>
+        </div>
+        <div>
+          <span>维修内容：</span>
+          <span>{{ weiXiuDeatail?.repairContent }}</span>
+        </div>
+        <div>
+          <span>维修原因：</span>
+          <span>{{ weiXiuDeatail?.faultReason }}</span>
         </div>
       </div>
     </div>
-  </template>
+  </div>
 
-  <template v-for="item in inspectionlist">
-    <div v-if="item.status" class="rbDialog">
-      <div class="rbDialog_top">
-        <span>巡检记录详情</span>
-        <img :src="img9" alt="" srcset="" @click="rbcanleClick(item)" />
-      </div>
-      <div class="rbDialog_bottom">
-        <div class="rbDialog_bottoml">
-          <div>
-            <span>巡检编号：</span>
-            <span> {{ item.recordId }}</span>
-          </div>
-          <div>
-            <span>巡检时期：</span>
-            <span> {{ dayjs(item.inspectionDate).format("YYYY-MM-DD") }}</span>
-          </div>
-          <div>
-            <span>巡检人员：</span>
-            <span>{{ item.inspector }}</span>
-          </div>
-          <div>
-            <span>异常数：</span>
-            <span>{{ item.anomalyCount }}</span>
-          </div>
-          <div>
-            <span>巡检内容：</span>
-            <span>{{ item.taskDescription }}</span>
-          </div>
-          <div>
-            <span>异常说明：</span>
-            <span>{{ item.anomalyDescription }}</span>
-          </div>
-        </div>
-        <!-- <img :src="item.img" alt="" /> -->
-      </div>
+  <!-- <template v-for="item in inspectionlist"> -->
+  <div v-if="xunJianShow" class="rbDialog">
+    <div class="rbDialog_top">
+      <span>巡检记录详情</span>
+      <img :src="img9" alt="" srcset="" @click="rbcanleClick" />
     </div>
-  </template>
+    <div class="rbDialog_bottom">
+      <div class="rbDialog_bottoml">
+        <div>
+          <span>巡检编号：</span>
+          <span> {{ xunJianDetail?.recordId }}</span>
+        </div>
+        <div>
+          <span>巡检时期：</span>
+          <span> {{ dayjs(xunJianDetail?.inspectionDate).format("YYYY-MM-DD") }}</span>
+        </div>
+        <div>
+          <span>巡检人员：</span>
+          <span>{{ xunJianDetail?.inspector }}</span>
+        </div>
+        <div>
+          <span>异常数：</span>
+          <span>{{ xunJianDetail?.anomalyCount }}</span>
+        </div>
+        <div>
+          <span>巡检内容：</span>
+          <span>{{ xunJianDetail?.taskDescription }}</span>
+        </div>
+        <div>
+          <span>异常说明：</span>
+          <span>{{ xunJianDetail?.anomalyDescription }}</span>
+        </div>
+      </div>
+      <!-- <img :src="item.img" alt="" /> -->
+    </div>
+  </div>
+  <!-- </template> -->
 
   <div v-show="rcStatus" class="rctDialog">
     <div class="rctDialog_top">
@@ -379,7 +379,8 @@ import {
   getRunningTime,
 } from "../../api/equipment/index";
 import dayjs from "dayjs";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
 import img9 from "../../../public/img/叉号.png";
 import { getChannelListApi, getStreamUrlApi } from "../../api/video";
 import Video from "../home/components/Video.vue";
@@ -389,6 +390,16 @@ import { useXunJianQushiHook } from "./qushi";
 import Lt from "./lt/index.vue";
 import Lb from "./lb/index.vue";
 
+const equipmentlistRef = ref()
+const videoListRef = ref()
+function resize() {
+  if (equipmentlistRef.value) {
+    equipmentlistRef.value?.reset()
+  }
+  if (videoListRef.value) {
+    videoListRef.value?.reset()
+  }
+}
 
 const rtStatus = ref(false);
 const videoRef = ref();
@@ -415,6 +426,7 @@ const ltequipmentFormData = ref({
   orderDirection: "descending",
 });
 const ltequipmentlist = ref<any[]>([]);
+const ltequipmentlistTotal = ref(0);
 // 修改获取设备数据颜色的方法
 const getEquipmentDataColor = row => {
   if (!row.threshold?.values?.length) return "white";
@@ -461,61 +473,6 @@ const getEquipmentDataColor = row => {
 
   return "white";
 };
-const ltequipmentListFun = async () => {
-  // const { data } = await equipmentList(ltequipmentFormData.value);
-  // let list = data.data.rows;
-  // let img = ["/img/正常状态.png", "/img/异常状态.png"];
-  // let back = ["/img/绿色背景.png", "/img/红色背景.png"];
-  // ltequipmentlist.value = list.map((item, index) => {
-  //   return {
-  //     ...item,
-  //     img: img[index % img.length],
-  //     back: back[index % back.length],
-  //   };
-  // });
-  const { data } = await thresholdDataList(ltequipmentFormData.value);
-  let list = data.data.rows;
-  ltequipmentlist.value = list.map((item, index) => {
-    if (!item.threshold?.values?.length) {
-      return {
-        ...item,
-        img: "/img/正常状态.png",
-        back: "/img/绿色背景.png",
-      }
-    }
-
-    const value = Number(item.equipmentData);
-    const thresholds = item.threshold.values;
-
-    // 按照level等级排序
-    const sortedThresholds = [...thresholds].sort((a, b) => {
-      const levelA = Number(a.level.replace(/[^0-9]/g, ""));
-      const levelB = Number(b.level.replace(/[^0-9]/g, ""));
-      return levelB - levelA;
-    });
-    for (const threshold of sortedThresholds) {
-      if (value >= threshold.min && value <= threshold.max) {
-        // 根据不同等级返回不同颜色
-        return {
-          ...item,
-          img: `/img/异常状态.png`,
-          back: `/img/红色背景.png`,
-        }
-      }
-    }
-    return {
-      ...item,
-      img: `/img/正常状态.png`,
-      back: `/img/绿色背景.png`,
-    }
-  })
-};
-// const ltequipmentlistTimer = useIntervalFn(() => {
-//   ltequipmentlistTimer.pause();
-//   ltequipmentListFun().finally(() => {
-//     ltequipmentlistTimer.resume();
-//   })
-// }, 100000)
 
 //设备台账
 const equipmentFormData = ref({
@@ -531,41 +488,13 @@ const equipmentlist = ref<any[]>([]);
 const equipmentlist2 = ref<any[]>([]);
 const equipmentListFun = async () => {
   const { data } = await equipmentList(equipmentFormData.value);
-  let list = data.data.rows;
-  equipmentlist.value = list;
-  // equipmentlist2.value = data.data.rows.map((item) => {
-  //   const list = item.thresholdList.map((v) => {
-  //     return {
-  //       ...v,
-  //       id: v.thresholdId,
-  //       name: v.sensorName,
-  //       label: v.sensorName,
-  //     };
-  //   });
-  //   return {
-  //     ...item,
-  //     id: item.equipmentId,
-  //     name: item.equipmentName + (item.equipmentCode != null || item.equipmentCode != "" ? "(" + item.equipmentCode + ")" : ""),
-  //     thresholdList: list,
-  //   };
-  // });
+  equipmentlist.value = data.data.rows;
   equipmentId.value = data.data.rows[0].equipmentId;
-  // equipmentIds.value = [
-  //   equipmentlist2.value[0].equipmentId,
-  //   equipmentlist2.value[0].thresholdList[0].thresholdId,
-  // ];
-  // thresholdId.value = equipmentlist2.value[0].thresholdList[0].thresholdId;
-  // historicalStatisticsListFun();
 };
 const searchEquipment = (val) => {
   equipmentListFun();
 };
-// const equipmentListTimer = useIntervalFn(() => {
-//   equipmentListTimer.pause();
-//   equipmentListFun().finally(() => {
-//     equipmentListTimer.resume();
-//   })
-// }, 10000)
+
 
 //设备运行状态
 let bigscreenLBChart: any = null;
@@ -646,39 +575,6 @@ const bigscreenLBoption = {
 };
 const thresholdId = ref(0);
 const runningTime = ref("0");
-// const historicalStatisticsListFun = async () => {
-//   const { data } = await historicalStatisticsList({
-//     thresholdId: thresholdId.value,
-//   });
-//   bigscreenLBoption.xAxis.data = data.time;
-//   bigscreenLBoption.series[0].data = data.data;
-//   if (Array.isArray(data.data) && data.data.length > 0) {
-//     bigscreenLBoption.series[0].data = data.data.map((item) => {
-//       return {
-//         value: item,
-//         equipmentName: data.equipmentName,
-//         equipmentCode: data.equipmentCode,
-//         unitName: data.unitName,
-//         sensorName: data.sensorName,
-//       }
-//     })
-//   }
-//   if (bigscreenLBRef.value && bigscreenLBChart == null) {
-//     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
-//   }
-//   bigscreenLBChart.setOption(bigscreenLBoption, true);
-//   getRunningTime(thresholdId.value).then(res => {
-//     runningTime.value = res.data.data;
-//   })
-
-// };
-// const historicalStatisticsListTimer = useIntervalFn(() => {
-//   historicalStatisticsListTimer.pause();
-//   historicalStatisticsListFun().finally(() => {
-//     historicalStatisticsListTimer.resume();
-//   })
-// }, 10000)
-
 const cascaderChange = (val) => {
   thresholdId.value = val[1];
   // historicalStatisticsListFun();
@@ -694,17 +590,22 @@ const repairformData = ref<equipmentRepairListRes>({
   orderDirection: "descending",
 });
 const repairList = ref<any[]>([]);
+const repairListTotal = ref(0)
+const repairListTarget = ref()
 const equipmentRepairListFun = async () => {
   const { data } = await equipmentRepairList(repairformData.value);
-  let list = data.data.rows;
-  repairList.value = list.map((item) => {
-    {
-      return {
-        ...item,
-        status: false,
-      };
-    }
-  });
+  if (repairListTotal.value != data.data.total) {
+    repairListTotal.value = data.data.total
+    repairList.value = data.data.rows.map((item) => {
+      {
+        return {
+          ...item,
+          status: false,
+        };
+      }
+    });
+  }
+
 };
 const repairListTimer = useIntervalFn(() => {
   repairListTimer.pause();
@@ -712,17 +613,21 @@ const repairListTimer = useIntervalFn(() => {
     repairListTimer.resume();
   })
 }, 10000)
+const weiXiuDeatail = ref()
+const weiXiuDeatailShow = ref(false)
 const rcClick = async (item: any) => {
-  repairList.value.forEach((v) => {
-    if (item.recordId == v.recordId) {
-      v.status = !v.status;
-    } else {
-      v.status = false;
-    }
-  });
+  weiXiuDeatail.value = item
+  weiXiuDeatailShow.value = true
+  // repairList.value.forEach((v) => {
+  //   if (item.recordId == v.recordId) {
+  //     v.status = !v.status;
+  //   } else {
+  //     v.status = false;
+  //   }
+  // });
 };
-const rccanleClick = (item: any) => {
-  item.status = false;
+const rccanleClick = () => {
+  weiXiuDeatailShow.value = false
 };
 
 let bigscreenRCChart: any = null;
@@ -791,13 +696,13 @@ async function getYzData() {
   bigscreenRCoption.xAxis.data = data.data.times;
   bigscreenRCoption.series[0].data = data.data.data;
   if (Array.isArray(data.data.data) && data.data.data.length > 0) {
-      // @ts-ignore
-      bigscreenRCoption.yAxis.min = 1;
-      // @ts-ignore
-      bigscreenRCoption.yAxis.max = Math.max(...data.data.data, 6); // 至少6
-      if(bigscreenRCoption.yAxis.max >6){
-        bigscreenRCoption.yAxis.max +=10
-      }
+    // @ts-ignore
+    bigscreenRCoption.yAxis.min = 1;
+    // @ts-ignore
+    bigscreenRCoption.yAxis.max = Math.max(...data.data.data, 6); // 至少6
+    if (bigscreenRCoption.yAxis.max > 6) {
+      bigscreenRCoption.yAxis.max += 10
+    }
   }
 
   if (bigscreenRCChart == null) {
@@ -821,17 +726,21 @@ const inspectionformData = ref<dailyInspectionRes>({
   orderDirection: "descending",
 });
 const inspectionlist = ref<any[]>([]);
+const inspectionlistTotal = ref(0)
 const inspectionListFun = async () => {
   const { data } = await dailyInspectionList(inspectionformData.value);
-  let list = data.data.rows;
-  inspectionlist.value = list.map((item) => {
-    {
-      return {
-        ...item,
-        status: false,
-      };
-    }
-  });
+  if (inspectionlistTotal.value != data.data.rows.total) {
+    inspectionlistTotal.value = data.data.rows.total
+    inspectionlist.value = data.data.rows.map((item) => {
+      {
+        return {
+          ...item,
+          status: false,
+        };
+      }
+    });
+  }
+
 };
 const inspectionListTimer = useIntervalFn(() => {
   inspectionListTimer.pause();
@@ -839,16 +748,21 @@ const inspectionListTimer = useIntervalFn(() => {
     inspectionListTimer.resume();
   })
 }, 10000)
+const xunJianDetail = ref()
 const rbClick = (item: any) => {
-  inspectionlist.value.forEach((v) => {
-    if (item.recordId == v.recordId) {
-      v.status = !v.status;
-    } else {
-      v.status = false;
-    }
-  });
+  xunJianDetail.value = item
+  xunJianShow.value = item
+  // inspectionlist.value.forEach((v) => {
+  //   if (item.recordId == v.recordId) {
+  //     v.status = !v.status;
+  //   } else {
+  //     v.status = false;
+  //   }
+  // });
 };
-const rbcanleClick = (item: any) => {
+const xunJianShow = ref(false)
+const rbcanleClick = () => {
+  xunJianShow.value = false;
   item.status = false;
 };
 
@@ -870,13 +784,6 @@ const getVideoList = () => {
     videoList.value = res.data.data.List;
   });
 };
-
-const jianceTimer = useIntervalFn(() => {
-  jianceTimer.pause();
-  ltequipmentListFun().finally(() => {
-    jianceTimer.resume();
-  })
-}, 10000)
 
 
 const lbEquipmentList = ref([]);
@@ -911,9 +818,6 @@ function loadMoreEquipment() {
   }
 }
 
-window.onresize = function () {
-  // bigscreenLBChart.resize();
-};
 
 
 const { ciShuTimer,
@@ -927,10 +831,13 @@ onMounted(() => {
   equipmentRepairListFun();
   inspectionListFun();
   equipmentListFun();
-  ltequipmentListFun();
   getVideoList()
   lbEquipmentListFun()
+  window.addEventListener("resize", resize)
 });
+onUnmounted(() => {
+  window.removeEventListener("resize", resize)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -2018,7 +1925,7 @@ $design-height: 1080;
     font-size: adaptiveFontSize(14);
     color: rgba(255, 255, 255, 1);
     margin-left: adaptiveFontSize(10);
-      /* 不换行 */
+    /* 不换行 */
     overflow: hidden;
     /* 超出隐藏 */
     text-overflow: ellipsis;

@@ -8,28 +8,30 @@
     </div>
     <div class="bigscreen_lt_bottom">
       <div class="bigscreen_lt_bottom_neis">
-        <Vue3SeamlessScroll :list="accesscontrollist" :class-option="{
+        <Vue3SeamlessScroll :key="accesscontrollistTotal" :list="accesscontrollist" :class-option="{
           step: 5,
         }" hover class="scrool">
-          <div class="bigscreen_lt_bottom_nei" v-for="item in accesscontrollist" @click="ltClick(item)">
-            <img src="/public/img/personnel/人物图标.png" alt="" />
-            <div class="bigscreen_lt_bottom_nei_r" :style="{
-              background: `url(${item.img}) no-repeat`,
-              'background-size': '100% 100%',
-            }">
-              <div>
-                <span>{{ item.personnel?.name }}</span>
-                <span>进入</span>
-              </div>
-              <div>
-                <span>员工编号：{{ item.personnel?.code }}</span>
-                <span>门禁地点：{{ item.doorPlace }}</span>
-              </div>
-              <div>
-                <span>刷卡时间：{{ item.createTime }}</span>
+          <template v-slot="{ data }">
+            <div class="bigscreen_lt_bottom_nei" @click="ltClick(data)">
+              <img src="/public/img/personnel/人物图标.png" alt="" />
+              <div class="bigscreen_lt_bottom_nei_r" :style="{
+                background: `url(${data?.img}) no-repeat`,
+                'background-size': '100% 100%',
+              }">
+                <div>
+                  <span>{{ data?.personnel?.name }}</span>
+                  <span>进入</span>
+                </div>
+                <div>
+                  <span>员工编号：{{ data?.personnel?.code }}</span>
+                  <span>门禁地点：{{ data?.doorPlace }}</span>
+                </div>
+                <div>
+                  <span>刷卡时间：{{ data?.createTime }}</span>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </Vue3SeamlessScroll>
       </div>
     </div>
@@ -45,45 +47,47 @@
     </div>
     <div class="bigscreen_lb_bottom">
       <div class="bigscreen_lb_bottom_neis">
-        <Vue3SeamlessScroll :list="healthylist" :class-option="{
+        <Vue3SeamlessScroll :key="healthylistTotal" :list="healthylist" :class-option="{
           step: 5,
         }" hover class="scrool">
-          <div class="bigscreen_lb_bottom_nei" v-for="(item, index) in healthylist" @click="lbClick(item, index)">
-            <div class="bigscreen_lb_bottom_nei_count">
-              <div class="left">
-                <div :style="{
-                  width: '79px',
-                  height: '27px',
-                  background: `url(${item.img}) no-repeat`,
-                  backgroundSize: '100% 100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '13px',
-                  color: '#ffffff',
-                }">
-                  {{ item.personnel.name }}
+          <template v-slot="{ data }">
+            <div class="bigscreen_lb_bottom_nei" @click="lbClick(data, 1)">
+              <div class="bigscreen_lb_bottom_nei_count">
+                <div class="left">
+                  <div :style="{
+                    width: '79px',
+                    height: '27px',
+                    background: `url(${data?.img}) no-repeat`,
+                    backgroundSize: '100% 100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                  }">
+                    {{ data?.personnel.name }}
+                  </div>
+                  <div style="color: #ffffff; margin-top: 10px">
+                    {{ data?.personnel.code }}
+                  </div>
                 </div>
-                <div style="color: #ffffff; margin-top: 10px">
-                  {{ item.personnel.code }}
+                <div class="right">
+                  <span class="right_text">
+                    <span>体温：{{ data?.temperature }}℃</span>
+                    <span style="padding-left: 15px">心率：{{ data?.heartRate }}/分钟</span>
+                  </span>
+                  <span class="right_text">
+                    <span>血压：{{ data?.lowBloodPressure }}mmHg</span>
+                    <span style="padding-left: 15px">{{ data?.highBloodPressure }}mmHg</span>
+                  </span>
+                  <span class="right_text">
+                    <span>监测时间：{{ data?.createTime }}</span>
+                  </span>
                 </div>
               </div>
-              <div class="right">
-                <span class="right_text">
-                  <span>体温：{{ item.temperature }}℃</span>
-                  <span style="padding-left: 15px">心率：{{ item.heartRate }}/分钟</span>
-                </span>
-                <span class="right_text">
-                  <span>血压：{{ item.lowBloodPressure }}mmHg</span>
-                  <span style="padding-left: 15px">{{ item.highBloodPressure }}mmHg</span>
-                </span>
-                <span class="right_text">
-                  <span>监测时间：{{ item.createTime }}</span>
-                </span>
-              </div>
+              <div class="bigscreen_lb_bottom_nei_dizuo"></div>
             </div>
-            <div class="bigscreen_lb_bottom_nei_dizuo"></div>
-          </div>
+          </template>
         </Vue3SeamlessScroll>
       </div>
     </div>
@@ -191,7 +195,9 @@ import {
   accesscontrolRes,
   accesscontrolList,
 } from "../../api/personnel/index";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
+
 import { getChannelListApi, getStreamUrlApi } from "../../api/video/index.ts";
 import { useIntervalFn } from '@vueuse/core'
 
@@ -448,6 +454,7 @@ const accesscontrolData = ref<accesscontrolRes>({
   orderDirection: "descending",
 });
 const accesscontrollist = ref<any[]>([]);
+const accesscontrollistTotal = ref(0)
 const accesscontrolFun = async () => {
   const { data } = await accesscontrolList(accesscontrolData.value);
   let img = [
@@ -455,10 +462,13 @@ const accesscontrolFun = async () => {
     "/img/personnel/绿色背景.png",
     "/img/personnel/黄色背景.png",
   ];
-  let list = data.data.rows;
-  accesscontrollist.value = list.map((item, index) => {
-    return { ...item, img: img[index % img.length], status: false };
-  });
+  if (accesscontrollistTotal.value != data.data.total) {
+    accesscontrollistTotal.value = data.data.total;
+    accesscontrollist.value = data.data.rows.map((item, index) => {
+      return { ...item, img: img[index % img.length], status: false };
+    });
+  }
+
 };
 const accessontrolTimer = useIntervalFn(() => {
   accessontrolTimer.pause();
@@ -494,6 +504,7 @@ const healthyFormData = ref({
   isGroup: true,
 });
 const healthylist = ref<any[]>([]);
+const healthylistTotal = ref(0)
 const healthylistFun = async () => {
   const { data } = await healthyList(healthyFormData.value);
   let imgList = [
@@ -501,10 +512,13 @@ const healthylistFun = async () => {
     "/img/personnel/名字蓝色背景.png",
     "/img/personnel/名字棕色背景.png",
   ];
-  let list = data.data.rows;
-  healthylist.value = list.map((item, index) => {
-    return { ...item, img: imgList[index % imgList.length], status: false };
-  });
+  if (healthylistTotal.value != data.data.total) {
+    healthylistTotal.value = data.data.total
+    healthylist.value = data.data.rows.map((item, index) => {
+      return { ...item, img: imgList[index % imgList.length], status: false };
+    });
+  }
+
 };
 const healthylistTimer = useIntervalFn(() => {
   healthylistTimer.pause();

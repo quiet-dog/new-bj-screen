@@ -102,8 +102,8 @@ importers:
         specifier: ^1.1.23
         version: 1.1.23
       vue3-seamless-scroll:
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^3.0.2
+        version: 3.0.2(vue@3.5.10(typescript@5.6.2))
     devDependencies:
       '@types/crypto-js':
         specifier: ^4.2.2
@@ -170,6 +170,11 @@ packages:
 
   '@element-plus/icons-vue@2.3.1':
     resolution: {integrity: sha512-XxVUZv48RZAd87ucGS48jPf6pKu0yV5UCg9f4FFwtrYxXOwWuVJo6wOvSLKEoMQKjv8GsX/mhP6UsC1lRwbUWg==}
+    peerDependencies:
+      vue: ^3.2.0
+
+  '@element-plus/icons-vue@2.3.2':
+    resolution: {integrity: sha512-OzIuTaIfC8QXEPmJvB4Y4kw34rSXdCJzxcD1kFStBvr8bK6X1zQAYDo0CNMjojnfTqRQCJ0I7prlErcoRiET2A==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -667,6 +672,9 @@ packages:
   '@types/lodash-es@4.17.12':
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
+  '@types/lodash@4.17.20':
+    resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
+
   '@types/lodash@4.17.9':
     resolution: {integrity: sha512-w9iWudx1XWOHW5lQRS9iKpK/XuRhnN+0T7HvdCCd802FYkT1AMTnxndJHGrNJwRoRHkslGr4S29tjm1cT7x/7w==}
 
@@ -986,6 +994,9 @@ packages:
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
+  dayjs@1.11.18:
+    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
+
   de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
 
@@ -1030,6 +1041,11 @@ packages:
 
   electron-to-chromium@1.5.218:
     resolution: {integrity: sha512-uwwdN0TUHs8u6iRgN8vKeWZMRll4gBkz+QMqdS7DDe49uiK68/UX92lFb61oiFPrpYZNeZIqa4bA7O6Aiasnzg==}
+
+  element-plus@2.11.5:
+    resolution: {integrity: sha512-O+bIVHQCjUDm4GiIznDXRoS8ar2TpWLwfOGnN/Aam0VXf5kbuc4SxdKKJdovWNxmxeqbcwjsSZPKgtXNcqys4A==}
+    peerDependencies:
+      vue: ^3.2.0
 
   element-plus@2.8.4:
     resolution: {integrity: sha512-ZlVAdUOoJliv4kW3ntWnnSHMT+u/Os7mXJjk2xzOlqNeHaI2/ozlF+R58ZCEak8ZnDi6+5A2viWEYRsq64IuiA==}
@@ -1552,10 +1568,6 @@ packages:
     resolution: {integrity: sha512-VbQLQXC04io6AoAjIUWuZwW4MSYozkcP9KjLdrsG/00Q/yiwvhz9RQyt0nHXV10hi9NVnDNy1/wv7Dzq1lkOCQ==}
     engines: {node: '>= 4.7.0'}
 
-  throttle-debounce@5.0.0:
-    resolution: {integrity: sha512-2iQTSgkkc1Zyk0MeVrt/3BvuOXYPl/R8Z0U2xxo9rjwNciaHDG3R+Lm6dh4EeUci49DanvBnuqI6jshoQQRGEg==}
-    engines: {node: '>=12.22'}
-
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
@@ -1696,8 +1708,8 @@ packages:
     peerDependencies:
       typescript: '>=5.0.0'
 
-  vue3-seamless-scroll@2.0.1:
-    resolution: {integrity: sha512-mI3BaDU3pjcPUhVSw3/xNKdfPBDABTi/OdZaZqKysx4cSdNfGRbVvGNDzzptBbJ5S7imv5T55l6x/SqgnxKreg==}
+  vue3-seamless-scroll@3.0.2:
+    resolution: {integrity: sha512-LpKoL1ht71MASabUBsoSqbhLqcuKSrD+u01dgHac+/cthPAShKvcdM7dSGtaxjVntSFqdeViqJssjcwy/KqRSA==}
 
   vue@3.5.10:
     resolution: {integrity: sha512-Vy2kmJwHPlouC/tSnIgXVg03SG+9wSqT1xu1Vehc+ChsXsRd7jLkKgMltVEFOzUdBr3uFwBCG+41LJtfAcBRng==}
@@ -1757,6 +1769,10 @@ snapshots:
       vue: 3.5.10(typescript@5.6.2)
 
   '@element-plus/icons-vue@2.3.1(vue@3.5.10(typescript@5.6.2))':
+    dependencies:
+      vue: 3.5.10(typescript@5.6.2)
+
+  '@element-plus/icons-vue@2.3.2(vue@3.5.10(typescript@5.6.2))':
     dependencies:
       vue: 3.5.10(typescript@5.6.2)
 
@@ -2107,6 +2123,8 @@ snapshots:
   '@types/lodash-es@4.17.12':
     dependencies:
       '@types/lodash': 4.17.9
+
+  '@types/lodash@4.17.20': {}
 
   '@types/lodash@4.17.9': {}
 
@@ -2504,6 +2522,8 @@ snapshots:
 
   dayjs@1.11.13: {}
 
+  dayjs@1.11.18: {}
+
   de-indent@1.0.2: {}
 
   debug@4.3.7:
@@ -2544,6 +2564,26 @@ snapshots:
       zrender: 5.6.0
 
   electron-to-chromium@1.5.218: {}
+
+  element-plus@2.11.5(vue@3.5.10(typescript@5.6.2)):
+    dependencies:
+      '@ctrl/tinycolor': 3.6.1
+      '@element-plus/icons-vue': 2.3.2(vue@3.5.10(typescript@5.6.2))
+      '@floating-ui/dom': 1.6.11
+      '@popperjs/core': '@sxzz/popperjs-es@2.11.7'
+      '@types/lodash': 4.17.20
+      '@types/lodash-es': 4.17.12
+      '@vueuse/core': 9.13.0(vue@3.5.10(typescript@5.6.2))
+      async-validator: 4.2.5
+      dayjs: 1.11.18
+      lodash: 4.17.21
+      lodash-es: 4.17.21
+      lodash-unified: 1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.17.21)(lodash@4.17.21)
+      memoize-one: 6.0.0
+      normalize-wheel-es: 1.2.0
+      vue: 3.5.10(typescript@5.6.2)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
 
   element-plus@2.8.4(vue@3.5.10(typescript@5.6.2)):
     dependencies:
@@ -3044,8 +3084,6 @@ snapshots:
 
   swiper@11.1.14: {}
 
-  throttle-debounce@5.0.0: {}
-
   to-fast-properties@2.0.0: {}
 
   to-regex-range@5.0.1:
@@ -3170,9 +3208,12 @@ snapshots:
       semver: 7.6.3
       typescript: 5.6.2
 
-  vue3-seamless-scroll@2.0.1:
+  vue3-seamless-scroll@3.0.2(vue@3.5.10(typescript@5.6.2)):
     dependencies:
-      throttle-debounce: 5.0.0
+      element-plus: 2.11.5(vue@3.5.10(typescript@5.6.2))
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
 
   vue@3.5.10(typescript@5.6.2):
     dependencies:

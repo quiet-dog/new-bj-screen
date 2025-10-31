@@ -16,26 +16,26 @@
         </div>
         <div class="bigscreen_lt_bottom_neib" @mouseenter="environmentFileTimer.pause"
           @mouseleave="environmentFileTimer.resume">
-          <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
+          <Vue3SeamlessScroll :key="environmentFileListTotal" :list="environmentFileList" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div class="bigscreen_lt_bottom_nei_b" v-for="(item, index) in environmentFileList">
-              <span>
-                <!-- {{ `${item?.environment?.description}-${item?.environment?.unitName}` }} -->
-                <!-- <too -->
-                <el-tooltip class="box-item" effect="dark"
-                  :content="`${item?.environment?.description}-${item?.environment?.unitName}`" placement="top-start">
-                  {{ `${item?.environment?.description}-${item?.environment?.unitName}` }}
-                </el-tooltip>
-              </span>
-              <span>
-                <el-tooltip :content="item?.environment?.tag" placement="top-start" class="box-item" effect="dark">
-                  {{ item?.environment?.tag }}
-                </el-tooltip>
-              </span>
-              <span :class="getValueColorClass(item)">{{ item.value }}</span>
-              <span>{{ item.createTime }}</span>
-            </div>
+            <template v-slot="{ data }">
+              <div class="bigscreen_lt_bottom_nei_b">
+                <span>
+                  <el-tooltip class="box-item" effect="dark"
+                    :content="`${data?.environment?.description}-${data?.environment?.unitName}`" placement="top-start">
+                    {{ `${data?.environment?.description}-${data?.environment?.unitName}` }}
+                  </el-tooltip>
+                </span>
+                <span>
+                  <el-tooltip :content="data?.environment?.tag" placement="top-start" class="box-item" effect="dark">
+                    {{ data?.environment?.tag }}
+                  </el-tooltip>
+                </span>
+                <span :class="getValueColorClass(data)">{{ data?.value }}</span>
+                <span>{{ data?.createTime }}</span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
 
@@ -181,18 +181,19 @@
           <span>时间</span>
         </div>
         <div class="bigscreen_rb_bottom_neib">
-          <Vue3SeamlessScroll :list="equipmentlist" :class-option="{
+          <Vue3SeamlessScroll :key="equipmentlistTotal" :list="equipmentlist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div style="cursor: pointer;" @click="clickFormItem(item.thresholdId)" class="bigscreen_rb_bottom_nei_b"
-              v-for="item in equipmentlist">
-              <span>
-                {{ item.thresholdId }}
-              </span>
-              <span>{{ item?.threshold.sensorName }}</span>
-              <span :style="{ color: getEquipmentDataColor(item) }">{{ item?.equipmentData }}</span>
-              <span>{{ dayjs(item?.createTime).format("YYYY-MM-DD hh:mm:ss") }}</span>
-            </div>
+            <template v-slot="{ data }">
+              <div style="cursor: pointer;" @click="clickFormItem(data?.thresholdId)" class="bigscreen_rb_bottom_nei_b">
+                <span>
+                  {{ data?.thresholdId }}
+                </span>
+                <span>{{ data?.threshold.sensorName }}</span>
+                <span :style="{ color: getEquipmentDataColor(data) }">{{ data?.equipmentData }}</span>
+                <span>{{ dayjs(data?.createTime).format("YYYY-MM-DD hh:mm:ss") }}</span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -251,7 +252,9 @@ import {
 import { thresholdDataList, thresholdList, exportAlarmEvents } from "../../api/riskassessment";
 import { alarmEventsList, getstatistics } from "../../api/incident";
 import center from "../../components/center.vue";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
+
 import dayjs from "dayjs";
 import { useIntervalFn } from '@vueuse/core'
 import img9 from "../../../public/img/叉号.png";
@@ -288,7 +291,7 @@ function changeHisPag() {
 
 // 修改获取设备数据颜色的方法
 const getEquipmentDataColor = row => {
-  if (row.threshold?.values?.length == 0) {
+  if (row == undefined || row.threshold?.values?.length == 0) {
     return "white"
   }
 
@@ -398,21 +401,29 @@ const environmentFileFormData = ref({
   // endTime:dayjs().add(1,"day").format("YYYY-MM-DD")
 });
 const environmentFileList = ref<any[]>([]);
+const environmentFileListTotal = ref()
 const environmentFileFun = async () => {
   // environmentFileFormData.value.startTime = dayjs().format("YYYY-MM-DD");
   // environmentFileFormData.value.endTime = dayjs().add(1,"day").format("YYYY-MM-DD")
   const { data } = await environmentalDetectionList(environmentFileFormData.value);
   let list = data.data.rows.slice(0, 9);
-  environmentFileList.value = list.map((item, index) => {
-    return {
-      ...item,
-      status: false,
-    };
-  });
+  if (environmentFileListTotal.value != data.data.total) {
+    environmentFileListTotal.value = data.data.total
+    environmentFileList.value = list.map((item, index) => {
+      return {
+        ...item,
+        status: false,
+      };
+    });
+  }
+
 };
 
 // 修改 getValueColorClass 方法
 const getValueColorClass = row => {
+  if(row == undefined || row.value == undefined || row.value == null){
+    return "text-info"
+  }
   const value = row.value;
   const alarmLevels = row.environment?.alarmlevels || [];
   for (const level of alarmLevels) {
@@ -627,7 +638,9 @@ const historyStatistics = async () => {
   bigscreenLBoption.series[0].data = sum;
   if (bigscreenLBRef.value) {
     if (!isInit.value) {
-      bigscreenLBChart = echarts.init(bigscreenLBRef.value);
+      if (bigscreenLBChart == null) {
+        bigscreenLBChart = echarts.init(bigscreenLBRef.value);
+      }
       bigscreenLBChart.off().on("click", params => {
         console.log("params", params)
         let cuData = "";
@@ -727,13 +740,18 @@ const equipmentFormData = ref({
   orderDirection: "descending",
 });
 const equipmentlist = ref<any[]>([]);
+const equipmentlistTotal = ref(0)
 const equipmentListFun = async () => {
   // const { data } = await thresholdList(equipmentFormData.value);
   // let list = data.data.rows;
   // equipmentlist.value = list;
   const { data } = await thresholdDataList(equipmentFormData.value);
-  let list = data.data.rows;
-  equipmentlist.value = list;
+  if (equipmentlistTotal.value != data.data.total) {
+    equipmentlistTotal.value = data.data.total
+    let list = data.data.rows;
+    equipmentlist.value = list;
+  }
+
 };
 
 const equipmentListTimer = useIntervalFn(() => {

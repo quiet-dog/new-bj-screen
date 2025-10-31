@@ -6,8 +6,8 @@
                     ${equipmentInfo?.equipmentCode} &nbsp;&nbsp;
                     ${equipmentInfo.installationLocation} )`">
                     设备名称：{{ equipmentInfo.equipmentName }}&nbsp;&nbsp;({{
-                    equipmentInfo.equipmentCode }}&nbsp;&nbsp;{{
-                    equipmentInfo.installationLocation }})
+                        equipmentInfo.equipmentCode }}&nbsp;&nbsp;{{
+                        equipmentInfo.installationLocation }})
                 </el-tooltip>
             </div>
         </div>
@@ -44,6 +44,7 @@ const equipmentInfo = ref({
 })
 
 const thresholdDataList = ref([{}, {}]);
+const thresholdDataListTotal = ref(0)
 function getThresholdInfo() {
     thresholdList({
         pageNum: 1,
@@ -51,7 +52,10 @@ function getThresholdInfo() {
         // @ts-expect-error
         equipmentId: equipmentInfo.value.equipmentId,
     }).then((res) => {
-        thresholdDataList.value = res.data.data.rows;
+        if (thresholdDataListTotal.value != res.data.data.total) {
+            thresholdDataList.value  = res.data.data.total;
+            thresholdDataList.value = res.data.data.rows;
+        }
     })
 }
 
@@ -111,7 +115,7 @@ $design-height: 1080;
     padding-top: 5px;
 }
 
-.equipment_info{
+.equipment_info {
     width: 100%;
 }
 

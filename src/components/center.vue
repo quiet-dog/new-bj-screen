@@ -3,7 +3,7 @@
     <div class="bigscreen_ct_l">
       <span>今日报警数量</span>
       <div class="bigscreen_ct_lb">
-        <div v-for="item in count1.toString().split('')">
+        <div v-for="(item,index) in count1.toString().split('')" :key="index">
           <img :src="shuimg(item)" alt="" />
         </div>
       </div>
@@ -11,7 +11,7 @@
     <div class="bigscreen_ct_r">
       <span @click=" useDeviceStore().isShowDetail = true;" >历史报警数量</span>
       <div class="bigscreen_ct_rb">
-        <div v-for="item in count2.toString().split('')">
+        <div v-for="(item,index) in count2.toString().split('')" :key="index">
           <img :src="shuimg(item)" alt="" />
         </div>
       </div>

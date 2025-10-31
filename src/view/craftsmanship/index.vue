@@ -68,22 +68,25 @@
       </div>
       <div class="bigscreen_lt_bottom_b">
         <div class="bigscreen_lt_bottom_b_neis">
-          <Vue3SeamlessScroll :list="alarmEventslist" :step="1" :singleHeight="72" hover class="scrool">
-            <div class="bigscreen_lt_bottom_b_nei" v-for="item in alarmEventslist">
-              <img :src="item.img" alt="" />
-              <div>
-                <span style="margin-left: 25px">{{ item.level }}</span>
-                <el-tooltip placement="top-start">
-                  <template #content>
-                    <span>{{ item.craftNode?.nodeName }}</span>
-                    <br/>
-                    <span>{{ item?.createTime }}</span>
-                  </template>
-                  <span>{{ item.craftNode?.nodeName }}</span>
-                </el-tooltip>
-                <span>节点故障</span>
+          <Vue3SeamlessScroll ref="alarmEventslistRef" :key="alarmEventslistTotal" :list="alarmEventslist"
+            :singleHeight="72" hover class="scrool">
+            <template v-slot="{ data }">
+              <div class="bigscreen_lt_bottom_b_nei">
+                <img :src="data?.img" alt="" />
+                <div>
+                  <span style="margin-left: 25px">{{ data?.level }}</span>
+                  <el-tooltip placement="top-start">
+                    <template #content>
+                      <span>{{ data?.craftNode?.nodeName }}</span>
+                      <br />
+                      <span>{{ data?.createTime }}</span>
+                    </template>
+                    <span>{{ data?.craftNode?.nodeName }}</span>
+                  </el-tooltip>
+                  <span>节点故障</span>
+                </div>
               </div>
-            </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -109,24 +112,24 @@
           </div>
         </div>
         <div class="bigscreen_lb_bottom_nei">
-          <Vue3SeamlessScroll :list="nodelist" :class-option="{
-            step: 5,
-          }" hover class="scrool">
-            <div class="bigscreen_lb_bottom_neis" v-for="item in nodelist" @click="lbClick(item)">
-              <div class="bigscreen_lb_bottom_nei_t_l" :style="{
-                background: `url(${item.img}) no-repeat`,
-                'background-size': '100% 100%',
-              }">
-                {{ item.nodeOrder }}
+          <Vue3SeamlessScroll ref="nodelistRef" :key="nodelistTotal" :list="nodelist" hover class="scrool">
+            <template v-slot="{ data }">
+              <div class="bigscreen_lb_bottom_neis" @click="lbClick(data)">
+                <div class="bigscreen_lb_bottom_nei_t_l" :style="{
+                  background: `url(${data?.img}) no-repeat`,
+                  'background-size': '100% 100%',
+                }">
+                  {{ data?.nodeOrder }}
+                </div>
+                <div class="bigscreen_lb_bottom_neis_r">
+                  <span :style="{
+                    color: data?.isHighRisk ? 'red' : '#ffffff',
+                  }">{{ data?.nodeName }}</span>
+                  <span>{{ data?.craftArchive?.craftArchiveName }}</span>
+                  <span>{{ data?.isHighRisk ? "是" : "否" }}</span>
+                </div>
               </div>
-              <div class="bigscreen_lb_bottom_neis_r">
-                <span :style="{
-                  color: item.isHighRisk ? 'red' : '#ffffff',
-                }">{{ item.nodeName }}</span>
-                <span>{{ item.craftArchive.craftArchiveName }}</span>
-                <span>{{ item.isHighRisk ? "是" : "否" }}</span>
-              </div>
-            </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -154,7 +157,7 @@
             <span style="font-size: 18px">工艺要素</span>
             <span style="font-size: 28px; padding-left: 25px">{{
               processTotal
-            }}</span>
+              }}</span>
           </div>
           <div>
             <span>
@@ -173,15 +176,17 @@
         </div>
       </div>
       <div class="bigscreen_rt_bottom_neis">
-        <Vue3SeamlessScroll :list="processlist" :class-option="{
+        <Vue3SeamlessScroll ref="processlistRef" :key="processTotal" :list="processlist" :class-option="{
           step: 5,
         }" hover class="scrool">
-          <div class="bigscreen_rt_bottom_nei" v-for="item in processlist" @click="rtClcik(item)">
-            <span>{{ item.craftArchiveName }}</span>
-            <span>{{ item.personnelFactors }}</span>
-            <span>{{ item.materialFactors }}</span>
-            <span>{{ item.environmentFactors }}</span>
-          </div>
+          <template v-slot="{ data }">
+            <div class="bigscreen_rt_bottom_nei" @click="rtClcik(data)">
+              <span>{{ data?.craftArchiveName }}</span>
+              <span>{{ data?.personnelFactors }}</span>
+              <span>{{ data?.materialFactors }}</span>
+              <span>{{ data?.environmentFactors }}</span>
+            </div>
+          </template>
         </Vue3SeamlessScroll>
       </div>
     </div>
@@ -201,30 +206,32 @@
           <span>工艺制定人员</span>
         </div>
         <div class="bigscreen_rb_bottom_nei_items">
-          <Vue3SeamlessScroll :list="archivelist" :class-option="{
+          <Vue3SeamlessScroll ref="archivelistRef" :key="archivelistTotal" :list="archivelist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div class="bigscreen_rb_bottom_nei_item" v-for="(item, index) in archivelist" @click="rbClick(item)">
-              <div class="bigscreen_rb_bottom_nei_item1">
-                <div class="bigscreen_rb_bottom_nei_item1_div" :style="{
-                  border: `1px solid ${index % 2 === 0 ? '#01D1E7' : '#DF9819'
-                    }`,
-                }">
-                  <div :style="{
-                    background: index % 2 === 0 ? '#01D1E7' : '#DF9819',
-                  }"></div>
+            <template v-slot="{ data }">
+              <div class="bigscreen_rb_bottom_nei_item" @click="rbClick(data)">
+                <div class="bigscreen_rb_bottom_nei_item1">
+                  <div class="bigscreen_rb_bottom_nei_item1_div" :style="{
+                    border: `1px solid ${data?.craftArchiveId % 2 === 0 ? '#01D1E7' : '#DF9819'
+                      }`,
+                  }">
+                    <div :style="{
+                      background: data?.craftArchiveId % 2 === 0 ? '#01D1E7' : '#DF9819',
+                    }"></div>
+                  </div>
+                  <ElTooltip :content="data?.craftArchiveName">
+                    <span>{{ data?.craftArchiveName }}</span>
+                  </ElTooltip>
                 </div>
-                <ElTooltip :content="item.craftArchiveName">
-                  <span>{{ item.craftArchiveName }}</span>
-                </ElTooltip>
+                <div>{{ data?.version }}</div>
+                <div :style="{
+                  color: data?.craftArchiveId % 2 === 0 ? '#01D1E7' : '#DF9819',
+                }">
+                  {{ data?.creator }}
+                </div>
               </div>
-              <div>{{ item.version }}</div>
-              <div :style="{
-                color: index % 2 === 0 ? '#01D1E7' : '#DF9819',
-              }">
-                {{ item.creator }}
-              </div>
-            </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -314,7 +321,7 @@
   <div v-show="rbShow" class="rbDialog">
     <div class="rbDialog_top">
       <span>工艺档案详情</span>
-      <img :src="img9" alt="" srcset="" @click="rbcanleClick(item)" />
+      <img :src="img9" alt="" srcset="" @click="rbcanleClick" />
     </div>
     <div class="rbDialog_bottom">
       <div class="rbDialog_bottom_selet">
@@ -393,8 +400,30 @@ import { archiveList, nodeList, processList } from "../../api/craftsmanship";
 import { alarmEventsList, getGongYiJieDianTodayAlarmCount } from "../../api/incident";
 import center from "../../components/center.vue";
 import img9 from "../../../public/img/叉号.png";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
-import { useIntervalFn } from '@vueuse/core'
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
+
+import { useIntervalFn } from '@vueuse/core';
+
+const alarmEventslistRef = ref<InstanceType<typeof Vue3SeamlessScroll>>()
+const nodelistRef = ref<InstanceType<typeof Vue3SeamlessScroll>>()
+const processlistRef = ref<InstanceType<typeof Vue3SeamlessScroll>>()
+const archivelistRef = ref<InstanceType<typeof Vue3SeamlessScroll>>()
+
+function resize() {
+  if (alarmEventslistRef.value) {
+    alarmEventslistRef.value?.resize()
+  }
+  if (nodelistRef.value) {
+    nodelistRef.value?.resize()
+  }
+  if (processlistRef.value) {
+    processlistRef.value?.resize()
+  }
+  if (archivelistRef.value) {
+    archivelistRef.value?.resize()
+  }
+}
 
 
 const bigscreenLBRef = ref();
@@ -591,12 +620,17 @@ const archiveFormData = ref({
   orderDirection: "descending",
 });
 const archivelist = ref<any[]>([]);
+const archivelistTotal = ref(0)
 const archivelistFun = async () => {
   const { data } = await archiveList(archiveFormData.value);
   let list = data.data.rows;
-  archivelist.value = list.map((item: any) => {
-    return { ...item, status: false };
-  });
+  if (archivelistTotal.value != data.data.total) {
+    archivelistTotal.value = data.data.total
+    archivelist.value = list.map((item: any) => {
+      return { ...item, status: false };
+    });
+  }
+
 };
 const archiveTimer = useIntervalFn(() => {
   archiveTimer.pause();
@@ -621,7 +655,7 @@ const rbClick = (item: any) => {
 };
 const rbShow = ref(false);
 
-const rbcanleClick = (item: any) => {
+const rbcanleClick = () => {
   rbShow.value = false;
   processSelst.value[0].status = true;
   processSelst.value[1].status = false;
@@ -663,6 +697,7 @@ const nodeFormData = ref({
   orderDirection: "descending",
 });
 const nodelist = ref<any[]>([]);
+const nodelistTotal = ref(0)
 const nodelistFun = async () => {
   const { data } = await nodeList(nodeFormData.value);
   let list = data.data.rows;
@@ -672,9 +707,13 @@ const nodelistFun = async () => {
     "/img/craftsmanship/3.png",
     "/img/craftsmanship/4.png",
   ];
-  nodelist.value = list.map((item, index) => {
-    return { ...item, img: imgList[index % imgList.length], status: false };
-  });
+  if (nodelistTotal.value != data.data.total) {
+    nodelistTotal.value = data.data.total
+    nodelist.value = list.map((item, index) => {
+      return { ...item, img: imgList[index % imgList.length], status: false };
+    });
+  }
+
 };
 
 const nodelistFunTimer = useIntervalFn(() => {
@@ -711,6 +750,7 @@ const alarmEventsFormData = ref({
   orderDirection: "descending",
 });
 const alarmEventslist = ref<any[]>([]);
+const alarmEventslistTotal = ref(0)
 const alarmEventsListFun = async () => {
   const { data } = await alarmEventsList(alarmEventsFormData.value);
   // let list = data.data.rows.slice(0, 4);
@@ -736,14 +776,18 @@ const alarmEventsListFun = async () => {
       img: "/img/yiji_icon.png",
     },
   ];
-  alarmEventslist.value = data.data.rows.map((item, index) => {
-    const matchedLevel = imgList.find((v) => v.level === item.level);
-    return {
-      ...item,
-      img: matchedLevel ? matchedLevel.img : "",
-      status: false,
-    };
-  });
+  if (alarmEventslistTotal.value != data.data.total) {
+    alarmEventslistTotal.value = data.data.total
+    alarmEventslist.value = data.data.rows.map((item, index) => {
+      const matchedLevel = imgList.find((v) => v.level === item.level);
+      return {
+        ...item,
+        img: matchedLevel ? matchedLevel.img : "",
+        status: false,
+      };
+    });
+  }
+
 };
 const jinRiGongYiJieDianAlarmCount = ref({
   "轻微": 0,
@@ -784,8 +828,11 @@ const processlist2 = ref<any[]>([]);
 const processTotal = ref<number>(0);
 const processlistFun = async () => {
   const { data } = await processList(processFormData.value);
-  processTotal.value = data.data.total;
-  processlist.value = data.data.rows;
+  if (processTotal.value != data.data.total) {
+    processTotal.value = data.data.total;
+    processlist.value = data.data.rows;
+  }
+
 };
 
 const processlistTimer = useIntervalFn(() => {
@@ -828,7 +875,12 @@ onMounted(() => {
   alarmEventsListFun();
   processlistFun();
   getJinRiGongYiJieDianAlarmCount()
+
+  window.addEventListener("resize", resize)
 });
+onUnmounted(() => {
+  window.addEventListener("resize", resize)
+})
 </script>
 
 <style lang="scss" scoped>

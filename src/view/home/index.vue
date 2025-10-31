@@ -183,26 +183,29 @@
       <div class="bigscreen_lc_bottom_nei">
         <img src="/public/img/事件报告图标.png" alt="" />
         <div class="bigscreen_lc_bottom_r">
-          <Vue3SeamlessScroll :list="alarmEventslist" :class-option="{
+          <Vue3SeamlessScroll :key="alarmEventslistTotal" :list="alarmEventslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div v-for="(item, index) in alarmEventslist" :key="index" class="bigscreen_lc_bottom_rnei">
-              <ElTooltip>
-                <template #content>
-                  <span>{{ item?.description }}</span>
-                  <br />
-                  <span>{{ item?.createTime }}</span>
-                </template>
-                <span>{{ item?.description }}</span>
-              </ElTooltip>
-              <div :style="{
-                background: ` url(${item.img}) no-repeat`,
-                'background-size': '100% 100%',
-              }">
-                <span v-if="item.type == '工艺节点报警'">工艺节点</span>
-                <span v-else>{{ item.type }}</span>
+            <template v-slot="{ data }">
+              <div class="bigscreen_lc_bottom_rnei">
+                <ElTooltip>
+                  <template #content>
+                    <span>{{ data?.description }}</span>
+                    <br />
+                    <span>{{ data?.createTime }}</span>
+                  </template>
+                  <span>{{ data?.description }}</span>
+                </ElTooltip>
+                <div :style="{
+                  background: ` url(${data?.img}) no-repeat`,
+                  'background-size': '100% 100%',
+                }">
+                  <span v-if="data?.type == '工艺节点报警'">工艺节点</span>
+                  <span v-else>{{ data?.type }}</span>
+                </div>
               </div>
-            </div>
+            </template>
+
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -324,17 +327,18 @@
           <!-- <div @click="rtClick(item)" v-for="item in videoList">
             <span>{{ item.name }}</span>
           </div> -->
-          <Vue3SeamlessScroll :list="videoList" :class-option="{
+          <Vue3SeamlessScroll :key="videoList.length" :list="videoList" :class-option="{
             step: 5,
           }" hover>
-            <div style="cursor: pointer;" @click="rtClick(item)" v-for="(item, index) in videoList" :key="index"
-              class="video_item">
-              <span>
-                <el-tooltip :content="item?.name">
-                  {{ item?.name }}
-                </el-tooltip>
-              </span>
-            </div>
+            <template v-slot="{ data }">
+              <div style="cursor: pointer;" @click="rtClick(data)" class="video_item">
+                <span>
+                  <el-tooltip :content="data?.name">
+                    {{ data?.name }}
+                  </el-tooltip>
+                </span>
+              </div>
+            </template>
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -357,26 +361,28 @@
           <img style="margin-top: 70px" src="/public/img/圆形标记.png" alt="" />
         </div>
         <div class="bigscreen_rc_bottom_r">
-          <Vue3SeamlessScroll :list="policieslist" :class-option="{
+          <Vue3SeamlessScroll :key="policieslistTotal" :list="policieslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <div style="cursor: pointer;" v-for="(item, index) in policieslist" @click="rcClick(item)" :key="index"
-              class="bigscreen_rc_bottom_rnei">
-              <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
-                dayjs(item.createTime).format("YYYY-MM-DD")
-                }}</span>
-              <div :style="{
-                background: `url(${item.img}) no-repeat`,
-                'background-size': '100% 100%',
-              }">
-                <span class="zhengcefagui" style="margin-left: 10px">
-                  <el-tooltip :content="item?.policiesName">
-                    {{ item.policiesName }}
-                  </el-tooltip>
-                </span>
-                <img style="margin-right: 18px; cursor: pointer" src="/public/img/查看详情.png" alt="" />
+            <template v-slot="{ data }">
+              <div style="cursor: pointer;" @click="rcClick(data)" class="bigscreen_rc_bottom_rnei">
+                <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
+                  dayjs(data?.createTime).format("YYYY-MM-DD")
+                  }}</span>
+                <div :style="{
+                  background: `url(${data?.img}) no-repeat`,
+                  'background-size': '100% 100%',
+                }">
+                  <span class="zhengcefagui" style="margin-left: 10px">
+                    <el-tooltip :content="data?.policiesName">
+                      {{ data?.policiesName }}
+                    </el-tooltip>
+                  </span>
+                  <img style="margin-right: 18px; cursor: pointer" src="/public/img/查看详情.png" alt="" />
+                </div>
               </div>
-            </div>
+            </template>
+
           </Vue3SeamlessScroll>
         </div>
       </div>
@@ -516,7 +522,9 @@ import { ref, onMounted, nextTick } from "vue";
 import * as echarts from "echarts";
 import { Search } from "@element-plus/icons-vue";
 import center from "../../components/center.vue";
-import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+// import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
+import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3SeamlessScroll.vue"
+
 import OfficePreview from "../../components/officereview.vue";
 import {
   getPoliciesListApi,
@@ -588,13 +596,18 @@ const policiesFormData = ref({
   orderDirection: "descending",
 });
 const policieslist = ref<any[]>([]);
+const policieslistTotal = ref(0)
 const previewVisibleUrl = ref("");
 const policieslistFun = async () => {
   const { data } = await getPoliciesListApi(policiesFormData.value);
   let imgList = [img5, img6, img7];
-  policieslist.value = data.data.rows.map((item: any, index: number) => {
-    return { ...item, img: imgList[index % imgList.length], status: false };
-  });
+  if (policieslistTotal.value != data.data.total) {
+    policieslistTotal.value = data.data.total
+    policieslist.value = data.data.rows.map((item: any, index: number) => {
+      return { ...item, img: imgList[index % imgList.length], status: false };
+    });
+  }
+
 };
 const policiesTimer = useIntervalFn(() => {
   policiesTimer.pause();
@@ -890,40 +903,45 @@ const alarmEventsFormData = ref({
   orderDirection: "descending",
 });
 const alarmEventslist = ref<any[]>([]);
+const alarmEventslistTotal = ref(0)
 const alarmEventslistFun = async () => {
   const { data } = await alarmEventsList(alarmEventsFormData.value);
-  let imgList = [
-    {
-      level: "轻微",
-      img: "/img/wuji_back.png",
-    },
-    {
-      level: "一般",
-      img: "/img/siji_back.png",
-    },
-    {
-      level: "中度",
-      img: "/img/sanji_back.png",
-    },
-    {
-      level: "重要",
-      img: "/img/erji_back.png",
-    },
-    {
-      level: "紧急",
-      img: "/img/yiji_back.png",
-    },
-  ];
-  alarmEventslist.value = data.data.rows.map(
-    (item: { level: string }, _index: any) => {
-      const matchedLevel = imgList.find((v) => v.level === item.level);
-      return {
-        ...item,
-        img: matchedLevel ? matchedLevel.img : "",
-        status: false,
-      };
-    }
-  );
+  if (alarmEventslistTotal.value != data.data.total) {
+    alarmEventslistTotal.value = data.data.total
+    let imgList = [
+      {
+        level: "轻微",
+        img: "/img/wuji_back.png",
+      },
+      {
+        level: "一般",
+        img: "/img/siji_back.png",
+      },
+      {
+        level: "中度",
+        img: "/img/sanji_back.png",
+      },
+      {
+        level: "重要",
+        img: "/img/erji_back.png",
+      },
+      {
+        level: "紧急",
+        img: "/img/yiji_back.png",
+      },
+    ];
+    alarmEventslist.value = data.data.rows.map(
+      (item: { level: string }, _index: any) => {
+        const matchedLevel = imgList.find((v) => v.level === item.level);
+        return {
+          ...item,
+          img: matchedLevel ? matchedLevel.img : "",
+          status: false,
+        };
+      }
+    );
+  }
+
 };
 
 //安全生产曲线
@@ -1063,10 +1081,11 @@ const getstatisticsList = async () => {
   bigscreenRBoption.series[1].data = data.data[0].data;
   bigscreenRBoption.series[2].data = data.data[1].data;
   bigscreenRBoption.series[3].data = data.data[3].data;
-  if (bigscreenRBRef.value) {
+  if (bigscreenRBRef.value && bigscreenRBChart == null) {
     bigscreenRBChart = echarts.init(bigscreenRBRef.value);
-    bigscreenRBChart.setOption(bigscreenRBoption, true);
   }
+  bigscreenRBChart.setOption(bigscreenRBoption, true);
+
 };
 const rbRadioTimer = useIntervalFn(() => {
   rbRadioTimer.pause();
@@ -1301,7 +1320,9 @@ const geteventTotalFun = async () => {
   if (bigscreenLBRef.value) {
     if (!bigScreenInit.value) {
       bigScreenInit.value = true;
-      bigscreenLBChart = echarts.init(bigscreenLBRef.value);
+      if (bigscreenLBChart == null) {
+        bigscreenLBChart = echarts.init(bigscreenLBRef.value);
+      }
       bigscreenLBChart.setOption(bigscreenLBoption);
       bigscreenLBChart.off().on("click", params => {
         let cuData = "";
@@ -1318,7 +1339,7 @@ const geteventTotalFun = async () => {
           } else {
             cuData = dayjs(params.name).startOf("month").format("YYYY-MM-DD")
             enData = dayjs(cuData).endOf("month").format("YYYY-MM-DD")
-            dataDefaultDate.value =dayjs(params.name).startOf("month").toDate()
+            dataDefaultDate.value = dayjs(params.name).startOf("month").toDate()
           }
 
           hisPage.value = 1;

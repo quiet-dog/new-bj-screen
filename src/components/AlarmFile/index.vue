@@ -31,7 +31,7 @@ function closed(){
 
 <template>
     <span>
-        <el-link size="small" style="font-size: 12px;" type="primary" :underline="'always'" v-for="file in files" @click="clickFile(file)">
+        <el-link size="small" style="font-size: 12px;" type="primary" :underline="'always'" v-for="(file,index) in files" :key="index" @click="clickFile(file)">
             {{ getFile(file) }}
         </el-link>
 
