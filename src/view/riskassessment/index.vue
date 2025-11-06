@@ -170,12 +170,14 @@
       <div class="bigscreen_rb_top_l">
         <img src="/public/img/光标.png" alt="" />
         <span>传感器数据</span>
+        <span class="high_node_btn" @click="filterHighNode"> {{ !equipmentHigh ? "高风险节点" : "重置" }}</span>
       </div>
     </div>
     <div class="bigscreen_rb_bottom">
       <div class="bigscreen_rb_bottom_nei">
         <div class="bigscreen_rb_bottom_nei_t">
-          <span>传感器编号</span>
+          <span>设备名称</span>
+          <span>房间号</span>
           <span>传感器名称</span>
           <span>数值</span>
           <span>时间</span>
@@ -187,7 +189,16 @@
             <template v-slot="{ data }">
               <div style="cursor: pointer;" @click="clickFormItem(data?.thresholdId)" class="bigscreen_rb_bottom_nei_b">
                 <span>
-                  {{ data?.thresholdId }}
+                  <el-tooltip :content="data?.deviceName">
+                    <span :class="{
+                      'high_node_red': equipmentHigh
+                    }">{{ data?.deviceName }}</span>
+                  </el-tooltip>
+                </span>
+                <span>
+                  <el-tooltip :content="data?.area">
+                    {{ data?.area }}
+                  </el-tooltip>
                 </span>
                 <span>{{ data?.threshold.sensorName }}</span>
                 <span :style="{ color: getEquipmentDataColor(data) }">{{ data?.equipmentData }}</span>
@@ -258,7 +269,6 @@ import Vue3SeamlessScroll from "../../package/vue3-seamless-scroll/packages/Vue3
 import dayjs from "dayjs";
 import { useIntervalFn } from '@vueuse/core'
 import img9 from "../../../public/img/叉号.png";
-import { type } from '../../../auto-imports';
 import { useEditThHook } from "./editTh.tsx";
 import isoWeek from 'dayjs/plugin/isoWeek';
 
@@ -394,7 +404,7 @@ const getEquipmentDataColorType = row => {
 //环境信息
 const environmentFileFormData = ref({
   pageNum: 1,
-  pageSize: 10,
+  pageSize: 20,
   orderColumn: "createTime",
   orderDirection: "descending",
   // startTime:dayjs().format("YYYY-MM-DD"),
@@ -406,10 +416,9 @@ const environmentFileFun = async () => {
   // environmentFileFormData.value.startTime = dayjs().format("YYYY-MM-DD");
   // environmentFileFormData.value.endTime = dayjs().add(1,"day").format("YYYY-MM-DD")
   const { data } = await environmentalDetectionList(environmentFileFormData.value);
-  let list = data.data.rows.slice(0, 9);
   if (environmentFileListTotal.value != data.data.total) {
     environmentFileListTotal.value = data.data.total
-    environmentFileList.value = list.map((item, index) => {
+    environmentFileList.value = data.data.rows.map((item, index) => {
       return {
         ...item,
         status: false,
@@ -421,7 +430,7 @@ const environmentFileFun = async () => {
 
 // 修改 getValueColorClass 方法
 const getValueColorClass = row => {
-  if(row == undefined || row.value == undefined || row.value == null){
+  if (row == undefined || row.value == undefined || row.value == null) {
     return "text-info"
   }
   const value = row.value;
@@ -738,9 +747,11 @@ const equipmentFormData = ref({
   pageSize: 100,
   orderColumn: "createTime",
   orderDirection: "descending",
+  highNode: ""
 });
 const equipmentlist = ref<any[]>([]);
-const equipmentlistTotal = ref(0)
+const equipmentlistTotal = ref(0);
+const equipmentHigh = ref(false)
 const equipmentListFun = async () => {
   // const { data } = await thresholdList(equipmentFormData.value);
   // let list = data.data.rows;
@@ -753,6 +764,14 @@ const equipmentListFun = async () => {
   }
 
 };
+
+async function filterHighNode() {
+  equipmentHigh.value = !equipmentHigh.value
+  equipmentFormData.value.highNode = equipmentHigh.value ? "high" : ""
+  const { data } = await thresholdDataList(equipmentFormData.value);
+  equipmentlistTotal.value = Math.random()
+  equipmentlist.value = data.data.rows;
+}
 
 const equipmentListTimer = useIntervalFn(() => {
   equipmentListTimer.pause();
@@ -1333,6 +1352,7 @@ $design-height: 1080;
     .bigscreen_rb_top_l {
       display: flex;
       align-items: center;
+      width: 100%;
 
       img {
         margin-left: 11px;
@@ -1385,7 +1405,7 @@ $design-height: 1080;
         align-items: center;
 
         span {
-          width: 25%;
+          width: 20%;
           color: #9eabb7;
           font-size: adaptiveFontSize(14);
           text-align: center;
@@ -1409,7 +1429,7 @@ $design-height: 1080;
           margin-bottom: adaptiveHeight(5);
 
           span {
-            width: 25%;
+            width: 20%;
             color: #ffffff;
             font-size: adaptiveFontSize(12);
             white-space: nowrap;
@@ -1525,5 +1545,15 @@ $design-height: 1080;
 
 #popperHiss :deep(button) {
   background: transparent !important;
+}
+
+.high_node_btn {
+  margin-left: auto;
+  margin-right: adaptiveWidth(20);
+  cursor: pointer;
+}
+
+.high_node_red {
+  color: red;
 }
 </style>

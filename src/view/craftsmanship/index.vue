@@ -77,11 +77,11 @@
                   <span style="margin-left: 25px">{{ data?.level }}</span>
                   <el-tooltip placement="top-start">
                     <template #content>
-                      <span>{{ data?.craftNode?.nodeName }}</span>
+                      <span>{{ data?.nodeName }}</span>
                       <br />
                       <span>{{ data?.createTime }}</span>
                     </template>
-                    <span>{{ data?.craftNode?.nodeName }}</span>
+                    <span>{{ data?.nodeName }}</span>
                   </el-tooltip>
                   <span>节点故障</span>
                 </div>
@@ -98,8 +98,8 @@
         <img src="/public/img/光标.png" alt="" />
         <span>工艺节点</span>
       </div>
-      <el-input class="inputcss" style="width: 148px; height: 24px; margin-right: 11px" placeholder="请输入节点名称"
-        :prefix-icon="Search" clearable v-model="nodeFormData.nodeName" @change="nodelistFun" />
+      <el-input class="inputcss" style="width: 148px; height: 24px; margin-right: 11px" placeholder="请输入工艺编号"
+        :prefix-icon="Search" clearable v-model="nodeFormData.craftArchiveCode" @change="nodelistFun" />
     </div>
     <div class="bigscreen_lb_bottom">
       <div class="bigscreen_lb_bottom_nei">
@@ -108,7 +108,8 @@
           <div class="bigscreen_lb_bottom_nei_t_r">
             <span>节点名称</span>
             <span>所属工艺</span>
-            <span>是否为高风险</span>
+            <span>工艺编号</span>
+            <span>是否高风险</span>
           </div>
         </div>
         <div class="bigscreen_lb_bottom_nei">
@@ -124,8 +125,21 @@
                 <div class="bigscreen_lb_bottom_neis_r">
                   <span :style="{
                     color: data?.isHighRisk ? 'red' : '#ffffff',
-                  }">{{ data?.nodeName }}</span>
-                  <span>{{ data?.craftArchive?.craftArchiveName }}</span>
+                  }">
+                    <el-tooltip :content="data?.nodeName">
+                      {{ data?.nodeName }}
+                    </el-tooltip>
+                  </span>
+                  <span>
+                    <el-tooltip :content="data?.craftArchive?.craftArchiveName">
+                      {{ data?.craftArchive?.craftArchiveName }}
+                    </el-tooltip>
+                  </span>
+                  <span>
+                    <el-tooltip :content="data?.craftArchive?.craftArchiveCode">
+                      {{ data?.craftArchive?.craftArchiveCode }}
+                    </el-tooltip>
+                  </span>
                   <span>{{ data?.isHighRisk ? "是" : "否" }}</span>
                 </div>
               </div>
@@ -206,10 +220,15 @@
           <span>工艺制定人员</span>
         </div>
         <div class="bigscreen_rb_bottom_nei_items">
-          <Vue3SeamlessScroll ref="archivelistRef" :key="archivelistTotal" :list="archivelist" :class-option="{
+          <!-- <Vue3SeamlessScroll ref="archivelistRef" :key="archivelistTotal" :list="archivelist" :class-option="{
             step: 5,
           }" hover class="scrool">
             <template v-slot="{ data }">
+              
+            </template>
+          </Vue3SeamlessScroll> -->
+          <el-scrollbar height="100%">
+            <div class="scrool" v-for="data in archivelist">
               <div class="bigscreen_rb_bottom_nei_item" @click="rbClick(data)">
                 <div class="bigscreen_rb_bottom_nei_item1">
                   <div class="bigscreen_rb_bottom_nei_item1_div" :style="{
@@ -231,8 +250,9 @@
                   {{ data?.creator }}
                 </div>
               </div>
-            </template>
-          </Vue3SeamlessScroll>
+            </div>
+          </el-scrollbar>
+
         </div>
       </div>
     </div>
@@ -353,7 +373,7 @@
         </div>
       </div>
       <div class="processflowchart" v-else>
-        <el-scrollbar height="100%">
+        <el-scrollbar height="100%" v-if="rbInfoList.length > 0">
           <div class="processflowchart_con">
             <el-steps direction="vertical" :active="0">
               <el-step id="stepMy" v-for="item in rbInfoList" :title="item.nodeOrder">
@@ -383,9 +403,15 @@
                   </div> -->
                 </template>
               </el-step>
+
+
             </el-steps>
           </div>
         </el-scrollbar>
+        <div v-else style="color: white;margin: auto;height: 100%;width: 100%;display: flex; align-items: center; justify-content: center; 
+            text-align: center;">
+          暂无数据
+        </div>
       </div>
     </div>
   </div>
@@ -623,13 +649,12 @@ const archivelist = ref<any[]>([]);
 const archivelistTotal = ref(0)
 const archivelistFun = async () => {
   const { data } = await archiveList(archiveFormData.value);
-  let list = data.data.rows;
-  if (archivelistTotal.value != data.data.total) {
-    archivelistTotal.value = data.data.total
-    archivelist.value = list.map((item: any) => {
-      return { ...item, status: false };
-    });
-  }
+  // if (archivelistTotal.value != data.data.total) {
+  archivelistTotal.value = data.data.total
+  archivelist.value = data.data.rows.map((item: any) => {
+    return { ...item, status: false };
+  });
+  // }
 
 };
 const archiveTimer = useIntervalFn(() => {
@@ -637,12 +662,13 @@ const archiveTimer = useIntervalFn(() => {
   archivelistFun().finally(() => {
     archiveTimer.resume();
   })
-}, 5000)
+}, 10000)
 const rbInfo = ref();
 const rbInfoList = ref([])
 const rbClick = (item: any) => {
   rbInfo.value = item;
   rbShow.value = true;
+  rbShowF.value = !rbShow.value;
   nodeList({
     pageNum: 1,
     pageSize: 100,
@@ -654,9 +680,11 @@ const rbClick = (item: any) => {
   })
 };
 const rbShow = ref(false);
+const rbShowF = ref(true);
 
 const rbcanleClick = () => {
   rbShow.value = false;
+  rbShowF.value = !rbShow.value;
   processSelst.value[0].status = true;
   processSelst.value[1].status = false;
   processFormData.value.craftArchiveId = null;
@@ -668,7 +696,7 @@ const processSelst = ref([
     status: true,
   },
   {
-    name: "工艺流程图",
+    name: "工艺流程",
     status: false,
   },
 ]);
@@ -695,6 +723,7 @@ const nodeFormData = ref({
   pageSize: 100,
   orderColumn: "createTime",
   orderDirection: "descending",
+  craftArchiveCode: ""
 });
 const nodelist = ref<any[]>([]);
 const nodelistTotal = ref(0)
@@ -716,18 +745,20 @@ const nodelistFun = async () => {
 
 };
 
-const nodelistFunTimer = useIntervalFn(() => {
-  nodelistFunTimer.pause();
-  nodelistFun().finally(() => {
-    nodelistFunTimer.resume();
-  })
-}, 10000)
+// const nodelistFunTimer = useIntervalFn(() => {
+//   nodelistFunTimer.pause();
+//   nodelistFun().finally(() => {
+//     nodelistFunTimer.resume();
+//   })
+// }, 10000)
 const lbShow = ref(false);
+const lbShowF = ref(true)
 const lbInfo = ref()
 const lbClick = (item: any) => {
   lbInfo.value = item;
   console.log("lbInfo", lbInfo.value)
   lbShow.value = true;
+  lbShowF.value = !lbShow.value;
   // nodelist.value.forEach((v) => {
   //   if (item.craftNodeId == v.craftNodeId) {
   //     v.status = !v.status;
@@ -739,6 +770,7 @@ const lbClick = (item: any) => {
 const lbcanleClick = (item: any) => {
   // rbShow.value = false;
   lbShow.value = false;
+  lbShowF.value = !lbShow.value
 };
 
 //报警信息
@@ -842,11 +874,13 @@ const processlistTimer = useIntervalFn(() => {
   })
 }, 5000)
 const rtShow = ref(false);
+const rtShowF = ref(true);
 const rtInfo = ref()
 const rtClcik = (item) => {
   console.log("item", item)
   rtInfo.value = item
   rtShow.value = true;
+  rtShowF.value = !rtShow.value
   processlist.value.forEach((v) => {
     if (item.craftProcessId == v.craftProcessId) {
       v.status = !v.status;
@@ -857,6 +891,7 @@ const rtClcik = (item) => {
 };
 const rtcanleClick = () => {
   rtShow.value = false;
+  rtShowF.value = !rtShow.value
   // rbShow.value = false;
 };
 
@@ -870,8 +905,11 @@ onMounted(() => {
     bigscreenRBChart = echarts.init(bigscreenRBRef.value);
     bigscreenRBChart.setOption(bigscreenRBoption);
   }
-  archivelistFun();
-  nodelistFun();
+  archivelistFun().then(res => {
+    if (Array.isArray(archivelist.value) && archivelist.value.length > 0) {
+      nodeFormData.value.craftArchiveCode =archivelist.value[0].craftArchiveCode
+    }
+  });
   alarmEventsListFun();
   processlistFun();
   getJinRiGongYiJieDianAlarmCount()
@@ -1199,10 +1237,10 @@ $design-height: 1080;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-left: adaptiveWidth(10);
+          // margin-left: adaptiveWidth(10);
 
           span {
-            width: 33%;
+            width: 25%;
             font-size: adaptiveFontSize(14);
             text-align: center;
           }
@@ -1244,8 +1282,9 @@ $design-height: 1080;
             color: #ffffff;
 
             span {
-              width: 33%;
+              width: 25%;
               font-size: adaptiveFontSize(14);
+              line-height: adaptiveFontSize(14);
               text-align: center;
               white-space: nowrap;
               /* 禁止换行 */

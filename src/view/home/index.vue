@@ -361,11 +361,13 @@
           <img style="margin-top: 70px" src="/public/img/圆形标记.png" alt="" />
         </div>
         <div class="bigscreen_rc_bottom_r">
-          <Vue3SeamlessScroll :key="policieslistTotal" :list="policieslist" :class-option="{
-            step: 5,
-          }" hover class="scrool">
+          <Vue3SeamlessScroll v-model="policieslistDetailShowF" :key="policieslistTotal" :list="policieslist"
+            :class-option="{
+              step: 5,
+            }" class="scrool">
             <template v-slot="{ data }">
-              <div style="cursor: pointer;" @click="rcClick(data)" class="bigscreen_rc_bottom_rnei">
+              <div @mouseenter="policieslistDetailShowFPause" @mouseleave="policieslistDetailShowFStart" style="cursor: pointer;" @click="rcClick(data)"
+                class="bigscreen_rc_bottom_rnei">
                 <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
                   dayjs(data?.createTime).format("YYYY-MM-DD")
                   }}</span>
@@ -495,26 +497,27 @@
     </div>
   </div>
   <!-- 政策法规 -->
-  <template v-for="(item, _index) in policieslist">
-    <div v-if="item.status" class="preview">
-      <div class="preview_top">
-        <span>文件预览
-          <ElButton size="large" @click="() => download(item.paths[0].path)" link type="success" text="success">
-            <el-icon style="vertical-align: middle; font-size: 25px">
-              <Download />
-            </el-icon>
-          </ElButton>
-        </span>
+  <!-- <template v-for="(item, _index) in policieslist"> -->
+  <div v-if="policieslistDetailShow" @mouseenter="policieslistDetailShowFPause" class="preview">
+    <div class="preview_top">
+      <span>文件预览
+        <ElButton size="large" @click="() => download(policieslistDetail?.paths[0].path)" link type="success"
+          text="success">
+          <el-icon style="vertical-align: middle; font-size: 25px">
+            <Download />
+          </el-icon>
+        </ElButton>
+      </span>
 
-        <img :src="img9" alt="" srcset="" @click="previewcanleClick(item)" />
-      </div>
-      <div class="preview_bottom">
-        <div class="preview_bottom_nei">
-          <OfficePreview :file-url="previewVisibleUrl" />
-        </div>
+      <img :src="img9" alt="" srcset="" @click="previewcanleClick" />
+    </div>
+    <div class="preview_bottom">
+      <div class="preview_bottom_nei">
+        <OfficePreview :file-url="previewVisibleUrl" />
       </div>
     </div>
-  </template>
+  </div>
+  <!-- </template> -->
 </template>
 
 <script lang="ts" setup>
@@ -568,9 +571,11 @@ const getValue = (item) => {
 }
 
 const rtStatus = ref(false);
+const rtStatusF = ref(true)
 const videoRef = ref(null);
 const rtClick = (item: { channelid: string }) => {
   rtStatus.value = !rtStatus.value;
+  rtStatusF.value = !rtStatus.value;
   if (rtStatus.value) {
     nextTick(() => {
       getStreamUrlApi(item.channelid).then((res) => {
@@ -585,6 +590,7 @@ const rtClick = (item: { channelid: string }) => {
 };
 const rtcanleClick = () => {
   rtStatus.value = false;
+  rtStatusF.value = !rtStatus.value;
 };
 
 //政策法规
@@ -615,20 +621,26 @@ const policiesTimer = useIntervalFn(() => {
     policiesTimer.resume();
   });
 }, 50000);
+const policieslistDetail = ref()
+const policieslistDetailShow = ref(false)
+const policieslistDetailShowF = ref(true)
+const policieslistDetailShowFPause =()=>{
+  policieslistDetailShowF.value = false
+}
+const policieslistDetailShowFStart =()=>{
+  policieslistDetailShowF.value = true
+}
 const rcClick = (item: any) => {
-  policieslist.value.forEach((v) => {
-    if (item.policiesId == v.policiesId) {
-      v.status = !v.status;
-    } else {
-      v.status = false;
-    }
-  });
+  policieslistDetailShow.value = !policieslistDetailShow.value
+  policieslistDetailShowFPause()
+  policieslistDetail.value = item
   if (item.paths.length > 0) {
     previewVisibleUrl.value = item.paths[0].path;
   }
 };
-const previewcanleClick = (item: { status: boolean }) => {
-  item.status = false;
+const previewcanleClick = () => {
+  policieslistDetailShow.value = !policieslistDetailShow.value
+  policieslistDetailShowFStart()
 };
 
 //报警信息

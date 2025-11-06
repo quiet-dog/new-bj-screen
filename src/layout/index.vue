@@ -6,6 +6,7 @@
         src="/public/img/高生物安全动态监管平台.png"
         alt=""
       /> -->
+      <div class="bigscreen_header_l">北京生物研究所有限责任公司108车间</div>
       <div class="text-my">高生物安全风险车间智能化风险管理和实时动态监管平台</div>
       <div class="bigscreen_header_r">
         <span>{{ time }}</span>
@@ -220,14 +221,7 @@ $design-height: 1080;
     position: absolute;
     top: 0;
 
-    .bigscreen_header_l {
-      position: absolute;
-      top: adaptiveHeight(18);
-      left: 50%;
-      margin-left: adaptiveWidth(-241);
-      width: adaptiveWidth(482);
-      height: adaptiveHeight(63);
-    }
+
 
     .bigscreen_header_r {
       height: adaptiveHeight(100);
@@ -380,5 +374,16 @@ $design-height: 1080;
   cursor: pointer;
   // 缩放
   transform: scale(0.8);
+}
+
+.bigscreen_header_l {
+  position: absolute;
+  top: adaptiveHeight(30);
+  left:  adaptiveWidth(75);
+  // margin-left: adaptiveWidth(-241);
+  width: adaptiveWidth(482);
+  height: adaptiveHeight(63);
+  font-size: adaptiveFontSize(16);
+  color: white;
 }
 </style>

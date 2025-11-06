@@ -70,6 +70,11 @@ export function equipmentDetail(id: number) {
   return http.get("/manage/equipment/" + id);
 }
 
+
+export function getEquipmentDetail(id: number) {
+  return http.get("/manage/equipment/" + id);
+}
+
 export function equipmentAlarmCount(params: string) {
   return http.get("/manage/equipment/alarmCount", {
     params: {

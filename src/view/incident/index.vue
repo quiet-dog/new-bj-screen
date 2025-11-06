@@ -3,14 +3,14 @@
     <div class="bigscreen_lt_top">
       <div class="bigscreen_lt_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>报警信息</span>
+        <span>隐患排查</span>
       </div>
     </div>
     <div class="bigscreen_lt_bottom">
       <div class="bigscreen_lt_bottom_l">
         <img src="/public/img/报警信息图标.png" alt="" />
         <div class="bigscreen_lt_bottom_lt">
-          <div>政策法规类</div>
+          <div>隐患信息</div>
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
@@ -22,7 +22,7 @@
                 {{ data?.eventName }}
               </div>
               <div>
-                {{ getHandlePerson(data) }}
+                {{ data?.handlerNames }}
               </div>
 
             </div>
@@ -74,11 +74,11 @@
         <img src="/public/img/光标.png" alt="" />
         <span>报警历史</span>
       </div>
-      <ElSelect @change="zxChangeSelect" v-model="zxSelect" size="small" class="selectcss">
+      <el-select @change="zxChangeSelect" v-model="zxSelect" size="small" class="selectcss">
         <ElOption label="政策法规类" value="政策法规类" />
         <ElOption label="设备报警类" value="设备报警类" />
         <ElOption label="环境报警类" value="环境报警类" />
-      </ElSelect>
+      </el-select>
     </div>
     <div class="bigscreen_lb_bottom">
       <div class="bigscreen_lb_bottom_nei" ref="bigscreenLBRef"></div>
@@ -136,7 +136,7 @@
               <div @click="openEventInfoShow(data)" class="bigscreen_rt_bottom_rnei">
                 <span>{{ data?.eventName }}</span>
                 <div :style="{
-                  background: ` url(${getBg(data)}) no-repeat`,
+                  background: ` url(${getBg(data?.level)}) no-repeat`,
                   'background-size': '100% 100%',
                 }">
                   <span>{{ data?.type }}</span>
@@ -193,7 +193,7 @@
     <div class="bigscreen_rc_top">
       <div class="bigscreen_rc_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>SOP管理</span>
+        <span>生物安全SOP管理</span>
       </div>
       <el-input class="inputcss" style="width: 148px; height: 24px; margin-right: 11px" placeholder="请输入SOP名称"
         :prefix-icon="Search" v-model="sopFormData.name" @change="soplistFun" clearable />
@@ -233,7 +233,7 @@
     <div class="bigscreen_rb_top">
       <div class="bigscreen_rb_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>政策法规</span>
+        <span>生物安全政策法规</span>
       </div>
       <el-input class="inputcss" placeholder="请输入政策法规" :prefix-icon="Search" v-model="policiesFormData.policiesName"
         @change="policieslistFun" clearable />
@@ -249,23 +249,23 @@
           <Vue3SeamlessScroll :key="policieslistTotal" :list="policieslist" :class-option="{
             step: 5,
           }" hover class="scrool">
-            <template v-slot="{data}">
+            <template v-slot="{ data }">
               <div class="bigscreen_rb_bottom_rnei">
-              <span class="bigscreen_rb_bottom_rnei_span">
-                {{ dayjs(data?.createTime).format("YYYY-MM-DD") }}</span>
-              <div :style="{
-                background: `url(${data?.img}) no-repeat`,
-                'background-size': '100% 100%',
-              }">
-                <!-- <span style="margin-left: 10px">{{ item.policiesName }}</span> -->
-                <span class="zhengcefagui" style="margin-left: 10px">
-                  <el-tooltip :content="data?.policiesName">
-                    {{ data?.policiesName }}
-                  </el-tooltip>
-                </span>
-                <img @click="rbClcik(data)" src="/public/img/查看详情.png" alt="" />
+                <span class="bigscreen_rb_bottom_rnei_span">
+                  {{ dayjs(data?.createTime).format("YYYY-MM-DD") }}</span>
+                <div :style="{
+                  background: `url(${data?.img}) no-repeat`,
+                  'background-size': '100% 100%',
+                }">
+                  <!-- <span style="margin-left: 10px">{{ item.policiesName }}</span> -->
+                  <span class="zhengcefagui" style="margin-left: 10px">
+                    <el-tooltip :content="data?.policiesName">
+                      {{ data?.policiesName }}
+                    </el-tooltip>
+                  </span>
+                  <img @click="rbClcik(data)" src="/public/img/查看详情.png" alt="" />
+                </div>
               </div>
-            </div>
             </template>
           </Vue3SeamlessScroll>
         </div>
@@ -349,13 +349,14 @@ import img5 from "../../../public/img/红色背景框.png";
 import img6 from "../../../public/img/绿色背景框.png";
 import img7 from "../../../public/img/黄色背景框.png";
 import img9 from "../../../public/img/叉号.png";
-import { getEventAtatistics } from "../../api/home";
+import { getEventAtatistics, getEventAtatisticsByHandle } from "../../api/home";
 import { download } from "../../api/login";
 import { get3dOption, getHistoryData } from "./echart";
 import "echarts-gl"
 import { useIntervalFn } from "@vueuse/core";
 import DialogPreview from "../../components/DialogPreview/index.vue";
 import { ElTable, ElTableColumn } from "element-plus";
+import { emergencyEventInfo } from "../../api/craftsmanship";
 
 
 // 修改报警级别样式映射函数
@@ -590,6 +591,7 @@ let bigscreenLBoption = {
         color: "#68B1A6", // 线条颜色
       },
     },
+
   ],
   tooltip: {
     trigger: 'axis',
@@ -688,13 +690,13 @@ const previewVisibleUrl = ref("");
 const policieslistFun = async () => {
   const { data } = await getPoliciesListApi(policiesFormData.value);
   let imgList = [img5, img6, img7];
-  if(policieslistTotal.value != data.data.total){
+  if (policieslistTotal.value != data.data.total) {
     policieslistTotal.value = data.data.total
- policieslist.value = data.data.rows.map((item, index) => {
-    return { ...item, img: imgList[index % imgList.length], status: false };
-  });
+    policieslist.value = data.data.rows.map((item, index) => {
+      return { ...item, img: imgList[index % imgList.length], status: false };
+    });
   }
- 
+
 };
 const rbClcik = (item: any) => {
   policieslist.value.forEach((v) => {
@@ -726,7 +728,7 @@ const alarmEventsFormData = ref({
   orderDirection: "descending",
 });
 const alarmEventslist = ref<any[]>([]);
-const getBg = (item) => {
+const getBg = (level) => {
   let imgList = [
     {
       level: "轻微",
@@ -750,13 +752,11 @@ const getBg = (item) => {
     },
   ];
   let bg = ""
-  if (item.emergencyAlarmDTOs && item.emergencyAlarmDTOs.length > 0) {
-    imgList.forEach(result => {
-      if (result.level == item.emergencyAlarmDTOs[0].level) {
-        bg = result.img
-      }
-    })
-  }
+  imgList.forEach(result => {
+    if (result.level == level) {
+      bg = result.img
+    }
+  })
   if (bg == "") {
     bg = imgList[0].img;
   }
@@ -766,8 +766,8 @@ const alarmEventslistTotal = ref(0)
 const alarmEventslistFun = async () => {
   const { data } = await emergencyEventList(alarmEventsFormData.value);
   if (alarmEventslistTotal.value != data.data.total) {
-    alarmEventslistTotal.value = data.data.total;
     alarmEventslist.value = data.data.rows;
+    alarmEventslistTotal.value = data.data.total;
   }
 };
 
@@ -810,13 +810,16 @@ const alarmInfoTimer = useIntervalFn(() => {
   });
 }, 5000);
 const ltDialogShow = ref(false)
+const ltDialogShowF = ref(false)
 const ltCurrentItem = ref({})
 function openLtDialogShow(item) {
   ltCurrentItem.value = item
   ltDialogShow.value = true
+  ltDialogShowF.value = !ltDialogShow.value
 }
 function closeLtDialogShow() {
   ltDialogShow.value = false
+  ltDialogShowF.value = !ltDialogShow.value
 }
 
 
@@ -898,11 +901,15 @@ const hisShowQuery = ref({
   dEndTime: "",
   pageNum: 1,
   pageSize: 10,
-  total: 0
+  total: 0,
+  handleType:""
 })
 const hisList = ref([])
 const historyStatistics = async () => {
-  const { data } = await getEventAtatistics({
+  // const { data } = await getEventAtatistics({
+  //   type: zxSelect.value
+  // });
+   const { data } = await getEventAtatisticsByHandle({
     type: zxSelect.value
   });
   // bigscreenLBoption.series[0].data = data.data.data;
@@ -912,10 +919,12 @@ const historyStatistics = async () => {
   }
   bigscreenLBChart.setOption(bigscreenLBoption, true);
   bigscreenLBChart.off().on("click", (param) => {
+    console.log("paramparamparam",param)
     hisShow.value = true;
-    hisShowQuery.value.dStartTime = dayjs().month(param.dataIndex).day(1).format("YYYY-MM-DD")
+    hisShowQuery.value.dStartTime = dayjs().month(param.dataIndex).startOf("month").format("YYYY-MM-DD")
     hisShowQuery.value.dEndTime = dayjs().month(param.dataIndex).endOf("month").format("YYYY-MM-DD")
     hisShowQuery.value.pageNum = 1
+    hisShowQuery.value.handleType = param.seriesName
     getEmergencyList()
   })
 };
@@ -969,40 +978,47 @@ const eventInfoDetail = ref({});
 const handlePerson = ref("");
 const files = ref([]);
 const eventInfoDetailShow = ref(false)
+const eventInfoDetailShowF = ref(true)
 const openEventInfoShow = (item) => {
   eventInfoDetailShow.value = true;
   handlePerson.value = "";
   eventInfoDetail.value = item;
   handlePerson.value = "";
+  eventInfoDetailShowF.value = !eventInfoDetailShow.value
   files.value = []
-  item.handlers.forEach((v) => {
-    handlePerson.value += v.name + " ";
-  })
-  item.emergencyAlarmDTOs.forEach((v) => {
-    v.paths.forEach((path) => {
+  emergencyEventInfo(item.emergencyEventId).then(res => {
+    // res.data.data.handlers.forEach((v) => {
+    //   handlePerson.value += v.name + " ";
+    // })
+    handlePerson.value = res.data.data.handlerNames;
+    res.data.data.emergencyAlarmDTOs.forEach((v) => {
+      v.paths.forEach((path) => {
 
-      let fileName = ""
-      let sub = ""
-      const r = path.split("_")
-      if (r.length > 0) {
-        const s = r[r.length - 1].split(".")
-        sub = "." + s[s.length - 1]
-      }
-      for (let i = 1; i < r.length - 1; i++) {
-        fileName += r[i]
-      }
-      let result = {
-        emergencyAlarmId: v.emergencyAlarmId,
-        level: v.level,
-        path: path,
-        fileName: fileName + sub,
-      };
-      files.value.push(result);
+        let fileName = ""
+        let sub = ""
+        const r = path.split("_")
+        if (r.length > 0) {
+          const s = r[r.length - 1].split(".")
+          sub = "." + s[s.length - 1]
+        }
+        for (let i = 1; i < r.length - 1; i++) {
+          fileName += r[i]
+        }
+        let result = {
+          emergencyAlarmId: v.emergencyAlarmId,
+          level: v.level,
+          path: path,
+          fileName: fileName + sub,
+        };
+        files.value.push(result);
+      })
     })
   })
+
 }
 const closeEventInfoShow = () => {
   eventInfoDetailShow.value = false;
+  eventInfoDetailShowF.value = !eventInfoDetailShow.value
 };
 
 onMounted(() => {
@@ -1848,38 +1864,38 @@ $design-height: 1080;
     }
   }
 
-  .rcDialog_bottom {
-    width: 100%;
-    height: adaptiveHeight(292);
+  // .rcDialog_bottom {
+  //   width: 100%;
+  //   height: adaptiveHeight(292);
 
-    :deep(.el-scrollbar) {
-      .el-scrollbar__wrap {
-        width: 100%;
-        display: flex;
-        justify-content: center;
+  //   :deep(.el-scrollbar) {
+  //     .el-scrollbar__wrap {
+  //       width: 100%;
+  //       display: flex;
+  //       justify-content: center;
 
-        .rcDialog_bottom_item {
-          width: 100%;
-          display: flex;
-          margin-top: adaptiveHeight(30);
+  //       .rcDialog_bottom_item {
+  //         width: 100%;
+  //         display: flex;
+  //         margin-top: adaptiveHeight(30);
 
-          span {
-            font-size: adaptiveFontSize(14);
+  //         span {
+  //           font-size: adaptiveFontSize(14);
 
-            &:nth-child(1) {
-              width: adaptiveWidth(100);
-              color: #687f92;
-            }
+  //           &:nth-child(1) {
+  //             width: adaptiveWidth(100);
+  //             color: #687f92;
+  //           }
 
-            &:nth-child(2) {
-              width: adaptiveWidth(191);
-              color: #ffffff;
-            }
-          }
-        }
-      }
-    }
-  }
+  //           &:nth-child(2) {
+  //             width: adaptiveWidth(191);
+  //             color: #ffffff;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 .rbDialog {
@@ -1914,38 +1930,38 @@ $design-height: 1080;
     }
   }
 
-  .rbDialog_bottom {
-    width: 100%;
-    height: adaptiveHeight(292);
+  // .rbDialog_bottom {
+  //   width: 100%;
+  //   height: adaptiveHeight(292);
 
-    :deep(.el-scrollbar) {
-      .el-scrollbar__wrap {
-        width: 100%;
-        display: flex;
-        justify-content: center;
+  //   :deep(.el-scrollbar) {
+  //     .el-scrollbar__wrap {
+  //       width: 100%;
+  //       display: flex;
+  //       justify-content: center;
 
-        .rbDialog_bottom_nei {
-          width: 100%;
-          display: flex;
-          margin-top: adaptiveHeight(30);
+  //       .rbDialog_bottom_nei {
+  //         width: 100%;
+  //         display: flex;
+  //         margin-top: adaptiveHeight(30);
 
-          span {
-            font-size: adaptiveFontSize(14);
+  //         span {
+  //           font-size: adaptiveFontSize(14);
 
-            &:nth-child(1) {
-              width: adaptiveWidth(105);
-              color: #687f92;
-            }
+  //           &:nth-child(1) {
+  //             width: adaptiveWidth(105);
+  //             color: #687f92;
+  //           }
 
-            &:nth-child(2) {
-              width: adaptiveWidth(191);
-              color: #ffffff;
-            }
-          }
-        }
-      }
-    }
-  }
+  //           &:nth-child(2) {
+  //             width: adaptiveWidth(191);
+  //             color: #ffffff;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 .preview {

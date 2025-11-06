@@ -59,7 +59,7 @@
           <Vue3SeamlessScroll ref="equipmentlistRef" :key="equipmentlist.length" :list="equipmentlist" :direction="'up'"
             hover class="scrool">
             <template v-slot="{ data }">
-              <div class="bigscreen_lc_bottom_nei_b">
+              <div @click="openEquipmentDetailShow(data?.equipmentId)" class="bigscreen_lc_bottom_nei_b">
                 <el-popover effect="dark" class="box-item" :content="data?.equipmentCode" placement="top-start">
                   <template #reference>
                     <span>
@@ -248,11 +248,11 @@
           <img src="/public/img/zuo.svg" alt="" @click="ciShuLeftClick" style="margin-left: 5px" />
           <span>{{
             dayjs(ciShuTimer.startTime).format("MM月DD日")
-            }}</span>
+          }}</span>
           <span>-</span>
           <span>{{
             dayjs(ciShuTimer.endTime).format("MM月DD日")
-            }}</span>
+          }}</span>
           <img src="/public/img/you.svg" alt="" @click="ciShuRightClick" style="margin-right: 5px" />
         </div>
       </div>
@@ -361,6 +361,38 @@
       <!-- <div>倍速播放×1</div> -->
     </div>
   </div>
+
+  <div v-show="equipmentDetailShow" class="rzDialog">
+    <div class="rzDialog_top">
+      <span>设备信息</span>
+      <img :src="img9" alt="" srcset="" @click="closeEquipmentDetailShow" />
+    </div>
+    <div class="rzDialog_bottom">
+      <el-scrollbar height="100%">
+        <el-descriptions :column="1" size="small" direction="horizontal" class="description-my">
+        <el-descriptions-item label="设备编号：">{{ equipmentDetail?.equipmentCode }}</el-descriptions-item>
+        <el-descriptions-item label="设备名称：">{{ equipmentDetail?.equipmentName }}</el-descriptions-item>
+        <el-descriptions-item label="设备型号：">{{ equipmentDetail?.equipmentType }}</el-descriptions-item>
+        <el-descriptions-item label="生产厂家：">{{ equipmentDetail?.manufacturer }}</el-descriptions-item>
+        <el-descriptions-item label="购置日期：">{{ equipmentDetail?.purchaseDate }}</el-descriptions-item>
+        <el-descriptions-item label="安装位置：">{{ equipmentDetail?.installationLocation }}</el-descriptions-item>
+        <el-descriptions-item label="在线状态：">
+          <el-tag :type="equipmentDetail?.isOnline ? 'success' : 'danger'">
+            {{ equipmentDetail?.isOnline ? "在线" : "离线" }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item v-for="item in equipmentDetail?.sensorList" :label="`${item?.key}：`">
+          <span :style="{
+            color: item?.color
+          }">{{ item?.value }}</span>
+        </el-descriptions-item>
+      </el-descriptions>
+      </el-scrollbar>
+    </div>
+  </div>
+
+
+
 </template>
 
 <script lang="ts" setup>
@@ -377,6 +409,7 @@ import {
   historicalStatisticsList,
   repairStatistics,
   getRunningTime,
+  getEquipmentDetail,
 } from "../../api/equipment/index";
 import dayjs from "dayjs";
 // import { Vue3SeamlessScroll } from "vue3-seamless-scroll";
@@ -402,9 +435,11 @@ function resize() {
 }
 
 const rtStatus = ref(false);
+const rtStatusF = ref(true);
 const videoRef = ref();
 const rtClick = (item) => {
   rtStatus.value = !rtStatus.value;
+  rtStatusF.value = !rtStatus.value
   getStreamUrlApi(item.channelid).then((res) => {
     console.log("res.data.data.wsflv", res.data.data.wsflv);
     const url = new URL(res.data.data.wsflv);
@@ -415,6 +450,8 @@ const rtClick = (item) => {
 };
 const rtcanleClick = () => {
   rtStatus.value = false;
+  rtStatusF.value = !rtStatus.value
+
 };
 
 //监测数据
@@ -485,6 +522,8 @@ const equipmentFormData = ref({
 const equipmentId = ref(0);
 const equipmentIds = ref<number[]>([]);
 const equipmentlist = ref<any[]>([]);
+const equipmentDetail = ref()
+const equipmentDetailShow = ref(false)
 const equipmentlist2 = ref<any[]>([]);
 const equipmentListFun = async () => {
   const { data } = await equipmentList(equipmentFormData.value);
@@ -494,6 +533,18 @@ const equipmentListFun = async () => {
 const searchEquipment = (val) => {
   equipmentListFun();
 };
+const openEquipmentDetailShow = (id: number) => {
+  // equipmentDetail.value = item
+  getEquipmentDetail(id).then(res => {
+    equipmentDetail.value = res.data.data
+  })
+  equipmentDetailShow.value = true
+}
+
+const closeEquipmentDetailShow = () => {
+  // equipmentDetail.value = item
+  equipmentDetailShow.value = false
+}
 
 
 //设备运行状态
@@ -615,9 +666,11 @@ const repairListTimer = useIntervalFn(() => {
 }, 10000)
 const weiXiuDeatail = ref()
 const weiXiuDeatailShow = ref(false)
+const weiXiuDeatailShowF = ref(true)
 const rcClick = async (item: any) => {
   weiXiuDeatail.value = item
   weiXiuDeatailShow.value = true
+  weiXiuDeatailShowF.value = !weiXiuDeatailShow.value
   // repairList.value.forEach((v) => {
   //   if (item.recordId == v.recordId) {
   //     v.status = !v.status;
@@ -628,6 +681,7 @@ const rcClick = async (item: any) => {
 };
 const rccanleClick = () => {
   weiXiuDeatailShow.value = false
+  weiXiuDeatailShowF.value = !weiXiuDeatailShow.value
 };
 
 let bigscreenRCChart: any = null;
@@ -697,7 +751,7 @@ async function getYzData() {
   bigscreenRCoption.series[0].data = data.data.data;
   if (Array.isArray(data.data.data) && data.data.data.length > 0) {
     // @ts-ignore
-    bigscreenRCoption.yAxis.min = 1;
+    bigscreenRCoption.yAxis.min = 0;
     // @ts-ignore
     bigscreenRCoption.yAxis.max = Math.max(...data.data.data, 6); // 至少6
     if (bigscreenRCoption.yAxis.max > 6) {
@@ -749,9 +803,13 @@ const inspectionListTimer = useIntervalFn(() => {
   })
 }, 10000)
 const xunJianDetail = ref()
+const xunJianShow = ref(false)
+const xunJianShowF = ref(true)
+
 const rbClick = (item: any) => {
   xunJianDetail.value = item
-  xunJianShow.value = item
+  xunJianShow.value = true
+  xunJianShowF.value = !xunJianShow.value
   // inspectionlist.value.forEach((v) => {
   //   if (item.recordId == v.recordId) {
   //     v.status = !v.status;
@@ -760,10 +818,9 @@ const rbClick = (item: any) => {
   //   }
   // });
 };
-const xunJianShow = ref(false)
 const rbcanleClick = () => {
   xunJianShow.value = false;
-  item.status = false;
+  xunJianShowF.value = !xunJianShow.value
 };
 
 const yzRadio = ref("week");
@@ -1634,6 +1691,69 @@ $design-height: 1080;
   }
 }
 
+.rzDialog {
+  width: adaptiveWidth(440);
+  height: adaptiveHeight(280);
+  background: url("/public/img/弹窗背景.png") no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  top: adaptiveHeight(400);
+  left: adaptiveWidth(480);
+  z-index: 10;
+
+  .rzDialog_top {
+    width: 100%;
+    height: adaptiveHeight(45);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      font-size: adaptiveFontSize(20);
+      color: #ffffff;
+      padding-left: adaptiveWidth(15);
+      font-family: youshe;
+    }
+
+    img {
+      width: adaptiveWidth(8);
+      height: adaptiveHeight(8);
+      padding-right: adaptiveWidth(10);
+      cursor: pointer;
+    }
+  }
+
+  .rzDialog_bottom {
+    width: adaptiveWidth(420);
+    height: adaptiveHeight(215);
+    margin-left: adaptiveWidth(10);
+    display: flex;
+    flex-direction: column;
+    // align-items: center;
+    justify-content: center;
+
+    .rzDialog_bottom_video {
+      :deep(#container) {
+        width: adaptiveWidth(420);
+        height: adaptiveHeight(215);
+        object-fit: cover;
+      }
+
+      object-fit: cover;
+    }
+
+    img {
+      width: 100%;
+      height: adaptiveHeight(195);
+    }
+
+    div {
+      font-size: adaptiveFontSize(14);
+      color: #ffffff;
+    }
+  }
+}
+
 .rbDialog {
   width: adaptiveWidth(440);
   height: adaptiveHeight(280);
@@ -1933,5 +2053,13 @@ $design-height: 1080;
     width: adaptiveWidth(100);
     white-space: nowrap;
   }
+}
+
+
+.description-my {
+  --el-fill-color-blank: transparent;
+  --el-text-color-primary: white;
+  --el-text-color-regular: white;
+
 }
 </style>

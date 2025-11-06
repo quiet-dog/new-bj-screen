@@ -17,3 +17,7 @@ export function getEventAtatistics(params: { type: string }) {
   return http.get("/manage/emergencyEvent/getStock", { params });
 }
 
+export function getEventAtatisticsByHandle(params: { type: string }) {
+  return http.get("/manage/emergencyEvent/getStockByHandle", { params });
+}
+

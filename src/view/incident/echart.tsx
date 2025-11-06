@@ -292,24 +292,127 @@ export function get3dOption(sourceData) {
 export function getHistoryData(sourceData) {
     let barData = {
         name: '数量',
-        data: sourceData.data,
-        // xAxis: ['水表', '电表', '监控', '电梯', '消防', '门禁'],
-        xAxis: sourceData.times,
+        data: sourceData.xdata,
+        xAxis: sourceData.xdata,
+        handle: sourceData.handle,
+        unHandle: sourceData.unHandle
     }
+    // let option = {
+    //     tooltip: {
+    //         trigger: 'axis',
+    //     },
+    //     grid: {
+    //         left: '10px',
+    //         right: '10px',
+    //         bottom: '10px',
+    //         top: '50px',
+    //         containLabel: true,
+    //     },
+    //     calculable: true,
+    //     xAxis: [
+    //         {
+    //             data: barData.xAxis,
+    //             type: 'category',
+    //             axisLabel: {
+    //                 interval: 0, // 解决x轴名称过长问题
+    //                 textStyle: {
+    //                     color: '#8fd5f3',
+    //                     fontSize: 12,
+    //                 },
+    //             },
+    //             axisLine: {
+    //                 lineStyle: {
+    //                     //y轴网格线设置
+    //                     color: '#032e42',
+    //                     width: 1,
+    //                 },
+    //             },
+    //             z: 2,
+    //         },
+    //     ],
+    //     yAxis: [
+    //         {
+    //             type: 'value',
+    //             nameGap: 8,
+    //             nameTextStyle: {
+    //                 color: '#8fd5f3',
+    //             },
+
+    //             axisTick: {
+    //                 show: false,
+    //             },
+    //             axisLine: {
+    //                 show: false,
+    //                 lineStyle: {
+    //                     //y轴网格线设置
+    //                     color: '#032e42',
+    //                     width: 1,
+    //                 },
+    //             },
+    //             splitLine: {
+    //                 //保留网格线
+    //                 show: true,
+    //                 lineStyle: {
+    //                     //y轴网格线设置
+    //                     color: '#032e42',
+    //                     width: 1,
+    //                 },
+    //             },
+    //             axisLabel: {
+    //                 show: true,
+    //                 textStyle: {
+    //                     fontSize: 12,
+    //                     color: '#8fd5f3', //字体颜色
+    //                 },
+    //             },
+    //             minInterval: 1, //y轴最小间隔
+    //         },
+    //     ],
+    //     series: [
+    //         {
+    //             name: barData.name,
+    //             type: 'pictorialBar',
+    //             z: 1,
+    //             barWidth: 12,
+    //             symbol: 'path://M0,10 L10,10 L5,0 L0,10 z',
+    //             label: {
+    //                 show: false,
+    //                 position: 'top',
+    //                 textStyle: {
+    //                     color: '#969a9d',
+    //                 },
+    //             },
+    //             itemStyle: {
+    //                 // color:'red'
+    //                 color: function (params) {
+    //                     // var colorList = ['#1c725e', '#1b8390', '#1d498a', '#4b2b9b', '#b79631', '#b44738']
+    //                     // return colorList[params.dataIndex]
+    //                     return "#1c725e"
+    //                 },
+    //             },
+    //             data: barData.data,
+    //             // 柱形顶部显示数据
+    //             label: {
+    //                 show: true,
+    //                 position: "top",
+    //                 distance: 10,
+    //                 color: "#fff",
+    //                 fontSize: 13
+    //             }
+    //         },
+    //     ],
+    // }
+
     let option = {
-        // backgroundColor: '#011026',
-        // title: {
-        //    text: '单位/kw/h',
-        //    textStyle: {
-        //       fontSize: 12,
-        //       fontWeight: 'normal',
-        //       color: '#8fd5f3', //标题颜色
-        //    },
-        //    top: '5px',
-        //    left: '0%',
-        // },
         tooltip: {
             trigger: 'axis',
+        },
+        legend: {
+            data: ['已处置', '未处置'],
+            top: 10,
+            textStyle: {
+                color: '#8fd5f3',
+            },
         },
         grid: {
             left: '10px',
@@ -321,10 +424,10 @@ export function getHistoryData(sourceData) {
         calculable: true,
         xAxis: [
             {
-                data: barData.xAxis,
                 type: 'category',
+                data: barData.xAxis, // 例如 ['1月', '2月', '3月', ...]
                 axisLabel: {
-                    interval: 0, // 解决x轴名称过长问题
+                    interval: 0,
                     textStyle: {
                         color: '#8fd5f3',
                         fontSize: 12,
@@ -332,7 +435,6 @@ export function getHistoryData(sourceData) {
                 },
                 axisLine: {
                     lineStyle: {
-                        //y轴网格线设置
                         color: '#032e42',
                         width: 1,
                     },
@@ -343,28 +445,23 @@ export function getHistoryData(sourceData) {
         yAxis: [
             {
                 type: 'value',
-                // name: "单位/个",
                 nameGap: 8,
                 nameTextStyle: {
                     color: '#8fd5f3',
                 },
-
                 axisTick: {
                     show: false,
                 },
                 axisLine: {
                     show: false,
                     lineStyle: {
-                        //y轴网格线设置
                         color: '#032e42',
                         width: 1,
                     },
                 },
                 splitLine: {
-                    //保留网格线
                     show: true,
                     lineStyle: {
-                        //y轴网格线设置
                         color: '#032e42',
                         width: 1,
                     },
@@ -373,45 +470,47 @@ export function getHistoryData(sourceData) {
                     show: true,
                     textStyle: {
                         fontSize: 12,
-                        color: '#8fd5f3', //字体颜色
+                        color: '#8fd5f3',
                     },
                 },
-                minInterval: 1, //y轴最小间隔
+                minInterval: 1,
             },
         ],
         series: [
             {
-                name: barData.name,
-                type: 'pictorialBar',
-                z: 1,
+                name: '已处置',
+                type: 'bar',
                 barWidth: 12,
-                symbol: 'path://M0,10 L10,10 L5,0 L0,10 z',
-                label: {
-                    show: false,
-                    position: 'top',
-                    textStyle: {
-                        color: '#969a9d',
-                    },
-                },
                 itemStyle: {
-                    // color:'red'
-                    color: function (params) {
-                        // var colorList = ['#1c725e', '#1b8390', '#1d498a', '#4b2b9b', '#b79631', '#b44738']
-                        // return colorList[params.dataIndex]
-                        return "#1c725e"
-                    },
+                    color: '#1c725e', // 绿色
                 },
-                data: barData.data,
-                // 柱形顶部显示数据
                 label: {
                     show: true,
-                    position: "top",
+                    position: 'top',
                     distance: 10,
-                    color: "#fff",
-                    fontSize: 13
-                }
+                    color: '#fff',
+                    fontSize: 13,
+                },
+                data: barData.handle, // 例如 [12, 15, 9, ...]
+            },
+            {
+                name: '未处置',
+                type: 'bar',
+                barWidth: 12,
+                itemStyle: {
+                    color: '#b44738', // 红色
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    distance: 10,
+                    color: '#fff',
+                    fontSize: 13,
+                },
+                data: barData.unHandle, // 例如 [3, 6, 8, ...]
             },
         ],
-    }
+    };
+
     return option;
 }

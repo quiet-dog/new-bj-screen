@@ -35,3 +35,9 @@ export interface processListRes {
 export function processList(params: processListRes) {
   return http.get("/manage/craft-process", { params });
 }
+
+
+//获取应急调度-报警事件信息
+export function emergencyEventInfo(emergencyEventId: number) {
+  return http.get(`/manage/emergencyEvent/${emergencyEventId}`);
+}
