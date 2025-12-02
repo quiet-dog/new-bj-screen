@@ -189,15 +189,15 @@
             <template v-slot="{ data }">
               <div style="cursor: pointer;" @click="clickFormItem(data?.thresholdId)" class="bigscreen_rb_bottom_nei_b">
                 <span>
-                  <el-tooltip :content="data?.deviceName">
+                  <el-tooltip :content="data?.equipment?.equipmentName">
                     <span :class="{
                       'high_node_red': equipmentHigh
-                    }">{{ data?.deviceName }}</span>
+                    }">{{ data?.equipment?.equipmentName }}</span>
                   </el-tooltip>
                 </span>
                 <span>
-                  <el-tooltip :content="data?.area">
-                    {{ data?.area }}
+                  <el-tooltip :content="data?.equipment?.installationLocation">
+                    {{ data?.equipment?.installationLocation }}
                   </el-tooltip>
                 </span>
                 <span>{{ data?.threshold.sensorName }}</span>
@@ -1103,7 +1103,7 @@ $design-height: 1080;
   width: adaptiveWidth(443);
   height: adaptiveHeight(445);
   position: relative;
-  ;
+  z-index: 999;
 }
 
 .bigscreen_lt {

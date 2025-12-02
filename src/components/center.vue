@@ -17,6 +17,10 @@
       </div>
     </div>
   </div>
+
+  <div class="scada-center">
+    <scada-center :top="'25%'" :svgViewTop="'25%'" :isIgnoreAlarm="false"></scada-center>
+  </div>
   <div class="bigscreen_cb">
     <div class="bigscreen_cb_nei"></div>
     <div class="bigscreen_cb_dialog" v-if="useDeviceStore().isShowDetail">
@@ -64,7 +68,8 @@ import TuThree from "./tuthree/index.vue";
 import TuFour from "./tufour/index.vue";
 import { ElButton, ElTabs } from "element-plus";
 import { useDeviceStore } from "./device";
-import { useIntervalFn } from '@vueuse/core'
+import { useIntervalFn } from '@vueuse/core';
+import scadaCenter from "./scada_center.vue";
 
 
 const count1 = ref(0);
@@ -102,6 +107,7 @@ function shuimg(val: string): string {
 const { pause, resume, isActive } =  useIntervalFn(() => {
   geteventTotalFun();
 }, 5000)
+
 onMounted(() => {
   geteventTotalFun();
 });
@@ -229,7 +235,7 @@ $design-height: 1080;
   .bigscreen_cb_nei {
     width: adaptiveWidth(840);
     height: adaptiveHeight(642);
-    background: url("/public/img/主体图片.png") no-repeat;
+    // background: url("/public/img/主体图片.png") no-repeat;
     background-size: 100% 100%;
   }
 
@@ -241,5 +247,9 @@ $design-height: 1080;
     overflow: scroll;
     overflow-x: scroll;
   }
+}
+
+.scada-center {
+  // 点击事件能穿透到底层
 }
 </style>

@@ -1539,6 +1539,7 @@ $design-height: 1080;
 .bigscreen_rb {
   width: adaptiveWidth(443);
   height: adaptiveHeight(292);
+  z-index: 999;
 }
 
 .bigscreen_lt {

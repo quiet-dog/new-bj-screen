@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
-        <Vue3SeamlessScroll :key="alarmInformationlistValueTotal" style="width: 100%;overflow: hidden;"
+        <Vue3SeamlessScroll :key="alarmInformationlistValueTotal" style="width: 100%;"
           :list="alarmInformationlistValue" hover class="scrool scroolMy">
           <template v-slot="{ data }">
             <div style="cursor: pointer;" class="bigscreen_lt_bottom_r_nei" @click="openLtDialogShow(data)">
@@ -72,7 +72,7 @@
     <div class="bigscreen_lb_top">
       <div class="bigscreen_lb_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>报警历史</span>
+        <span>处置历史</span>
       </div>
       <el-select @change="zxChangeSelect" v-model="zxSelect" size="small" class="selectcss">
         <ElOption label="政策法规类" value="政策法规类" />
@@ -120,7 +120,7 @@
     <div class="bigscreen_rt_top">
       <div class="bigscreen_rt_top_l">
         <img src="/public/img/光标.png" alt="" />
-        <span>事件报告</span>
+        <span>报警处置</span>
       </div>
       <el-input class="inputcss" placeholder="请输入事件报告" :prefix-icon="Search" clearable
         v-model="alarmEventsFormData.type" @change="alarmEventslistFun" />
@@ -303,7 +303,7 @@
 
   <div v-show="ltDialogShow" class="ltTrendDialog">
     <div class="ltTrendDialog_top">
-      <span>事件详情</span>
+      <span>隐患信息</span>
       <img :src="img9" alt="" srcset="" @click="closeLtDialogShow" />
     </div>
     <div class="ltTrendDialog_bottom">
@@ -1064,6 +1064,8 @@ $design-height: 1080;
 .bigscreen_rb {
   width: adaptiveWidth(443);
   height: adaptiveHeight(292);
+  z-index: 999;
+
 }
 
 #formStyle {
@@ -1230,6 +1232,7 @@ $design-height: 1080;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      overflow-y: hidden;
 
 
     }

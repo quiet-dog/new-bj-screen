@@ -35,6 +35,7 @@ export function useEditThHook() {
   });
   const num = ref(1)
   const clickFormItem = (id) => {
+    return
     getThresholdInfo(id).then(res => {
       formData.value = res.data.data
       num.value = res.data.data?.values?.length

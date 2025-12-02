@@ -1,58 +1,29 @@
 <template>
-	<div class="bigscreen_cb">
+	<div class="bigscreen_cb" :style="{ 'top': top }">
+		<div class="bigscreen_cb_ignore" v-if="isIgnoreAlarm" @click="ignoreAlarm()">
+			<div>
+				忽略报警
+			</div>
+		</div>
 		<div class="bigscreen_cb_switcher">
-			<div class="bigscreen_cb_switcher_item" @click="switchZone(1)">
+			<div class="bigscreen_cb_switcher_item" v-for="floor in floors"
+				:class="{ 'alarm-box': alarmedFloor.includes(floor.code) }" @click="switchZone(floor.code)">
 				<div :style="{
-					color: floorStore.currentFloor === 1 ? '#ffffff' : '#00ABFF',
+					color: floorStore.currentFloor === floor.code ? '#ffffff' : '#00ABFF',
 				}">
-					一层
+					{{ floor.name }}
 				</div>
-				<img v-if="floorStore.currentFloor === 1" src="/img/切换图标.png" alt="" />
+				<img v-if="floorStore.currentFloor === floor.code" src="/img/切换图标.png" alt="" />
 			</div>
-			<div class="bigscreen_cb_switcher_item" @click="switchZone(21)">
-				<div :style="{
-					color: floorStore.currentFloor === 21 ? '#ffffff' : '#00ABFF',
-				}">
-					二层-1
-				</div>
-				<img v-if="floorStore.currentFloor === 21" src="/img/切换图标.png" alt="" />
-			</div>
-			<div class="bigscreen_cb_switcher_item" @click="switchZone(22)">
-				<div :style="{
-					color: floorStore.currentFloor === 22 ? '#ffffff' : '#00ABFF',
-				}">
-					二层-2
-				</div>
-				<img v-if="floorStore.currentFloor === 22" src="/img/切换图标.png" alt="" />
-			</div>
-			<div class="bigscreen_cb_switcher_item" @click="switchZone(3)">
-				<div :style="{
-					color: floorStore.currentFloor === 3 ? '#ffffff' : '#00ABFF',
-				}">
-					三层
-				</div>
-				<img v-if="floorStore.currentFloor === 3" src="/img/切换图标.png" alt="" />
-			</div>
-			<!-- <div class="bigscreen_cb_switcher_item" @click="switchZone(32)">
-				<div :style="{
-					color: floorStore.currentFloor === 32 ? '#ffffff' : '#00ABFF',
-				}">
-					三层-2
-				</div>
-				<img v-if="floorStore.currentFloor === 32" src="/img/切换图标.png" alt="" />
-			</div>
-			<div class="bigscreen_cb_switcher_item" @click="switchZone(33)">
-				<div :style="{
-					color: floorStore.currentFloor === 33 ? '#ffffff' : '#00ABFF',
-				}">
-					三层-3
-				</div>
-				<img v-if="floorStore.currentFloor === 33" src="/img/切换图标.png" alt="" />
-			</div> -->
 		</div>
 		<div class="bigscreen_cb_nei">
-			<img style="width: 100%;" :src="zoneMap" alt="" />
+			<svg-view :name="floorStore.currentFloor" :initialScale="0.8" :svgViewTop="svgViewTop"
+				@element-click="onSvgElementClick" />
+			<!-- 如需回退到图片：<img style="width: 100%;" :src="imgZoneMap" alt="" /> -->
 		</div>
+		<scada-window v-model="scadaWindowStore.scadaWindowVisible"
+			:data="scadaWindowStore.scadaWindowData"></scada-window>
+		<div></div>
 	</div>
 </template>
 
@@ -77,18 +48,83 @@
 	import { ElButton, ElTabs } from "element-plus";
 	import { useDeviceStore } from "./device";
 	import { useIntervalFn } from '@vueuse/core'
-	import { useFloorStore } from "../store/scada_data";
+	import { useFloorStore, useScadaWindowStore, useScadaAlarmStore, useEquipmentStore, useScadaSvgViewStore } from "../store/scada_data";
+	import SvgView from "./svg_view.vue";
+	import ScadaWindow from "./scada_window.vue";
+	const { top } = defineProps({
+		top: {
+			type: String,
+		},
+		svgViewTop: {
+			type: String,
+		},
+		isIgnoreAlarm: {
+			type: Boolean,
+			default: true,
+		},
+	})
 
 	const count1 = ref(0);
 	const count2 = ref(0);
 
 	const floorStore = useFloorStore();
-
-	const zoneMap = ref("/public/img/scada/1.png");
+	const scadaWindowStore = useScadaWindowStore();
+	const scadaAlarmStore = useScadaAlarmStore();
+	const equipmentStore = useEquipmentStore();
+	const scadaSvgViewStore = useScadaSvgViewStore();
+	// 传给 SvgView 的“键”，与 src/assets/svg 下的文件对应（不含 .svg）。
+	// 比如有 1.svg、21.svg... 则这里用 "1"、"21"。
+	// 如仍需保留原先 PNG 的路径，可单独维护：
+	// const imgZoneMap = ref("/public/img/scada/1.png")
+	// const scadaWindowData = ref({ "code": { "code": "8M117", "name": "制水间", "el": "[object SVGPolygonElement]", "event": "[object PointerEvent]" } });
+	const ignoreAlarm = () => {
+		scadaAlarmStore.clearAlarm();
+	}
+	const floors = ref([{
+		code: 1,
+		name: "一层"
+	}, {
+		code: 21,
+		name: "二层-1"
+	}, {
+		code: 22,
+		name: "二层-2"
+	}, {
+		code: 31,
+		name: "三层-1"
+	}, {
+		code: 32,
+		name: "三层-2"
+	}, {
+		code: 33,
+		name: "三层-3"
+	}])
+	const alarmedFloor = ref([]);
+	watch(() => scadaAlarmStore.alarmTime, (newVal) => {
+		if (newVal === '') {
+			alarmedFloor.value = [];
+			return;
+		}
+		if (scadaAlarmStore.equipment.equipmentCode && scadaAlarmStore.equipment.equipmentCode != '') {
+			let map = equipmentStore.svgCodeNameList.find(item => {
+				return item.code === scadaAlarmStore.equipment.installationLocation
+			}).map
+			alarmedFloor.value.push(parseInt(map));
+			floorStore.currentFloor = parseInt(map);
+		}
+	}, { immediate: true });
+	const onSvgElementClick = (data) => {
+		console.log("SVG 元素被点击：", data);
+		scadaWindowStore.scadaWindowData = data;
+		scadaWindowStore.scadaWindowVisible = true;
+		// 在这里处理点击事件，例如显示详情弹窗等
+	}
 
 	const switchZone = (zone: number) => {
+		scadaSvgViewStore.svgHighlight = '';
 		floorStore.currentFloor = zone;
-		zoneMap.value = zone==3? `/public/img/scada/m251013936.svg` : `/public/img/scada/${zone}.png`;
+		// 切换 Svg 键（例如 1 -> 加载 src/assets/svg/1f.svg）
+		// imgZoneMap.value = `/public/img/scada/${zone}.png`
 	}
 
 	const geteventTotalFun = async () => {
@@ -246,6 +282,29 @@
 		align-items: center;
 		justify-content: center;
 
+		.bigscreen_cb_ignore {
+			position: fixed;
+			left: 50%;
+			transform: translateX(-50%);
+			bottom: adaptiveHeight(140);
+
+			div {
+				color: white;
+				width: adaptiveWidth(112);
+				height: adaptiveHeight(56);
+				background: url("/img/dbwenan.png") no-repeat;
+				background-size: 100% 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+				position: relative;
+				/* 圆角与裁剪，保证遮罩与按钮一致 */
+				border-radius: adaptiveHeight(28);
+				overflow: hidden;
+			}
+		}
+
 		.bigscreen_cb_switcher {
 			display: flex;
 			flex-direction: row;
@@ -256,6 +315,9 @@
 			row-gap: adaptiveHeight(20);
 
 			.bigscreen_cb_switcher_item {
+				/* 作为遮罩定位的参考容器 */
+				position: relative;
+
 				div {
 					width: adaptiveWidth(112);
 					height: adaptiveHeight(56);
@@ -266,6 +328,9 @@
 					align-items: center;
 					cursor: pointer;
 					position: relative;
+					/* 圆角与裁剪，保证遮罩与按钮一致 */
+					border-radius: adaptiveHeight(28);
+					overflow: hidden;
 				}
 
 				img {
@@ -280,6 +345,26 @@
 				align-items: center;
 				color: rgba(255, 255, 255, 1);
 				font-size: adaptiveFontSize(20);
+
+				/* 将遮罩应用到内层按钮，使其继承圆角 */
+				&.alarm-box {
+					div::after {
+						content: "";
+						position: absolute;
+						inset: 0;
+						background: #ff0000;
+						opacity: 0;
+						pointer-events: none;
+						z-index: 1;
+						border-radius: inherit;
+						animation: alarmFlash 1s infinite;
+					}
+
+					/* 红色发光（与闪烁同步） */
+					div {
+						animation: alarmGlow 1s infinite;
+					}
+				}
 			}
 		}
 
@@ -296,6 +381,32 @@
 			// border: 1px solid red;
 			overflow: scroll;
 			overflow-x: scroll;
+		}
+	}
+
+	/* 统一的警报闪烁动画 */
+	@keyframes alarmFlash {
+
+		0%,
+		100% {
+			opacity: 0;
+		}
+
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	/* 红色发光动画：脉冲式 box-shadow */
+	@keyframes alarmGlow {
+
+		0%,
+		100% {
+			box-shadow: 0 0 0 rgba(255, 0, 0, 0);
+		}
+
+		50% {
+			box-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 20px rgba(255, 0, 0, 0.5);
 		}
 	}
 </style>
