@@ -26,7 +26,7 @@
         <div :style="{
           color: $route.path === '/scada' ? '#ffffff' : '#00ABFF',
         }">
-          综合数据
+          报警中心
         </div>
         <img v-if="$route.path === '/scada'" style="position: absolute; bottom: 0" src="/img/切换图标.png" alt="" />
       </div>
@@ -71,9 +71,9 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const hres = ref(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=628e2892c1b6a84d1e13a0a13bb89cc0`)
+const hres = ref(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=387a7daa7ee530c425b41cd8fc9c1ac2`)
 function getHres() {
-  window.open(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=628e2892c1b6a84d1e13a0a13bb89cc0`, '_blank');
+  window.open(`http://${location.hostname}:7177/third_path/fengxianpingguxitong/webrisk/bjsw/login?random=30c267c666805e9227d8b62544c3ee0de05a0a59854aafc523ad36f641943cc68f2ca086b4e019a383e578002bbd3a9b&redirect_url=/backstage/riskAssessment/riskMapConfig/riskMapDetail?taskId=387a7daa7ee530c425b41cd8fc9c1ac2`, '_blank');
 }
 
 let times: any;

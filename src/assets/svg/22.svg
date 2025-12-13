@@ -15,12 +15,13 @@
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-247.206 527.786 -320.471 924.466 8.47 927.21 44.92 525.68" data-code="8R207" data-name="CNC服清洗间"/>
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-170.456 295.823 -216.958 524.537 44.699 520.079 70.042 293.126" data-code="8R208" data-name="净衣暂存间"/>
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-523.815 523.626 -221.716 522.638 -175.781 297.263 -467.117 297.195" data-code="8R209" data-name="灭后间"/>
-  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-915.347 298.907 -1061.895 673.311 -280.287 670.483 -252.323 527.941 -532.157 530.204 -474.851 297.195" data-code="8E205" data-name="洁净服整衣间"/>
-  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1136.706 523.368 -1177.963 618.369 -1043.87 621.001 -1004.436 523.774" data-code="8E204" data-name="物流气闸"/>
-  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1290.214 741.344 -1090.702 740.341 -1046.544 622.5 -1233.239 622.615" data-code="8E202" data-name="二更"/>
+  <polygon style="fill-opacity: 0.5; fill: rgb(251, 255, 97);" points="-915.347 298.907 -1061.895 673.311 -280.287 670.483 -252.323 527.941 -532.157 530.204 -474.851 297.195" data-code="8E205" data-name="洁净服整衣间"/>
+  <polygon style="fill-opacity: 0.5; fill: rgb(251, 255, 97);" points="-1136.706 523.368 -1177.963 618.369 -1043.87 621.001 -1004.436 523.774" data-code="8E204" data-name="物流气闸"/>
+  <polygon style="fill-opacity: 0.5; fill: rgb(251, 255, 97);" points="-1290.214 741.344 -1090.702 740.341 -1046.544 622.5 -1233.239 622.615" data-code="8E202" data-name="二更"/>
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1205.352 298.123 -1262.312 406.76 -959.953 407.026 -918.133 298.439" data-code="8R201" data-name="20-25℃暖房"/>
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1319.573 515.731 -1004.762 519.755 -961.945 410.171 -1262.122 408.953" data-code="8R202" data-name="30-35℃暖房"/>
-  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1320.923 524.852 -1370.52 619.998 -1181.133 618.596 -1139.311 523.642" data-code="8E203" data-name="缓冲间"/>
-  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1427.726 741.73 -1292.753 741.453 -1235.216 622.096 -1372.058 622.748" data-code="8E201" data-name="缓冲间"/>
+  <polygon style="fill-opacity: 0.5; fill: rgb(251, 255, 97);" points="-1320.923 524.852 -1370.52 619.998 -1181.133 618.596 -1139.311 523.642" data-code="8E203" data-name="缓冲间"/>
+  <polygon style="fill-opacity: 0.5; fill: rgb(251, 255, 97);" points="-1427.726 741.73 -1292.753 741.453 -1235.216 622.096 -1372.058 622.748" data-code="8E201" data-name="缓冲间"/>
   <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1427.547 745.837 -1525.215 928.572 -323.985 927.753 -281.364 677.177 -1066.78 681.65 -1089.623 745.679" data-code="8R211" data-name="洁净服清洗间"/>
+  <polygon style="fill: rgb(0, 252, 255); fill-opacity: 0.5;" points="-1707.906 927.245 -1307.583 216.467 1881.931 219.736 2242.35 926.489 2066.953 926.285 1782.938 291.852 196.296 289.926 152.724 925.349 10.312 926.711 75.454 292.337 -1212.366 296.949 -1528.169 926.428" data-code="8R237" data-name="走廊"/>
 </svg>

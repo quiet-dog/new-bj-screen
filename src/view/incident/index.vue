@@ -10,7 +10,7 @@
       <div class="bigscreen_lt_bottom_l">
         <img src="/public/img/报警信息图标.png" alt="" />
         <div class="bigscreen_lt_bottom_lt">
-          <div>隐患信息</div>
+          <div></div>
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
