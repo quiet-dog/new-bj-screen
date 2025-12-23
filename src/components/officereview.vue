@@ -117,7 +117,7 @@ export default {
       handler(newUrl) {
         // var encodedUrl = encodeURIComponent(`http://${location.hostname}:9000/biology` + newUrl);
         // var encodedUrl = encodeURIComponent(`${location.origin}/minioapi/biology` + newUrl);
-         var encodedUrl = encodeURIComponent(`http://${location.hostname}:9000/biology`+newUrl);
+         var encodedUrl = encodeURIComponent(`http://172.20.11.2:9000/biology`+newUrl);
         //var encodedUrl = encodeURIComponent(`${location.origin}/minioapi/biology` + newUrl);
         console.error("fileUrl", newUrl);
         //var encodedUrl = encodeURIComponent(`http://192.168.0.11:9000/biology` + newUrl);
