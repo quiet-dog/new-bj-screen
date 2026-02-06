@@ -484,13 +484,13 @@ export function getHistoryData(sourceData) {
                 itemStyle: {
                     color: '#1c725e', // 绿色
                 },
-                label: {
-                    show: true,
-                    position: 'top',
-                    distance: 10,
-                    color: '#fff',
-                    fontSize: 13,
-                },
+                // label: {
+                //     show: true,
+                //     position: 'top',
+                //     distance: 10,
+                //     color: '#fff',
+                //     fontSize: 13,
+                // },
                 data: barData.handle, // 例如 [12, 15, 9, ...]
             },
             {
@@ -500,13 +500,13 @@ export function getHistoryData(sourceData) {
                 itemStyle: {
                     color: '#b44738', // 红色
                 },
-                label: {
-                    show: true,
-                    position: 'top',
-                    distance: 10,
-                    color: '#fff',
-                    fontSize: 13,
-                },
+                // label: {
+                //     show: true,
+                //     position: 'top',
+                //     distance: 10,
+                //     color: '#fff',
+                //     fontSize: 13,
+                // },
                 data: barData.unHandle, // 例如 [3, 6, 8, ...]
             },
         ],

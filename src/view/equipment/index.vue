@@ -443,6 +443,7 @@ const rtClick = (item) => {
   getStreamUrlApi(item.channelid).then((res) => {
     console.log("res.data.data.wsflv", res.data.data.wsflv);
     const url = new URL(res.data.data.wsflv);
+    url.protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     url.host = location.host;
     videoRef.value.play(url.toString());
     videoRef.value.setChannelId(res.data.data.channelId);

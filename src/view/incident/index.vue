@@ -14,8 +14,8 @@
         </div>
       </div>
       <div class="bigscreen_lt_bottom_r">
-        <Vue3SeamlessScroll :key="alarmInformationlistValueTotal" style="width: 100%;"
-          :list="alarmInformationlistValue" hover class="scrool scroolMy">
+        <Vue3SeamlessScroll :key="alarmInformationlistValueTotal" style="width: 100%;" :list="alarmInformationlistValue"
+          hover class="scrool scroolMy">
           <template v-slot="{ data }">
             <div style="cursor: pointer;" class="bigscreen_lt_bottom_r_nei" @click="openLtDialogShow(data)">
               <div>
@@ -515,7 +515,7 @@ function openShowQushi() {
     beginTime: areaStatisticsFormData.value.startTime,
     endTime: areaStatisticsFormData.value.endTime,
   }).then(res => {
-    qushiOptions.xAxis.data = res.data.data.xdata
+    qushiOptions.xAxis.data = res.data.data?.xdata
     qushiOptions.title.text = "" + areaStatisticsFormData.value.startTime + "至" + areaStatisticsFormData.value.endTime + ""
     qushiOptions.series = res.data.data.series
     qushiOptions.legend.data = res.data.data.series.map(item => item.name)
@@ -902,24 +902,39 @@ const hisShowQuery = ref({
   pageNum: 1,
   pageSize: 10,
   total: 0,
-  handleType:""
+  handleType: ""
 })
 const hisList = ref([])
 const historyStatistics = async () => {
   // const { data } = await getEventAtatistics({
   //   type: zxSelect.value
   // });
-   const { data } = await getEventAtatisticsByHandle({
+  const { data } = await getEventAtatisticsByHandle({
     type: zxSelect.value
   });
   // bigscreenLBoption.series[0].data = data.data.data;
-  bigscreenLBoption = getHistoryData(data.data)
+  // data.data都是0
+  if (Array.isArray(data.data) && data.data.length > 0 && data.data.every(item => item === 0)) {
+    bigscreenLBoption.series = [];
+    const title = {
+      text: "暂无数据",
+      show: true,
+      left: "center",
+      top: "center",
+      textStyle: {
+        color: "#ffffff",
+      },
+    }
+    bigscreenLBoption.title = title
+  } else {
+    bigscreenLBoption = getHistoryData(data.data)
+  }
   if (bigscreenLBChart == null) {
     bigscreenLBChart = echarts.init(bigscreenLBRef.value);
   }
   bigscreenLBChart.setOption(bigscreenLBoption, true);
   bigscreenLBChart.off().on("click", (param) => {
-    console.log("paramparamparam",param)
+    console.log("paramparamparam", param)
     hisShow.value = true;
     hisShowQuery.value.dStartTime = dayjs().month(param.dataIndex).startOf("month").format("YYYY-MM-DD")
     hisShowQuery.value.dEndTime = dayjs().month(param.dataIndex).endOf("month").format("YYYY-MM-DD")

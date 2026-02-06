@@ -171,7 +171,7 @@
             <span style="font-size: 18px">工艺要素</span>
             <span style="font-size: 28px; padding-left: 25px">{{
               processTotal
-              }}</span>
+            }}</span>
           </div>
           <div>
             <span>
@@ -736,12 +736,10 @@ const nodelistFun = async () => {
     "/img/craftsmanship/3.png",
     "/img/craftsmanship/4.png",
   ];
-  if (nodelistTotal.value != data.data.total) {
-    nodelistTotal.value = data.data.total
-    nodelist.value = list.map((item, index) => {
-      return { ...item, img: imgList[index % imgList.length], status: false };
-    });
-  }
+  nodelist.value = list.map((item, index) => {
+    return { ...item, img: imgList[index % imgList.length], status: false };
+  });
+  nodelistTotal.value = Math.random()
 
 };
 
@@ -907,7 +905,8 @@ onMounted(() => {
   }
   archivelistFun().then(res => {
     if (Array.isArray(archivelist.value) && archivelist.value.length > 0) {
-      nodeFormData.value.craftArchiveCode =archivelist.value[0].craftArchiveCode
+      nodeFormData.value.craftArchiveCode = "GY006"
+      nodelistFun()
     }
   });
   alarmEventsListFun();

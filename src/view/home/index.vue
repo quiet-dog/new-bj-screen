@@ -327,7 +327,7 @@
           <!-- <div @click="rtClick(item)" v-for="item in videoList">
             <span>{{ item.name }}</span>
           </div> -->
-          <Vue3SeamlessScroll :key="videoList.length" :list="videoList" :class-option="{
+          <Vue3SeamlessScroll :key="videoKey" :list="videoList" :class-option="{
             step: 5,
           }" hover>
             <template v-slot="{ data }">
@@ -366,11 +366,11 @@
               step: 5,
             }" class="scrool">
             <template v-slot="{ data }">
-              <div @mouseenter="policieslistDetailShowFPause" @mouseleave="policieslistDetailShowFStart" style="cursor: pointer;" @click="rcClick(data)"
-                class="bigscreen_rc_bottom_rnei">
+              <div @mouseenter="policieslistDetailShowFPause" @mouseleave="policieslistDetailShowFStart"
+                style="cursor: pointer;" @click="rcClick(data)" class="bigscreen_rc_bottom_rnei">
                 <span style="color: rgba(172, 223, 255, 1); font-size: 11px">{{
                   dayjs(data?.createTime).format("YYYY-MM-DD")
-                  }}</span>
+                }}</span>
                 <div :style="{
                   background: `url(${data?.img}) no-repeat`,
                   'background-size': '100% 100%',
@@ -569,7 +569,14 @@ const getValue = (item) => {
   }
   return "未知"
 }
-
+function isValidUrl(string: string) {
+  try {
+    new URL(string);  // 尝试解析 URL
+    return true;
+  } catch (err) {
+    return false;     // 如果解析失败，则不是合法 URL
+  }
+}
 const rtStatus = ref(false);
 const rtStatusF = ref(true)
 const videoRef = ref(null);
@@ -580,10 +587,13 @@ const rtClick = (item: { channelid: string }) => {
     nextTick(() => {
       getStreamUrlApi(item.channelid).then((res) => {
         console.log("res.data.data.wsflv", res.data.data.wsflv);
-        const url = new URL(res.data.data.wsflv);
-        url.host = location.host;
-        videoRef.value.play(url.toString());
-        videoRef.value.setChannelId(res.data.data.channelId);
+        if (isValidUrl(res.data.data.wsflv)) {
+          const url = new URL(res.data.data.wsflv);
+          url.protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+          url.host = location.host;
+          videoRef.value.play(url.toString());
+          videoRef.value.setChannelId(res.data.data.channelId);
+        }
       });
     });
   }
@@ -609,9 +619,13 @@ const policieslistFun = async () => {
   let imgList = [img5, img6, img7];
   if (policieslistTotal.value != data.data.total) {
     policieslistTotal.value = data.data.total
-    policieslist.value = data.data.rows.map((item: any, index: number) => {
-      return { ...item, img: imgList[index % imgList.length], status: false };
-    });
+    if (Array.isArray(data.data.rows) && data.data.rows.length > 0) {
+      policieslist.value = data.data.rows?.map((item: any, index: number) => {
+        return { ...item, img: imgList[index % imgList.length], status: false };
+      });
+    } else {
+      policieslist.value = [];
+    }
   }
 
 };
@@ -624,10 +638,10 @@ const policiesTimer = useIntervalFn(() => {
 const policieslistDetail = ref()
 const policieslistDetailShow = ref(false)
 const policieslistDetailShowF = ref(true)
-const policieslistDetailShowFPause =()=>{
+const policieslistDetailShowFPause = () => {
   policieslistDetailShowF.value = false
 }
-const policieslistDetailShowFStart =()=>{
+const policieslistDetailShowFStart = () => {
   policieslistDetailShowF.value = true
 }
 const rcClick = (item: any) => {
@@ -655,7 +669,10 @@ const alarmEvnetListLt = ref<any[]>([]);
 // 获取报警信息
 const alarmEventslistFunLt = async () => {
   const { data } = await alarmEventsList(ltalarmEventsFormData.value);
-  let list = data.data.rows.slice(0, 4);
+  let list: any[] = data.data.rows
+  if (data.data.rows.length > 3) {
+    list = data.data.rows.slice(0, 4);
+  }
   let evnetimglist = [
     {
       type: "设备报警",
@@ -696,7 +713,7 @@ const alarmEventslistFunLt = async () => {
       img: "/img/yiji_ticon.png",
     },
   ];
-  alarmEvnetListLt.value = list.map((item: { type: string; level: string }) => {
+  alarmEvnetListLt.value = Array.isArray(list) && list.length > 0 ? list.map((item: { type: string; level: string }) => {
     const matchedEvent = evnetimglist.find((v) => v.type === item.type);
     const matchedLevel = levelList.find((v) => v.level === item.level);
 
@@ -706,7 +723,7 @@ const alarmEventslistFunLt = async () => {
       status: false,
       img: matchedLevel ? matchedLevel.img : "",
     };
-  });
+  }) : [];
 };
 const jinRiShebeiTargetStatus = ref(false);
 const jinRiSheBeiBaoJingInfo = ref({
@@ -871,12 +888,12 @@ const mouseLeaveBaoJingXinxi = () => {
   jinRiWuLiaoBaoJingSwiper.value?.$el.swiper.autoplay.start();
   jinRiGongYiJieDianBaoJingSwiper.value?.$el.swiper.autoplay.start();
 };
-const { pause, resume, isActive } = useIntervalFn(() => {
-  pause();
-  alarmEventslistFunLt().finally(() => {
-    resume();
-  });
-}, 1000);
+// const { pause, resume, isActive } = useIntervalFn(() => {
+//   pause();
+//   alarmEventslistFunLt().finally(() => {
+//     resume();
+//   });
+// }, 1000);
 const neiClick = (item: { eventId: any }) => {
   targetItem.value = item;
   jinRiShebeiTargetStatus.value = true;
@@ -942,16 +959,20 @@ const alarmEventslistFun = async () => {
         img: "/img/yiji_back.png",
       },
     ];
-    alarmEventslist.value = data.data.rows.map(
-      (item: { level: string }, _index: any) => {
-        const matchedLevel = imgList.find((v) => v.level === item.level);
-        return {
-          ...item,
-          img: matchedLevel ? matchedLevel.img : "",
-          status: false,
-        };
-      }
-    );
+    if (Array.isArray(data.data.rows) && data.data.rows.length > 0) {
+      alarmEventslist.value = data.data.rows.map(
+        (item: { level: string }, _index: any) => {
+          const matchedLevel = imgList.find((v) => v.level === item.level);
+          return {
+            ...item,
+            img: matchedLevel ? matchedLevel.img : "",
+            status: false,
+          };
+        }
+      );
+    } else {
+      alarmEventslist.value = [];
+    }
   }
 
 };
@@ -1389,14 +1410,17 @@ const lbRadioChange = (val: string) => {
 };
 
 const videoList = ref([]);
+const videoKey = ref(Math.random());
 const channelQuery = ref({
   name: "",
   pageNum: 1,
-  pageSize: 3,
+  pageSize: 80,
 });
 const getVideoList = () => {
   getChannelListApi(channelQuery.value).then((res) => {
     videoList.value = res.data.data.List;
+  }).finally(()=>{
+    videoKey.value = Math.random();
   });
 };
 
@@ -1423,7 +1447,7 @@ onMounted(() => {
   getVideoList();
   policieslistFun();
   alarmEventslistFun();
-  alarmEventslistFunLt();
+  // alarmEventslistFunLt();
   getstatisticsList();
   geteventTotalFun();
   jinRiShebeiBaoJingListFun();
